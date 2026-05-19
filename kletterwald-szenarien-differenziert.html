@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Kletterwald — Szenarien differenziert (leicht / schwer)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+<style>
+  @page { size: A4; margin: 14mm; }
+  body { font-family:'Helvetica','Arial',sans-serif; max-width:182mm; margin:0 auto; color:#1a1a1a; line-height:1.42; font-size:10.5pt; }
+  h1 { color:#1a3a1a; border-bottom: 2px solid #2e6b2e; padding-bottom:4px; font-size:15pt; }
+  h2.sec { color:white; padding: 6px 12px; border-radius:5px; font-size:13pt; margin-top:1.5em; }
+  h2.leicht { background:#2e7d32; }
+  h2.mittel { background:#c77700; }
+  h2.schwer { background:#a30000; }
+  h3 { color:#444; font-size:11pt; margin:0.7em 0 0.3em 0; }
+  .karte { border:1.4px solid #7aa874; border-radius:6px; padding:9px 13px; margin:11px 0; background:#f7fbf6; page-break-inside:avoid; }
+  .karte.l { border-left:6px solid #2e7d32; }
+  .karte.m { border-left:6px solid #c77700; background:#fdf8ec;}
+  .karte.s { border-left:6px solid #a30000; background:#fdf6f6;}
+  .kontext { font-style:italic; color:#335533; margin-bottom:5px; font-size:10pt;}
+  .afb { display:inline-block; padding:1px 8px; border-radius:10px; font-size:9pt; font-weight:bold; margin-left:6px; vertical-align:middle;}
+  .afb1 { background:#c8e6c9; color:#1b5e20;}
+  .afb2 { background:#fff3b0; color:#806000;}
+  .afb3 { background:#ffccbc; color:#bf360c;}
+  .plattform { width:100%; border-collapse:collapse; font-size:9pt; }
+  .plattform th, .plattform td { border:1px solid #bbb; padding:2px 5px; text-align:center; }
+  .plattform th { background:#e5f0e0; }
+  .hi { background:#fff0f0; }
+  ol.aufgaben { padding-left:1.3em; margin:5px 0; }
+  ol.aufgaben > li { margin:4px 0; }
+  ol.aufgaben ul { margin:1px 0; padding-left:1.1em; }
+  .loesung { background:#f0f0f0; border-left:4px solid #777; padding:7px 11px; font-size:9.7pt; margin:7px 0; }
+  .loesung summary { cursor:pointer; font-weight:bold; color:#444; }
+  .tipp { background:#e3f2fd; border-left:3px solid #1976d2; padding:5px 10px; font-size:9.5pt; margin:5px 0; border-radius:3px;}
+  .quelle { font-size:9pt; color:#777; font-style:italic; margin-top:5px; }
+  .hinweis { font-size:9.5pt; color:#555; font-style:italic; }
+  hr { border:none; border-top:1px dashed #aaa; margin:14px 0;}
+  @media print { .karte { background:white; } details { page-break-inside:avoid;} }
+</style>
+</head>
+<body>
+
+<h1>Kletterwald — Geraden-Szenarien (differenziert)</h1>
+<p>Drei Spuren: <strong style="color:#2e7d32;">Leicht (AFB I)</strong> — Verfahren anwenden · <strong style="color:#c77700;">Mittel (AFB II Basis)</strong> — Verfahren verknüpfen · <strong style="color:#a30000;">Schwer (AFB II/III)</strong> — modellieren, beweisen, verallgemeinern.</p>
+
+<table class="plattform">
+  <thead><tr><th>Kürzel</th><th>Name</th><th>$x$</th><th>$y$</th><th>$z$</th></tr></thead>
+  <tbody>
+    <tr><td><strong>B</strong></td><td>Basislager</td><td>−4</td><td>−3</td><td>2</td></tr>
+    <tr><td><strong>E</strong></td><td>Eichenturm</td><td>−7</td><td>3</td><td>3</td></tr>
+    <tr><td><strong>F</strong></td><td>Fuchsbau</td><td>−1</td><td>7</td><td>5</td></tr>
+    <tr><td><strong>W</strong></td><td>Wurzelhütte</td><td>3</td><td>0</td><td>2</td></tr>
+    <tr><td><strong>R</strong></td><td>Rabenfels</td><td>5</td><td>−4</td><td>4</td></tr>
+    <tr class="hi"><td><strong>A</strong></td><td>Adlerhorst</td><td>1</td><td>2</td><td>6</td></tr>
+    <tr><td><strong>S</strong></td><td>Spechtnest</td><td>2</td><td>1</td><td>4</td></tr>
+    <tr class="hi"><td><strong>G</strong></td><td>Gipfelstation</td><td>8</td><td>5</td><td>6</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!-- LEICHT  =================================================== -->
+<!-- ============================================================ -->
+<h2 class="sec leicht">Leichte Szenarien — Verfahren anwenden <span class="afb afb1">AFB I</span></h2>
+
+<!-- ===== L1 ===== -->
+<div class="karte l">
+<h3>L1 — Erste Erkundung <span class="afb afb1">AFB I</span></h3>
+<p class="kontext">Lies die Koordinaten direkt aus der Tabelle ab und führe Standard-Operationen aus.</p>
+<ol class="aufgaben">
+  <li>Schreibe die Ortsvektoren $\vec{b}$, $\vec{w}$ und $\vec{g}$ als Spaltenvektoren.</li>
+  <li>Berechne $\vec{BW}$ und $\vec{BG}$.</li>
+  <li>Bestimme die Länge $|\vec{BW}|$ und $|\vec{BG}|$ jeweils in LE und in cm.</li>
+  <li>Welches der beiden Seile ist länger?</li>
+</ol>
+<details class="loesung"><summary>Lösung L1</summary>
+<p>$\vec{b}=(-4,-3,2)^T$, $\vec{w}=(3,0,2)^T$, $\vec{g}=(8,5,6)^T$. ·
+$\vec{BW}=(7,3,0)$, $\vec{BG}=(12,8,4)$. ·
+$|\vec{BW}|=\sqrt{58}\approx 7{,}62$ LE $\approx 22{,}9$ cm. $|\vec{BG}|=\sqrt{224}\approx 14{,}97$ LE $\approx 44{,}9$ cm. ·
+$\overline{BG}$ ist deutlich länger.</p>
+</details>
+</div>
+
+<!-- ===== L2 ===== -->
+<div class="karte l">
+<h3>L2 — Mittelpunkt einer Strecke <span class="afb afb1">AFB I</span></h3>
+<p class="kontext">Standardformel anwenden — Mittelpunkt $M_{AB}=\tfrac12(\vec{a}+\vec{b})$.</p>
+<ol class="aufgaben">
+  <li>Berechne den Mittelpunkt von $\overline{BG}$.</li>
+  <li>Berechne den Mittelpunkt von $\overline{WA}$.</li>
+  <li>Was fällt dir auf, wenn du die Ergebnisse vergleichst?</li>
+</ol>
+<details class="loesung"><summary>Lösung L2</summary>
+<p>$M_{BG}=\tfrac12((-4,-3,2)+(8,5,6))=(2|1|4)=S$. $M_{WA}=\tfrac12((3,0,2)+(1,2,6))=(2|1|4)=S$. <strong>Beide Mittelpunkte fallen exakt auf das Spechtnest S.</strong></p>
+</details>
+</div>
+
+<!-- ===== L3 ===== -->
+<div class="karte l">
+<h3>L3 — Geradengleichung aufstellen <span class="afb afb1">AFB I</span></h3>
+<p class="kontext">Aus zwei Plattformen direkt die Parameterform notieren.</p>
+<ol class="aufgaben">
+  <li>Stelle die Geradengleichung $g_{BG}$ in Parameterform mit Stützvektor $\vec{b}$ auf.</li>
+  <li>Stelle die Geradengleichung $g_{EF}$ analog auf.</li>
+  <li>Gib für $g_{BG}$ je einen Punkt für $t=0$, $t=1$ und $t=-1$ an.</li>
+</ol>
+<details class="loesung"><summary>Lösung L3</summary>
+<p>$g_{BG}:\vec{x}=\begin{pmatrix}-4\\-3\\2\end{pmatrix}+t\begin{pmatrix}12\\8\\4\end{pmatrix}$. ·
+$g_{EF}:\vec{x}=\begin{pmatrix}-7\\3\\3\end{pmatrix}+t\begin{pmatrix}6\\4\\2\end{pmatrix}$. ·
+$t=0\!:\!B(-4|-3|2)$, $t=1\!:\!G(8|5|6)$, $t=-1\!:\!(-16|-11|-2)$.</p>
+</details>
+</div>
+
+<!-- ===== L4 ===== -->
+<div class="karte l">
+<h3>L4 — Punktprobe <span class="afb afb1">AFB I</span></h3>
+<p class="kontext">Setze den Punkt in die Geradengleichung ein, löse eine Zeile nach $t$ auf und prüfe die anderen.</p>
+<p>Gegeben: $g:\vec{x}=\begin{pmatrix}-4\\-3\\2\end{pmatrix}+t\begin{pmatrix}3\\2\\1\end{pmatrix}$</p>
+<ol class="aufgaben">
+  <li>Liegt das Spechtnest $S(2|1|4)$ auf $g$?</li>
+  <li>Liegt der Punkt $P(2|3|4)$ auf $g$?</li>
+  <li>Liegt die Gipfelstation $G(8|5|6)$ auf $g$?</li>
+</ol>
+<details class="loesung"><summary>Lösung L4</summary>
+<p>$S$: $-4+3t=2\Rightarrow t=2$. Probe: $-3+4=1$ ✓, $2+2=4$ ✓ → <strong>ja</strong>. ·
+$P$: $-4+3t=2\Rightarrow t=2$. Probe: $-3+4=1\ne 3$ ✗ → <strong>nein</strong>. ·
+$G$: $-4+3t=8\Rightarrow t=4$. Probe: $-3+8=5$ ✓, $2+4=6$ ✓ → <strong>ja</strong>.</p>
+</details>
+</div>
+
+<!-- ===== L5 ===== -->
+<div class="karte l">
+<h3>L5 — Parallelitätsprüfung <span class="afb afb1">AFB I</span></h3>
+<p class="kontext">Sind die Richtungsvektoren Vielfache voneinander? — Faktor-Test.</p>
+<ol class="aufgaben">
+  <li>Sind $\vec{BG}=(12,8,4)$ und $\vec{EF}=(6,4,2)$ parallel? Welcher Faktor?</li>
+  <li>Sind $\vec{BG}$ und $\vec{WA}=(-2,2,4)$ parallel?</li>
+  <li>Sind $\vec{u}=(3,2,1)$ und $\vec{v}=(9,6,3)$ parallel?</li>
+</ol>
+<details class="loesung"><summary>Lösung L5</summary>
+<p>(1) $(12,8,4)=2\cdot(6,4,2)$ ✓ parallel, Faktor 2. ·
+(2) $12=k\cdot(-2)\Rightarrow k=-6$, aber $8\ne -6\cdot 2 = -12$ ✗ nicht parallel. ·
+(3) $(9,6,3)=3\cdot(3,2,1)$ ✓ parallel.</p>
+</details>
+</div>
+
+<!-- ===== L6 ===== -->
+<div class="karte l">
+<h3>L6 — Spurpunkt mit dem Boden <span class="afb afb1">AFB I</span></h3>
+<p class="kontext">Setze $z=0$ und bestimme den Punkt.</p>
+<ol class="aufgaben">
+  <li>Gegeben $g_{AW}:\vec{x}=\begin{pmatrix}1\\2\\6\end{pmatrix}+t\begin{pmatrix}2\\-2\\-4\end{pmatrix}$. Bestimme den Spurpunkt mit der $xy$-Ebene ($z=0$).</li>
+  <li>Bestimme den Spurpunkt von $g_{BG}$ (mit Richtung $(3,2,1)$) mit der $yz$-Ebene ($x=0$).</li>
+</ol>
+<details class="loesung"><summary>Lösung L6</summary>
+<p>(1) $6-4t=0\Rightarrow t=\tfrac32$, Punkt $(1+3,2-3,0)=(4|-1|0)$. ·
+(2) $-4+3t=0\Rightarrow t=\tfrac43$, Punkt $(0,-3+\tfrac{8}{3},2+\tfrac{4}{3})=(0|-\tfrac{1}{3}|\tfrac{10}{3})$.</p>
+</details>
+</div>
+
+<!-- ============================================================ -->
+<!-- MITTEL  =================================================== -->
+<!-- ============================================================ -->
+<h2 class="sec mittel">Mittlere Szenarien — Verfahren verknüpfen <span class="afb afb2">AFB II Basis</span></h2>
+
+<!-- ===== M1 ===== -->
+<div class="karte m">
+<h3>M1 — Gerade aufstellen + Punktprobe in einem Zug <span class="afb afb2">AFB II</span></h3>
+<p class="kontext">Klassische Klausuraufgabe: Gerade aus zwei Punkten, dann prüfen, ob ein dritter darauf liegt — mit Folgefrage.</p>
+<ol class="aufgaben">
+  <li>Stelle die Geradengleichung $g_{BG}$ (Basislager → Gipfelstation) in Parameterform mit einem <em>möglichst einfachen</em> Richtungsvektor auf.</li>
+  <li>Prüfe, ob das Spechtnest $S(2|1|4)$ auf $g_{BG}$ liegt.</li>
+  <li>Falls ja: Bestimme den Parameterwert $t$ und interpretiere ihn (z.B. „S liegt bei … % des Weges von B nach G").</li>
+  <li>Liegt auch das Rabenfels $R(5|-4|4)$ auf $g_{BG}$? Begründe.</li>
+</ol>
+<details class="loesung"><summary>Lösung M1</summary>
+<p>$\vec{BG}=(12,8,4)=4\cdot(3,2,1)$. Mit Richtung $(3,2,1)$: $g_{BG}:\vec{x}=(-4,-3,2)+t(3,2,1)$. Strecke: $t\in[0;4]$. ·
+$S$: $-4+3t=2\Rightarrow t=2$; Probe $-3+4=1$ ✓, $2+2=4$ ✓ → <strong>S liegt drauf</strong>, bei $t=2$, also genau in der Mitte zwischen B ($t=0$) und G ($t=4$) — 50 % des Weges. ·
+$R(5|-4|4)$: $-4+3t=5\Rightarrow t=3$; Probe $-3+6=3\ne -4$ ✗ → <strong>R liegt nicht drauf</strong>.</p>
+</details>
+</div>
+
+<!-- ===== M2 ===== -->
+<div class="karte m">
+<h3>M2 — Schnittpunkt zweier Seile <span class="afb afb2">AFB II</span></h3>
+<p class="kontext">Zwei Seile spannen sich quer durch den Wald — schneiden sie sich, und wenn ja, wo?</p>
+<ol class="aufgaben">
+  <li>Stelle die Geradengleichungen $g_{BG}$ und $g_{WA}$ (Wurzelhütte → Adlerhorst) auf. Verwende verschiedene Parameter $t$ und $s$.</li>
+  <li>Setze die Gleichungen gleich und löse das lineare Gleichungssystem mit drei Gleichungen.</li>
+  <li>Bestimme den Schnittpunkt $S^*$ und vergleiche ihn mit der Plattform Spechtnest.</li>
+  <li>Begründe in einem Satz: Warum liegen Spechtnest und Schnittpunkt am selben Ort?</li>
+</ol>
+<details class="loesung"><summary>Lösung M2</summary>
+<p>$g_{BG}:\vec{x}=(-4,-3,2)+t(3,2,1)$ · $g_{WA}:\vec{x}=(3,0,2)+s(-2,2,4)$. ·
+Gleichsetzen: $-4+3t=3-2s$ → $3t+2s=7$ · $-3+2t=2s$ → $2t-2s=3$ · Addieren: $5t=10\Rightarrow t=2$, dann $s=\tfrac12$. ·
+Probe in $z$: $2+2=4$ ✓ und $2+4\cdot\tfrac12=4$ ✓ → Schnittpunkt $S^*=(2|1|4)$ = Spechtnest. ·
+Begründung: Spechtnest liegt sowohl auf $g_{BG}$ (Mittelpunkt) als auch auf $g_{WA}$ (Mittelpunkt) — also auf beiden Geraden gleichzeitig, das ist die Definition des Schnittpunkts.</p>
+</details>
+</div>
+
+<!-- ===== M3 ===== -->
+<div class="karte m">
+<h3>M3 — Lagebeziehung systematisch prüfen <span class="afb afb2">AFB II</span></h3>
+<p class="kontext">Wendet den Standard-Entscheidungsbaum auf <em>ein</em> Geraden-Paar an. Methode statt Beispielsammlung.</p>
+<p>Untersuche die Lagebeziehung der Geraden $g_{AR}$ und $g_{EW}$ in vier Schritten:</p>
+<ol class="aufgaben">
+  <li>Schreibe beide Geradengleichungen auf.</li>
+  <li>Sind die Richtungsvektoren <strong>Vielfache</strong> voneinander? (Falls ja → parallel oder identisch; falls nein → schneidend oder windschief.)</li>
+  <li>Setze die Geradengleichungen gleich und prüfe das LGS auf Lösbarkeit.</li>
+  <li>Formuliere das Ergebnis als vollständigen Satz: „Die Seile … sind …, weil …".</li>
+</ol>
+<div class="tipp"><strong>Entscheidungsbaum:</strong>
+<br>① Richtungen Vielfache? → ② Punkt der einen Geraden auf der anderen? → <em>identisch</em>; sonst <em>echt parallel</em>.
+<br>① Nicht Vielfache → ③ LGS lösbar? → <em>schneidend</em> (Schnittpunkt angeben); sonst <em>windschief</em>.</div>
+<details class="loesung"><summary>Lösung M3</summary>
+<p>$g_{AR}:\vec{x}=(1,2,6)+t(4,-6,-2)$ · $g_{EW}:\vec{x}=(-7,3,3)+s(10,-3,-1)$. ·
+$(4,-6,-2)=k(10,-3,-1)$? $4=10k\Rightarrow k=0{,}4$, aber $-6\ne 0{,}4\cdot(-3)=-1{,}2$ ✗ → nicht parallel. ·
+LGS: $1+4t=-7+10s$ · $2-6t=3-3s$ · $6-2t=3-s$. Aus 3.: $s=2t-3$. In 2.: $2-6t=3-3(2t-3)=12-6t\Rightarrow 2=12$ ✗ → keine Lösung. ·
+<strong>Die Seile $\overline{AR}$ und $\overline{EW}$ sind windschief</strong>, weil ihre Richtungsvektoren keine Vielfachen sind und das Schnitt-LGS keine Lösung hat.</p>
+</details>
+</div>
+
+<!-- ===== M4 ===== -->
+<div class="karte m">
+<h3>M4 — Spurpunkt mit Interpretation <span class="afb afb2">AFB II</span></h3>
+<p class="kontext">Verlängere ein Seil bis zum Boden — wo würde es einschlagen? Spurpunkt + sinnvolle Folgefrage.</p>
+<ol class="aufgaben">
+  <li>Stelle die Geradengleichung $g_{AW}$ (Adlerhorst → Wurzelhütte) auf.</li>
+  <li>Bestimme den Spurpunkt $S_{xy}$ mit der Bodenebene ($z=0$).</li>
+  <li>Liegt $S_{xy}$ innerhalb der gezeichneten Anlage (Bereich $-13\le x\le 13$ und $-8\le y\le 8$)?</li>
+  <li>Wie weit (in cm) liegt der Spurpunkt vom Ursprung entfernt?</li>
+  <li>Was bedeutet der Parameterwert $t$, den du in Aufgabe 2 erhalten hast? (Über oder unter dem Seil?)</li>
+</ol>
+<details class="loesung"><summary>Lösung M4</summary>
+<p>$g_{AW}:\vec{x}=(1,2,6)+t(2,-2,-4)$. ·
+$z=0$: $6-4t=0\Rightarrow t=\tfrac32$. Spurpunkt: $(1+3, 2-3, 0)=(4|-1|0)$. ·
+$-13\le 4\le 13$ ✓ und $-8\le -1\le 8$ ✓ → innerhalb der Anlage. ·
+Abstand zum Ursprung: $\sqrt{16+1}=\sqrt{17}\approx 4{,}12$ LE $\approx 4{,}12$ cm. ·
+$t=\tfrac32 > 1$ → der Spurpunkt liegt <em>jenseits</em> der Wurzelhütte ($t=1$), also unter der verlängerten Linie hinter W.</p>
+</details>
+</div>
+
+<!-- ===== M5 ===== -->
+<div class="karte m">
+<h3>M5 — Routenlänge vergleichen <span class="afb afb2">AFB II</span></h3>
+<p class="kontext">Verknüpft Geraden, Längenformel und Argumentation.</p>
+<p>Zwei Routen vom Basislager zur Gipfelstation:</p>
+<ul style="margin:3px 0">
+  <li><strong>Route 1 (direkt):</strong> $B \to G$</li>
+  <li><strong>Route 2 (über Wurzelhütte):</strong> $B \to W \to G$</li>
+</ul>
+<ol class="aufgaben">
+  <li>Berechne die Länge von Route 1.</li>
+  <li>Berechne $|\vec{BW}|$ und $|\vec{WG}|$ einzeln; addiere sie zur Gesamtlänge von Route 2.</li>
+  <li>Welche Route ist kürzer? Um wie viel cm?</li>
+  <li>Begründe mit der Dreiecksungleichung, warum Route 1 grundsätzlich nicht länger sein kann als Route 2.</li>
+  <li>Wann wären die beiden Routen <em>gleich lang</em>? (Hinweis: vgl. mit Spechtnest auf $\overline{BG}$.)</li>
+</ol>
+<details class="loesung"><summary>Lösung M5</summary>
+<p>$|\vec{BG}|=\sqrt{144+64+16}=\sqrt{224}\approx 14{,}97$ LE. ·
+$|\vec{BW}|=\sqrt{49+9+0}=\sqrt{58}\approx 7{,}62$; $|\vec{WG}|=\sqrt{25+25+16}=\sqrt{66}\approx 8{,}12$. Summe $\approx 15{,}74$ LE. ·
+Route 1 ist um $\approx 0{,}77$ LE $\approx 0{,}77$ cm kürzer. ·
+Dreiecksungleichung: $|\vec{BG}|\le |\vec{BW}|+|\vec{WG}|$, mit Gleichheit nur, wenn $W$ auf der Geraden $g_{BG}$ liegt — was hier nicht der Fall ist. ·
+Gleich lang wären die Routen, wenn die Zwischenstation <em>genau auf</em> der Geraden $g_{BG}$ liegt (z.B. das Spechtnest S, das diese Eigenschaft erfüllt).</p>
+</details>
+</div>
+
+<!-- ============================================================ -->
+<!-- SCHWER  =================================================== -->
+<!-- ============================================================ -->
+<h2 class="sec schwer">Schwere Szenarien — modellieren, beweisen, verallgemeinern <span class="afb afb2">AFB II</span> <span class="afb afb3">AFB III</span></h2>
+
+<!-- ===== S1 ===== -->
+<div class="karte s">
+<h3>S1 — Beweisaufgabe: Drei Plattformen auf einer Geraden <span class="afb afb2">AFB II</span></h3>
+<p class="kontext">Du hast einen Verdacht: B, S und G liegen auf einer einzigen Geraden. Beweise es — und nutze daraus eine elegante Schlussfolgerung.</p>
+<ol class="aufgaben">
+  <li>Zeige rechnerisch, dass $\vec{BS}$ und $\vec{SG}$ <strong>parallel</strong> sind, und dass sie sich nur durch einen Faktor unterscheiden.</li>
+  <li>Folgere: B, S und G sind kollinear.</li>
+  <li>Bestimme das <strong>Teilverhältnis</strong>, in dem S die Strecke $\overline{BG}$ teilt.</li>
+  <li>Begründe ohne erneutes Rechnen, warum gelten muss: $|BS|+|SG|=|BG|$. (Welche Eigenschaft macht eine Dreiecksungleichung zu einer Gleichung?)</li>
+</ol>
+<details class="loesung"><summary>Lösung S1</summary>
+<p>$\vec{BS}=(6,4,2)$, $\vec{SG}=(6,4,2)$. Identisch → parallel mit Faktor 1, und sie teilen den Punkt S. Damit liegen B, S, G kollinear. ·
+$\vec{BS}=\tfrac12\vec{BG}$ → S teilt $\overline{BG}$ im Verhältnis $1:1$ (Mittelpunkt). ·
+$|BS|+|SG|=|BG|$ gilt genau dann, wenn S <em>auf der Strecke</em> liegt — sonst wäre die Ungleichung echt. Umgekehrt: liegen drei Punkte kollinear und einer zwischen den anderen, addieren sich die Teilstrecken exakt zur Gesamtstrecke.</p>
+</details>
+</div>
+
+<!-- ===== S2 ===== -->
+<div class="karte s">
+<h3>S2 — Parameter-Aufgabe: Wo muss eine neue Plattform stehen? <span class="afb afb2">AFB II</span></h3>
+<p class="kontext">Eine neue Plattform $P(a|b|4)$ soll mit dem Spechtnest auf gleicher Höhe gebaut werden. Welche Bedingungen kann man stellen?</p>
+<ol class="aufgaben">
+  <li>Für welche Werte von $a$ liegt $P(a|2|4)$ auf der Geraden $g_{BG}$? Begründe.</li>
+  <li>Für welche Werte von $a$ und $b$ liegt $P(a|b|4)$ <em>überhaupt</em> auf $g_{BG}$? (Hinweis: $z=4$ legt $t$ fest.)</li>
+  <li>Eine zweite Plattform $Q$ soll so gebaut werden, dass die Strecke $\overline{SQ}$ parallel zu $\overline{EF}$ verläuft und genau halb so lang ist wie $\overline{EF}$. Gib zwei mögliche Positionen von $Q$ an.</li>
+</ol>
+<details class="loesung"><summary>Lösung S2</summary>
+<p>(1) $g_{BG}$ mit Richtung $(3,2,1)$: $z=2+t=4\Rightarrow t=2$. Dann $y=-3+2\cdot 2=1$. Da $P$ aber $y=2$ hat: <strong>kein</strong> $a$ erfüllt das. ·
+(2) Aus $z=4\Rightarrow t=2$: Punkt $(-4+6,-3+4,4)=(2|1|4)$. Also nur $a=2$ und $b=1$ → der Punkt ist exakt $S$. Auf $z=4$ liegt nur S auf der Geraden. ·
+(3) $\vec{EF}=(6,4,2)$, halb so lang: $\tfrac12\vec{EF}=(3,2,1)$ oder $-\tfrac12\vec{EF}=(-3,-2,-1)$. ·
+$Q_1=S+(3,2,1)=(5|3|5)$ oder $Q_2=S+(-3,-2,-1)=(-1|-1|3)$.</p>
+</details>
+</div>
+
+<!-- ===== S3 ===== -->
+<div class="karte s">
+<h3>S3 — Modellierung: Zwei Kletterer in Echtzeit <span class="afb afb3">AFB III</span></h3>
+<p class="kontext">Inspiriert von einer IB-Air-Traffic-Controller-Aufgabe — übertragen auf den Kletterwald.</p>
+<p>Lena startet zur Zeit $t=0$ vom Basislager B und bewegt sich entlang der Geraden $g_L:\vec{x}=\vec{b}+t\cdot(3,2,1)$ ($t$ in Minuten, Geschwindigkeit in LE/min). Tim startet $2$ Min später (zum Zeitpunkt $t=2$) von der Wurzelhütte W und bewegt sich mit $g_T:\vec{x}=\vec{w}+(t-2)\cdot(-1,1,2)$.</p>
+<ol class="aufgaben">
+  <li>Wo befindet sich jeder von beiden zum Zeitpunkt $t=3$?</li>
+  <li>Wann erreichen Lena und Tim erstmals dieselbe $z$-Höhe?</li>
+  <li>Befinden sie sich zu diesem Zeitpunkt am <em>selben Ort</em>? Begründe.</li>
+  <li>Bestimme den Zeitpunkt $t^*$, an dem ihr Abstand $|\vec{LT}(t)|$ minimal wird. (Hinweis: Quadrat des Abstands ableiten, Nullstelle suchen.)</li>
+  <li>Wann (falls überhaupt) erreicht Lena die Gipfelstation G?</li>
+</ol>
+<details class="loesung"><summary>Lösung S3</summary>
+<p>(1) Lena bei $t=3$: $B+3(3,2,1)=(5|3|5)$. Tim bei $t=3$: $W+1\cdot(-1,1,2)=(2|1|4)=S$ (Spechtnest!). ·
+(2) Lena: $z_L=2+t$. Tim: $z_T=2+2(t-2)=2t-2$. Gleichsetzen: $2+t=2t-2\Rightarrow t=4$. ·
+(3) Bei $t=4$: $L=(8|5|6)=G$, $T=(1|2|6)=A$. Verschiedene Orte — gleiche Höhe, aber Lena ist am Gipfel, Tim am Adlerhorst. ·
+(4) $\vec{LT}(t)=(2t-2-4-3t,\,2-2+3-2t,\,2t-2-2-t)\cdots$ — sauber rechnen: $L(t)=(-4+3t,-3+2t,2+t)$, $T(t)=(3-(t-2),0+(t-2),2+2(t-2))=(5-t,t-2,2t-2)$. ·
+$\vec{LT}=T-L=(9-4t,t-1,t-4)$. $|LT|^2=(9-4t)^2+(t-1)^2+(t-4)^2$. Ableiten: $-8(9-4t)+2(t-1)+2(t-4)=-72+32t+2t-2+2t-8=36t-82\stackrel{!}{=}0\Rightarrow t^*=\tfrac{82}{36}=\tfrac{41}{18}\approx 2{,}28$ min. ·
+(5) Lena erreicht G bei $t=4$ (aus $-4+3t=8$).</p>
+</details>
+<p class="quelle">Quelle des Aufgabentyps: IB Math AI HL, Vector Kinematics (vgl. „Air Traffic Controller").</p>
+</div>
+
+<!-- ===== S4 ===== -->
+<div class="karte s">
+<h3>S4 — Verallgemeinerung: Wann sind drei Punkte kollinear? <span class="afb afb3">AFB III</span></h3>
+<p class="kontext">Nicht nur ein einzelnes Beispiel — eine allgemeine Aussage entwickeln und beweisen.</p>
+<ol class="aufgaben">
+  <li>Formuliere eine Bedingung dafür, dass drei beliebige Punkte $P$, $Q$, $R$ im Raum auf einer Geraden liegen — verwende Vektoren.</li>
+  <li>Beweise, dass deine Bedingung sowohl <em>notwendig</em> als auch <em>hinreichend</em> ist.</li>
+  <li>Wende deine Bedingung auf $(B, S, A)$ an. Liegen die drei kollinear? Begründe rechnerisch.</li>
+  <li>Wenn drei Plattformen <em>nicht</em> kollinear sind, spannen sie eindeutig eine Ebene auf. Warum spielt das im Kletterwald keine Rolle, solange wir nur Seile (Geraden) untersuchen?</li>
+</ol>
+<details class="loesung"><summary>Lösung S4</summary>
+<p>(1) $P,Q,R$ kollinear $\Leftrightarrow$ $\vec{PQ}$ und $\vec{PR}$ sind linear abhängig $\Leftrightarrow$ es gibt $\lambda\in\mathbb{R}$ mit $\vec{PR}=\lambda\,\vec{PQ}$. ·
+(2) <em>Notwendig</em>: liegen die Punkte auf einer Geraden, müssen Verbindungsvektoren parallel sein. <em>Hinreichend</em>: ist $\vec{PR}=\lambda\vec{PQ}$, dann ist $R=P+\lambda\vec{PQ}$, also auf der Geraden durch $P$ und $Q$. ·
+(3) $\vec{BS}=(6,4,2)$, $\vec{BA}=(5,5,4)$. Existiert $\lambda$ mit $(5,5,4)=\lambda(6,4,2)$? Aus 1. Komp: $\lambda=\tfrac56$; aus 2.: $\lambda=\tfrac54$ ✗ — nicht kollinear. ·
+(4) Seile (Geraden) sind 1-dimensional; ihre Lage hängt nur von zwei Punkten ab. Die durch drei Punkte aufgespannte Ebene wird erst relevant, wenn man <em>Flächen</em> betrachtet (Kletterwände, Sicherungsnetze).</p>
+</details>
+</div>
+
+<!-- ===== S5 ===== -->
+<div class="karte s">
+<h3>S5 — Modellierung: Parallelogramm-Konstruktion <span class="afb afb2">AFB II</span></h3>
+<p class="kontext">Damit zwei parallele Seile zusammen mit zwei Verbindungsseilen ein <em>echtes</em> Parallelogramm bilden, müssen die Endpunkte aufeinander abgestimmt sein.</p>
+<ol class="aufgaben">
+  <li>Aus Szenario L5: BG und EF sind parallel, aber $|BG|=2|EF|$. Folgt daraus ein Parallelogramm BEFG? Untersuche $\vec{BE}$ und $\vec{GF}$.</li>
+  <li>Wo müsste die Plattform $E$ liegen (mit gleichem $x$- und $y$-Wert), damit BEFG ein <strong>echtes</strong> Parallelogramm ergäbe? Bestimme die neuen Koordinaten $E^*$.</li>
+  <li>Gibt es überhaupt eine Plattform-Anordnung mit drei der existierenden Punkte (B, E, F, G), bei der die vier Eckpunkte ein Parallelogramm bilden? (Hinweis: $\vec{PQ}=\vec{SR}$ ist die Bedingung.)</li>
+  <li><span class="afb afb3">AFB III</span> Verallgemeinere: Welche allgemeine Bedingung an die vier Ortsvektoren $\vec{p},\vec{q},\vec{r},\vec{s}$ macht $PQRS$ zum Parallelogramm? Drücke sie auf <em>zwei</em> gleichwertige Arten aus.</li>
+</ol>
+<details class="loesung"><summary>Lösung S5</summary>
+<p>(1) $\vec{BE}=(-3,6,1)$, $\vec{GF}=(-9,2,-1)$. $\vec{BE}\ne\vec{GF}$ → kein Parallelogramm (sondern Trapez). ·
+(2) Damit BEFG Parallelogramm ist, muss $\vec{BE}^*=\vec{GF}=(-9,2,-1)$, also $E^*=B+(-9,2,-1)=(-13|-1|1)$ — liegt aber außerhalb des Plot-Bereichs. Alternativ: $\vec{EF}=\vec{BG}$ verlangen, was wegen $|EF|\ne|BG|$ unmöglich ist. Die Plattformen müssten also komplett neu platziert werden. ·
+(3) Mit Ecken B, E, F, G in dieser Reihenfolge: nein (s.o.). Andere Reihenfolge B, E, G, F: $\vec{BE}=(-3,6,1)$, $\vec{FG}=(9,-2,1)$. Nicht gleich. Mit B, F, G, E: $\vec{BF}=(3,10,3)$, $\vec{EG}=(15,2,3)$ — nicht gleich. <em>Keine</em> Anordnung der vier Punkte ergibt ein Parallelogramm. ·
+(4) Bedingung 1: $\vec{PQ}=\vec{SR}$ (Gegenseiten gleich). Bedingung 2: $\vec{p}+\vec{r}=\vec{q}+\vec{s}$ (Diagonalen halbieren sich → gleicher Mittelpunkt). Beide sind äquivalent.</p>
+</details>
+</div>
+
+<!-- ===== S6 ===== -->
+<div class="karte s">
+<h3>S6 — Lagebeziehungen-Triathlon <span class="afb afb2">AFB II</span></h3>
+<p class="kontext">Für jedes der drei Seil-Paare: <em>parallel</em> (echt parallel oder identisch?), <em>schneidend</em> (wo?) oder <em>windschief</em>?</p>
+<ol class="aufgaben">
+  <li>$g_{BG}$ und $g_{EF}$</li>
+  <li>$g_{BA}$ und $g_{WG}$</li>
+  <li>$g_{AR}$ und $g_{EW}$</li>
+</ol>
+<p>Verwende für jede Untersuchung das Entscheidungsbaum-Verfahren (erst Vielfaches-Test, dann LGS).</p>
+<details class="loesung"><summary>Lösung S6</summary>
+<p>(1) Richtungen $(12,8,4)=2(6,4,2)$ → parallel. Punktprobe von $E(-7|3|3)$ auf $g_{BG}$: $-4+12t=-7\Rightarrow t=-\tfrac14$, $-3+8(-\tfrac14)=-5\ne 3$ ✗ → <strong>echt parallel</strong>. ·
+(2) $\vec{BA}=(5,5,4)$, $\vec{WG}=(5,5,4)$ — identisch! → parallel. Punktprobe $B$ auf $g_{WG}$: $3+5t=-4\Rightarrow t=-\tfrac75$, $0-7=-7\ne -3$ ✗ → <strong>echt parallel</strong> (zwei verschiedene Geraden mit gleicher Richtung).·
+(3) $\vec{AR}=(4,-6,-2)$, $\vec{EW}=(10,-3,-1)$. Vielfaches? $4=10k\Rightarrow k=0{,}4$, aber $-6\ne -1{,}2$ ✗ → nicht parallel.
+LGS $A+t\vec{AR}=E+s\vec{EW}$:
+$1+4t=-7+10s$ · $2-6t=3-3s$ · $6-2t=3-s$.
+Aus 3.: $s=2t-3$. In 2.: $2-6t=3-3(2t-3)=12-6t\Rightarrow 2=12$ ✗ → keine Lösung → <strong>windschief</strong>.</p>
+</details>
+</div>
+
+<hr>
+<div class="tipp"><strong>Einsatz-Tipp:</strong> Leichte Spur als Trainingsbatterie vor der Klausur (45 min, Pflichtaufgaben). Schwere Spur als Wahlaufgabe / Hausaufgabe / Vertretungsstunde — besonders S3 (Echtzeit) und S5 (Verallgemeinerung) eignen sich als Klausur-Anker.</p>
+<p class="hinweis">Aufgabentypen orientieren sich an: Französisches Bac (Reproduktion), IB AI HL (Modellierung, Kinematik), Cambridge NRICH (Beweise), Bayern Abi 2018 Hochseilgarten (Anwendung). Quellen siehe <code>Fächer/Mathe/Vektoren-Q1/Vektoren-Kletterpark/aufgaben-vektoren-kletterpark-2026-04-25.md</code>.</p>
+
+</body>
+</html>

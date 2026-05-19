@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kletterwald DIN A4 Querformat (297 x 210 mm), Maßstab 1 LE = 1 cm = 10 mm -->
+<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 297 210">
+  <defs>
+    <style>
+      .grid-sub  { stroke:#edf3eb; stroke-width:0.1; fill:none; }
+      .grid-min  { stroke:#bcd4b6; stroke-width:0.2; fill:none; }
+      .grid-maj  { stroke:#7aa874; stroke-width:0.35; fill:none; }
+      .grid-bold { stroke:#3f7a3a; stroke-width:0.6;  fill:none; }
+      .axis      { stroke:#1a3a1a; stroke-width:0.7; fill:none; }
+      .tick      { font: 2.6px 'Helvetica', sans-serif; fill:#1a3a1a; }
+      .tick-bold { font: 3.2px 'Helvetica', sans-serif; font-weight:bold; fill:#1a3a1a; }
+      .tick0     { font: 3.2px 'Helvetica', sans-serif; font-weight:bold; fill:#1a3a1a; }
+      .baum      { fill:#2e6b2e; stroke:#1a3a1a; stroke-width:0.4; }
+      .baum-hi   { fill:#c44; stroke:#1a3a1a; stroke-width:0.4; }
+      .boden     { fill:#c9a45a; stroke:#1a3a1a; stroke-width:0.4; }
+      .label     { font: 3.8px 'Helvetica', sans-serif; font-weight:bold; fill:#1a3a1a; }
+      .sublabel  { font: 2.5px 'Helvetica', sans-serif; fill:#444; }
+      .name      { font: 2.8px 'Helvetica', sans-serif; font-style:italic; fill:#1a3a1a; }
+      .title     { font: 5px 'Helvetica', sans-serif; font-weight:bold; fill:#1a3a1a; }
+      .subtitle  { font: 3px 'Helvetica', sans-serif; fill:#335533; }
+      .legend    { font: 3px 'Helvetica', sans-serif; fill:#1a3a1a; }
+      .scalebar  { stroke:#1a3a1a; stroke-width:0.6; fill:none; }
+      .scaletext { font: 2.8px 'Helvetica', sans-serif; font-weight:bold; fill:#1a3a1a; }
+      .druckhinw { font: 3px 'Helvetica', sans-serif; font-weight:bold; fill:#a30000; }
+    </style>
+    <pattern id="sub" width="1"  height="1"  patternUnits="userSpaceOnUse"><path d="M 1 0 L 0 0 0 1"   class="grid-sub"/></pattern>
+    <pattern id="min" width="5"  height="5"  patternUnits="userSpaceOnUse"><path d="M 5 0 L 0 0 0 5"   class="grid-min"/></pattern>
+    <pattern id="maj" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" class="grid-maj"/></pattern>
+  </defs>
+
+  <rect x="0" y="0" width="297" height="210" fill="white"/>
+
+  <text x="10" y="8" class="title">Kletterwald — Koordinatensystem DIN A4 (1 LE = 1 cm)</text>
+  <text x="10" y="13" class="subtitle">8 Plattformen · x: −13 … +13 · y: −8 … +8 · z = Spießlänge in cm</text>
+  <text x="10" y="17" class="druckhinw">DRUCKEN: A4 Querformat, „Tatsächliche Größe / 100 %“ — niemals „an Seite anpassen“! · 1 LE auf dem Lineal = 1 cm</text>
+
+  <!-- Plot-Origin: Mitte der A4-Seite leicht unterhalb der Titelzeile -->
+  <g transform="translate(148.5, 110)">
+    <!-- Plot 260 x 160 mm: x ∈ [-130, 130], y ∈ [-80, 80] -->
+    <rect x="-130" y="-80" width="260" height="160" fill="url(#sub)"/>
+    <rect x="-130" y="-80" width="260" height="160" fill="url(#min)"/>
+    <rect x="-130" y="-80" width="260" height="160" fill="url(#maj)"/>
+
+    <!-- 5-LE-Bold-Linien -->
+    <g>
+      <line x1="-100" y1="-80" x2="-100" y2="80" class="grid-bold"/>
+      <line x1="-50"  y1="-80" x2="-50"  y2="80" class="grid-bold"/>
+      <line x1="50"   y1="-80" x2="50"   y2="80" class="grid-bold"/>
+      <line x1="100"  y1="-80" x2="100"  y2="80" class="grid-bold"/>
+      <line x1="-130" y1="-50" x2="130"  y2="-50" class="grid-bold"/>
+      <line x1="-130" y1="50"  x2="130"  y2="50"  class="grid-bold"/>
+    </g>
+
+    <rect x="-130" y="-80" width="260" height="160" fill="none" stroke="#1a3a1a" stroke-width="0.3"/>
+
+    <!-- Achsen -->
+    <line x1="-134" y1="0" x2="134" y2="0" class="axis"/>
+    <line x1="0" y1="84" x2="0" y2="-84" class="axis"/>
+    <polygon points="134,0 130,-1.4 130,1.4" fill="#1a3a1a"/>
+    <polygon points="0,-84 -1.4,-80 1.4,-80" fill="#1a3a1a"/>
+    <text x="136" y="2" class="label">x</text>
+    <text x="-3" y="-85" class="label">y</text>
+
+    <!-- x-Beschriftungen alle 1 LE -->
+    <g>
+      <text x="-130" y="4.5" class="tick" text-anchor="middle">−13</text>
+      <text x="-120" y="4.5" class="tick" text-anchor="middle">−12</text>
+      <text x="-110" y="4.5" class="tick" text-anchor="middle">−11</text>
+      <text x="-100" y="4.5" class="tick-bold" text-anchor="middle">−10</text>
+      <text x="-90"  y="4.5" class="tick" text-anchor="middle">−9</text>
+      <text x="-80"  y="4.5" class="tick" text-anchor="middle">−8</text>
+      <text x="-70"  y="4.5" class="tick" text-anchor="middle">−7</text>
+      <text x="-60"  y="4.5" class="tick" text-anchor="middle">−6</text>
+      <text x="-50"  y="4.5" class="tick-bold" text-anchor="middle">−5</text>
+      <text x="-40"  y="4.5" class="tick" text-anchor="middle">−4</text>
+      <text x="-30"  y="4.5" class="tick" text-anchor="middle">−3</text>
+      <text x="-20"  y="4.5" class="tick" text-anchor="middle">−2</text>
+      <text x="-10"  y="4.5" class="tick" text-anchor="middle">−1</text>
+      <text x="10"   y="4.5" class="tick" text-anchor="middle">1</text>
+      <text x="20"   y="4.5" class="tick" text-anchor="middle">2</text>
+      <text x="30"   y="4.5" class="tick" text-anchor="middle">3</text>
+      <text x="40"   y="4.5" class="tick" text-anchor="middle">4</text>
+      <text x="50"   y="4.5" class="tick-bold" text-anchor="middle">5</text>
+      <text x="60"   y="4.5" class="tick" text-anchor="middle">6</text>
+      <text x="70"   y="4.5" class="tick" text-anchor="middle">7</text>
+      <text x="80"   y="4.5" class="tick" text-anchor="middle">8</text>
+      <text x="90"   y="4.5" class="tick" text-anchor="middle">9</text>
+      <text x="100"  y="4.5" class="tick-bold" text-anchor="middle">10</text>
+      <text x="110"  y="4.5" class="tick" text-anchor="middle">11</text>
+      <text x="120"  y="4.5" class="tick" text-anchor="middle">12</text>
+      <text x="130"  y="4.5" class="tick" text-anchor="middle">13</text>
+    </g>
+    <!-- y-Beschriftungen -->
+    <g>
+      <text x="-2" y="-78" class="tick" text-anchor="end">8</text>
+      <text x="-2" y="-68" class="tick" text-anchor="end">7</text>
+      <text x="-2" y="-58" class="tick" text-anchor="end">6</text>
+      <text x="-2" y="-48" class="tick-bold" text-anchor="end">5</text>
+      <text x="-2" y="-38" class="tick" text-anchor="end">4</text>
+      <text x="-2" y="-28" class="tick" text-anchor="end">3</text>
+      <text x="-2" y="-18" class="tick" text-anchor="end">2</text>
+      <text x="-2" y="-8"  class="tick" text-anchor="end">1</text>
+      <text x="-2" y="12"  class="tick" text-anchor="end">−1</text>
+      <text x="-2" y="22"  class="tick" text-anchor="end">−2</text>
+      <text x="-2" y="32"  class="tick" text-anchor="end">−3</text>
+      <text x="-2" y="42"  class="tick" text-anchor="end">−4</text>
+      <text x="-2" y="52"  class="tick-bold" text-anchor="end">−5</text>
+      <text x="-2" y="62"  class="tick" text-anchor="end">−6</text>
+      <text x="-2" y="72"  class="tick" text-anchor="end">−7</text>
+      <text x="-2" y="82"  class="tick" text-anchor="end">−8</text>
+    </g>
+    <text x="-2" y="4.5" class="tick0" text-anchor="end">0</text>
+
+    <!-- 9 Plattformen: SVG = (x*10, -y*10) mm -->
+    <!-- T Treffpunkt (0|0|0) am Boden — Quadrat als Bodenmarkierung -->
+    <g transform="translate(0,0)"><rect x="-2" y="-2" width="4" height="4" class="boden"/><text x="-3" y="-3" class="label" text-anchor="end">T</text><text x="-3" y="-0.2" class="name" text-anchor="end">Treffpunkt</text><text x="-3" y="3" class="sublabel" text-anchor="end">(0|0|0)</text></g>
+    <g transform="translate(-40,30)"><circle r="1.8" class="baum"/><text x="3" y="-1.5" class="label">B</text><text x="3" y="1.8" class="name">Basislager</text><text x="3" y="5" class="sublabel">(−4|−3|2)</text></g>
+    <g transform="translate(-70,-30)"><circle r="1.8" class="baum"/><text x="3" y="-1.5" class="label">E</text><text x="3" y="1.8" class="name">Eichenturm</text><text x="3" y="5" class="sublabel">(−7|3|3)</text></g>
+    <g transform="translate(-10,-70)"><circle r="1.8" class="baum"/><text x="3" y="-1.5" class="label">F</text><text x="3" y="1.8" class="name">Fuchsbau</text><text x="3" y="5" class="sublabel">(−1|7|5)</text></g>
+    <g transform="translate(30,0)"><circle r="1.8" class="baum"/><text x="3" y="-1.5" class="label">W</text><text x="3" y="1.8" class="name">Wurzelhütte</text><text x="3" y="5" class="sublabel">(3|0|2)</text></g>
+    <g transform="translate(50,40)"><circle r="1.8" class="baum"/><text x="3" y="-1.5" class="label">R</text><text x="3" y="1.8" class="name">Rabenfels</text><text x="3" y="5" class="sublabel">(5|−4|4)</text></g>
+    <g transform="translate(10,-20)"><circle r="2.3" class="baum-hi"/><text x="3.5" y="-1.5" class="label">A</text><text x="3.5" y="1.8" class="name">Adlerhorst</text><text x="3.5" y="5" class="sublabel">(1|2|6)</text></g>
+    <g transform="translate(20,-10)"><circle r="1.8" class="baum"/><text x="-3" y="-1" class="label" text-anchor="end">S</text><text x="-3" y="2.3" class="name" text-anchor="end">Spechtnest</text><text x="-3" y="5.5" class="sublabel" text-anchor="end">(2|1|4)</text></g>
+    <g transform="translate(80,-50)"><circle r="2.3" class="baum-hi"/><text x="3.5" y="-1.5" class="label">G</text><text x="3.5" y="1.8" class="name">Gipfelstation</text><text x="3.5" y="5" class="sublabel">(8|5|6)</text></g>
+  </g>
+
+  <!-- Maßstab unten links -->
+  <g transform="translate(12, 200)">
+    <line x1="0" y1="0" x2="10" y2="0" class="scalebar"/>
+    <line x1="0" y1="-1.5" x2="0" y2="1.5" class="scalebar"/>
+    <line x1="10" y1="-1.5" x2="10" y2="1.5" class="scalebar"/>
+    <text x="5" y="-2.3" class="scaletext" text-anchor="middle">1 LE</text>
+    <text x="5" y="5" class="scaletext" text-anchor="middle">1 cm</text>
+    <line x1="30" y1="0" x2="80" y2="0" class="scalebar"/>
+    <line x1="30" y1="-1.5" x2="30" y2="1.5" class="scalebar"/>
+    <line x1="80" y1="-1.5" x2="80" y2="1.5" class="scalebar"/>
+    <text x="55" y="-2.3" class="scaletext" text-anchor="middle">5 LE</text>
+    <text x="55" y="5" class="scaletext" text-anchor="middle">5 cm</text>
+  </g>
+
+  <g transform="translate(80, 200)">
+    <circle cx="0" cy="-1" r="1.8" class="baum"/>
+    <text x="3" y="0" class="legend">Plattform (Spieß = z cm)</text>
+    <circle cx="55" cy="-1" r="2.3" class="baum-hi"/>
+    <text x="59" y="0" class="legend">hohe Plattform</text>
+    <rect x="115" y="-3" width="4" height="4" class="boden"/>
+    <text x="121" y="0" class="legend">Treffpunkt (Boden, z = 0)</text>
+  </g>
+
+  <g transform="translate(220, 200)">
+    <line x1="0" y1="0" x2="6" y2="0" class="grid-min"/>
+    <text x="8" y="0.8" class="legend">5 mm = 0,5 LE</text>
+    <line x1="35" y1="0" x2="41" y2="0" class="grid-maj"/>
+    <text x="43" y="0.8" class="legend">1 cm = 1 LE</text>
+  </g>
+</svg>

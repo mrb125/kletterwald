@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kletterwald – Vektoren-Lernapp (Schülerversion)</title>
+
+<!-- KaTeX -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInDocument();"></script>
+
+<!-- Three.js -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"
+  onerror="window.__threeFailed=true;console.error('THREE.js Hauptscript konnte nicht geladen werden');"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"
+  onerror="window.__threeFailed=true;console.error('OrbitControls konnte nicht geladen werden');"></script>
+
+<style>
+  :root{
+    --green-dark: #2e6b2e;
+    --green: #4a8a3a;
+    --green-light: #cfe6c4;
+    --sand: #c9a45a;
+    --rot: #c44;
+    --bg: #f6f7f2;
+    --text: #233322;
+    --border: #b9c8b3;
+    --card: #ffffff;
+    --highlight: #ffcc33;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}
+  header{background:var(--green-dark);color:#fff;padding:10px 16px;
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  header h1{margin:0;font-size:18px;font-weight:600;}
+  header .spacer{flex:1;}
+  header button{background:var(--green);color:#fff;border:1px solid #fff5;
+    padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;}
+  header button.active{background:#fff;color:var(--green-dark);}
+  header button:hover{filter:brightness(1.1);}
+
+  nav.tabs{background:#e8eee2;display:flex;flex-wrap:wrap;gap:4px;
+    padding:6px 10px;border-bottom:1px solid var(--border);}
+  nav.tabs button{background:transparent;border:1px solid transparent;
+    padding:6px 12px;border-radius:6px;cursor:pointer;font-size:14px;color:#333;}
+  nav.tabs button.active{background:#fff;border-color:var(--green);color:var(--green-dark);font-weight:600;}
+  nav.tabs button:hover{background:#fff;}
+
+  main{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px;padding:12px;max-width:1500px;margin:0 auto;}
+  @media(max-width:1000px){main{grid-template-columns:1fr;}}
+
+  .viewbox{background:#fff;border:1px solid var(--border);border-radius:8px;
+    overflow:hidden;min-height:500px;position:relative;}
+  #svgWrap, #threeWrap{width:100%;height:560px;}
+  #threeWrap{position:relative;}
+  #threeCanvas{display:block;width:100%;height:100%;}
+  .label3d{position:absolute;pointer-events:none;background:rgba(255,255,255,0.85);
+    border:1px solid #888;border-radius:4px;padding:1px 5px;font-size:12px;
+    transform:translate(-50%,-110%);white-space:nowrap;}
+  .label3d.hi{background:#ffefb0;border-color:#cc9;font-weight:600;}
+
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:8px;
+    padding:14px;display:flex;flex-direction:column;gap:10px;}
+  .panel h2{margin:0 0 4px 0;font-size:17px;color:var(--green-dark);}
+  .panel p{margin:0;line-height:1.45;font-size:14px;}
+  .panel input[type=text], .panel input[type=number]{
+    padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:14px;
+    width:90px;}
+  .panel input.wide{width:100%;}
+  .panel button{background:var(--green);color:#fff;border:none;padding:7px 14px;
+    border-radius:6px;cursor:pointer;font-size:14px;}
+  .panel button.alt{background:#ddd;color:#333;}
+  .panel button:hover{filter:brightness(1.1);}
+  .panel .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+  .panel .feedback{padding:8px;border-radius:6px;font-size:14px;}
+  .panel .feedback.ok{background:#d6f0c8;color:#234d12;}
+  .panel .feedback.bad{background:#fadcdc;color:#5a1414;}
+  .score{font-weight:600;color:var(--green-dark);}
+
+  .hilfekarte{border:1px solid var(--border);border-radius:6px;background:#fafafa;}
+  .hilfekarte summary{cursor:pointer;padding:8px 10px;font-weight:600;background:#eef3e8;}
+  .hilfekarte[open] summary{background:var(--green-light);}
+  .hilfekarte .body{padding:10px;font-size:14px;}
+
+  /* Drag-and-Drop */
+  .schild{display:inline-block;padding:5px 10px;background:#fff7d6;
+    border:1px solid #cdb46a;border-radius:6px;margin:4px;cursor:grab;font-size:13px;
+    user-select:none;}
+  .schild.dragging{opacity:0.4;}
+  .schildpool{min-height:50px;padding:6px;border:2px dashed var(--border);
+    border-radius:6px;background:#fafafa;}
+  .drop-marker{stroke:var(--green-dark);stroke-width:2;fill:transparent;}
+  .drop-marker.hover{fill:#ffe;stroke-dasharray:4;}
+
+  /* Story */
+  .story-choice{display:block;width:100%;text-align:left;padding:8px 10px;
+    margin:4px 0;background:#eef3e8;border:1px solid var(--border);border-radius:6px;
+    cursor:pointer;font-size:14px;}
+  .story-choice:hover{background:var(--green-light);}
+
+  .legend{font-size:12px;color:#555;padding:6px 12px;}
+  .legend span{display:inline-block;margin-right:12px;}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;
+    margin-right:4px;vertical-align:middle;border:1px solid #0006;}
+
+  .warning{background:#fff4d6;border:1px solid #d9b647;border-radius:6px;
+    padding:8px 12px;margin:6px 12px;font-size:13px;color:#5a4710;}
+
+  /* Welcome */
+  .welcome ul{margin:6px 0 0 20px;padding:0;font-size:14px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌲 Kletterwald – Vektoren-Lernapp</h1>
+  <span class="spacer"></span>
+  <button id="btn2D" class="active" title="2D-Karte">🗺️ 2D</button>
+  <button id="btn3D" title="3D-Modell">🧊 3D</button>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="welcome" class="active">👋 Start</button>
+  <button data-tab="quiz">🎯 Quiz</button>
+  <button data-tab="drag">🏷 Beschriftungen</button>
+  <button data-tab="hilfen">💡 Mit Hilfen</button>
+  <button data-tab="avatar">🧗 Avatar-Klettern</button>
+  <button data-tab="story">📖 Geschichte</button>
+  <button data-tab="audio">🔊 Hörbuch</button>
+  <button data-tab="klausur">📚 Klausur</button>
+</nav>
+
+<div id="warning3d" class="warning" style="display:none;">
+  Hinweis: Die 3D-Bibliothek (Three.js) konnte nicht geladen werden. Die App läuft im 2D-Modus.
+</div>
+
+<main>
+  <!-- Linke Spalte: Karte/3D -->
+  <section class="viewbox">
+    <div id="svgWrap"></div>
+    <div id="threeWrap" style="display:none;">
+      <canvas id="threeCanvas"></canvas>
+      <div id="labelLayer"></div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--green)"></i>Baum-Plattform</span>
+      <span><i style="background:var(--rot)"></i>Hohe Plattform</span>
+      <span><i style="background:var(--sand)"></i>Boden-Treffpunkt</span>
+      <span><i style="background:orange"></i>Avatar</span>
+    </div>
+  </section>
+
+  <!-- Rechte Spalte: Modus-Panel -->
+  <section id="panel" class="panel">
+    <!-- wird per JS gefüllt -->
+  </section>
+</main>
+
+<script>
+/* =====================================================================
+   STATE
+   ===================================================================== */
+const DEFAULT_PLATFORMS = [
+  {id:'T', letter:'T', name:'Treffpunkt', x:0,  y:0,  z:0, type:'boden'},
+  {id:'B', letter:'B', name:'Basislager', x:-4, y:-3, z:2, type:'baum'},
+  {id:'E', letter:'E', name:'Eichenturm', x:-7, y:3,  z:3, type:'baum'},
+  {id:'F', letter:'F', name:'Fuchsbau',   x:-1, y:7,  z:5, type:'baum'},
+  {id:'W', letter:'W', name:'Wurzelhütte',x:3,  y:0,  z:2, type:'baum'},
+  {id:'R', letter:'R', name:'Rabenfels',  x:5,  y:-4, z:4, type:'baum'},
+  {id:'A', letter:'A', name:'Adlerhorst', x:1,  y:2,  z:6, type:'baum-hi'},
+  {id:'S', letter:'S', name:'Spechtnest', x:2,  y:1,  z:4, type:'baum'},
+  {id:'G', letter:'G', name:'Gipfelstation',x:8,y:5,  z:6, type:'baum-hi'},
+];
+
+// Lädt Plattformen + Seile aus dem geteilten Speicher (Editor → Schüler-App)
+function loadSharedState(){
+  try{
+    // Erst kanonischer Schlüssel, dann Legacy
+    const raw = localStorage.getItem('kletterwald-shared-state')
+             || localStorage.getItem('kletterwald-state-v2');
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ console.warn('localStorage Fehler:', e); return null; }
+}
+
+function loadPlatforms(){
+  const obj = loadSharedState();
+  if(obj && Array.isArray(obj.platforms) && obj.platforms.length>0){
+    return obj.platforms.map(p=>({
+      id: p.id || p.letter || '?',
+      letter: p.letter || p.id || '?',
+      name: p.name || '',
+      x: Number(p.x)||0, y: Number(p.y)||0, z: Number(p.z)||0,
+      type: p.type || 'baum'
+    }));
+  }
+  return [...DEFAULT_PLATFORMS];
+}
+
+function loadSeile(){
+  const obj = loadSharedState();
+  if(obj && Array.isArray(obj.seile)) return obj.seile;
+  return [];
+}
+
+// Live-Sync: wenn der Editor in einem anderen Tab Änderungen speichert, hier neu laden
+window.addEventListener('storage', (e) => {
+  if(e.key === 'kletterwald-shared-state' || e.key === 'kletterwald-state-v2'){
+    if(typeof STATE !== 'undefined'){
+      STATE.platforms = loadPlatforms();
+      STATE.seile = loadSeile();
+      if(typeof renderTab === 'function') renderTab();
+      if(typeof refreshView === 'function') refreshView();
+      if(typeof buildPlatformMeshes === 'function' && scene) buildPlatformMeshes();
+      console.info('🔄 Plattformen aus Editor synchronisiert:', STATE.platforms.length, 'Plattformen,', STATE.seile.length, 'Seile/Brücken');
+    }
+  }
+});
+
+const STATE = {
+  view: '2d',
+  tab: 'welcome',
+  platforms: loadPlatforms(),
+  seile: loadSeile(),  // aus Editor übernommene Seile & Brücken
+  highlight: [],     // Buchstaben, die hervorgehoben werden
+  avatar: null,      // {x,y,z} oder null
+  quiz: { score:0, total:0, current:null },
+};
+
+function P(letter){ return STATE.platforms.find(p=>p.letter===letter); }
+function platformColor(p){
+  if(p.type==='boden') return 'var(--sand)';
+  if(p.type==='baum-hi') return 'var(--rot)';
+  return 'var(--green)';
+}
+function platformColorHex(p){
+  if(p.type==='boden') return '#c9a45a';
+  if(p.type==='baum-hi') return '#c44';
+  return '#2e6b2e';
+}
+
+/* =====================================================================
+   2D SVG RENDER
+   ===================================================================== */
+const VIEW_MIN_X=-13, VIEW_MAX_X=13, VIEW_MIN_Y=-8, VIEW_MAX_Y=8;
+const SCALE = 28; // px je LE
+function sx(x){ return (x - VIEW_MIN_X)*SCALE; }
+function sy(y){ return (VIEW_MAX_Y - y)*SCALE; } // y nach oben
+
+function render2D(opts={}){
+  const wrap = document.getElementById('svgWrap');
+  const W = (VIEW_MAX_X-VIEW_MIN_X)*SCALE;
+  const H = (VIEW_MAX_Y-VIEW_MIN_Y)*SCALE;
+  const hideLabels = !!opts.hideLabels;
+
+  let svg = `<svg id="mainSvg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet"
+              style="width:100%;height:560px;background:#f8faf4;">`;
+  // Gitter
+  for(let x=VIEW_MIN_X; x<=VIEW_MAX_X; x++){
+    svg += `<line x1="${sx(x)}" y1="0" x2="${sx(x)}" y2="${H}"
+            stroke="${x===0?'#888':'#e0e6da'}" stroke-width="${x===0?1.2:0.6}"/>`;
+  }
+  for(let y=VIEW_MIN_Y; y<=VIEW_MAX_Y; y++){
+    svg += `<line x1="0" y1="${sy(y)}" x2="${W}" y2="${sy(y)}"
+            stroke="${y===0?'#888':'#e0e6da'}" stroke-width="${y===0?1.2:0.6}"/>`;
+  }
+  // Achsenpfeile
+  svg += `<line x1="${sx(0)}" y1="${sy(0)}" x2="${sx(VIEW_MAX_X-0.3)}" y2="${sy(0)}"
+          stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>`;
+  svg += `<line x1="${sx(0)}" y1="${sy(0)}" x2="${sx(0)}" y2="${sy(VIEW_MAX_Y-0.3)}"
+          stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>`;
+  svg += `<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4"
+            orient="auto"><polygon points="0,0 8,4 0,8" fill="#444"/></marker></defs>`;
+  svg += `<text x="${sx(VIEW_MAX_X-0.3)}" y="${sy(0)-6}" font-size="13" fill="#444">x</text>`;
+  svg += `<text x="${sx(0)+6}" y="${sy(VIEW_MAX_Y-0.3)}" font-size="13" fill="#444">y</text>`;
+
+  // Avatar (orange)
+  if(STATE.avatar){
+    const a = STATE.avatar;
+    svg += `<circle cx="${sx(a.x)}" cy="${sy(a.y)}" r="10" fill="orange"
+            stroke="#a06000" stroke-width="2"/>`;
+    svg += `<text x="${sx(a.x)}" y="${sy(a.y)+4}" text-anchor="middle"
+            font-size="11" fill="#5a3300" font-weight="bold">★</text>`;
+  }
+
+  // Plattformen
+  STATE.platforms.forEach(p=>{
+    const cx = sx(p.x), cy = sy(p.y);
+    const isHi = STATE.highlight.includes(p.letter);
+    const stroke = isHi ? '#ffcc00' : '#1c3a1a';
+    const strokeW = isHi ? 4 : 1.5;
+    if(p.type==='boden'){
+      svg += `<rect x="${cx-12}" y="${cy-12}" width="24" height="24"
+              fill="${platformColorHex(p)}" stroke="${stroke}" stroke-width="${strokeW}"/>`;
+    }else{
+      const r = p.type==='baum-hi' ? 13 : 11;
+      svg += `<circle cx="${cx}" cy="${cy}" r="${r}"
+              fill="${platformColorHex(p)}" stroke="${stroke}" stroke-width="${strokeW}"/>`;
+    }
+    if(!hideLabels){
+      svg += `<text x="${cx}" y="${cy+5}" text-anchor="middle"
+              fill="#fff" font-size="14" font-weight="bold">${p.letter}</text>`;
+      svg += `<text x="${cx+16}" y="${cy-6}" font-size="12" fill="#222">${p.name}</text>`;
+      svg += `<text x="${cx+16}" y="${cy+8}" font-size="11" fill="#555">(${p.x}|${p.y}|${p.z})</text>`;
+    }else{
+      // im drag-mode trotzdem Position markieren mit Buchstabe als Drop-Ziel
+      svg += `<circle class="droptarget" data-letter="${p.letter}"
+              cx="${cx}" cy="${cy}" r="22" fill="transparent" stroke="#0002" stroke-dasharray="3"/>`;
+    }
+  });
+
+  svg += `</svg>`;
+  wrap.innerHTML = svg;
+}
+
+/* =====================================================================
+   3D RENDER (Three.js)
+   ===================================================================== */
+const THREE_OK = !window.__threeFailed
+  && typeof THREE !== 'undefined'
+  && typeof THREE.OrbitControls === 'function'
+  && typeof THREE.WebGLRenderer === 'function';
+if (typeof THREE === 'undefined') console.error('3D-Fehler: THREE global nicht definiert');
+else if (typeof THREE.OrbitControls !== 'function') console.error('3D-Fehler: THREE.OrbitControls nicht verfügbar (CDN-Ladefehler)');
+let scene, camera, renderer, controls, labelLayer;
+let platformMeshes = {}; // letter -> {pillar, top, glow?}
+let avatarMesh = null;
+let animating = false;
+
+function init3D(){
+  if(!THREE_OK) {
+    const w = document.getElementById('warning3d');
+    w.textContent = 'Die 3D-Bibliothek konnte nicht geladen werden. (Tipp: Strg+F5 für Hard-Reload zur Cache-Umgehung versuchen.) Details siehe Browser-Konsole F12.';
+    w.style.display = 'block';
+    return;
+  }
+  try {
+  const canvas = document.getElementById('threeCanvas');
+  const wrap = document.getElementById('threeWrap');
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xeaf1e3);
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  camera = new THREE.PerspectiveCamera(50, w/h, 0.1, 200);
+  camera.up.set(0,0,1);
+  camera.position.set(18, -18, 14);
+  camera.lookAt(0,0,3);
+
+  renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(w, h, false);
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0,0,3);
+  controls.update();
+
+  // Licht
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.6);
+  dl.position.set(10, -10, 20);
+  scene.add(dl);
+
+  // Bodenraster
+  const grid = new THREE.GridHelper(26, 26, 0x888888, 0xcfd8c5);
+  grid.rotation.x = Math.PI/2; // in xy-Ebene
+  scene.add(grid);
+
+  // Achsen
+  const ax = makeArrow(new THREE.Vector3(0,0,0), new THREE.Vector3(13,0,0), 0xcc3333);
+  const ay = makeArrow(new THREE.Vector3(0,0,0), new THREE.Vector3(0,13,0), 0x33aa33);
+  const az = makeArrow(new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,8), 0x3366cc);
+  scene.add(ax); scene.add(ay); scene.add(az);
+
+  labelLayer = document.getElementById('labelLayer');
+  buildPlatformMeshes();
+  animate();
+
+  window.addEventListener('resize', onResize3D);
+  } catch (err) {
+    console.error('3D-Initialisierung fehlgeschlagen:', err);
+    const w = document.getElementById('warning3d');
+    w.textContent = '3D-Fehler: ' + err.message + ' — bitte Strg+F5 versuchen oder F12 Konsole prüfen.';
+    w.style.display = 'block';
+    document.getElementById('btn2D').click();
+  }
+}
+
+function makeArrow(from, to, color){
+  const dir = new THREE.Vector3().subVectors(to, from);
+  const len = dir.length();
+  const arrow = new THREE.ArrowHelper(dir.clone().normalize(), from, len, color, 0.4, 0.2);
+  return arrow;
+}
+
+function buildPlatformMeshes(){
+  // Vorhandene entfernen
+  Object.values(platformMeshes).forEach(g=>{
+    if(g.pillar) scene.remove(g.pillar);
+    if(g.top) scene.remove(g.top);
+    if(g.glow) scene.remove(g.glow);
+  });
+  platformMeshes = {};
+  if(labelLayer) labelLayer.innerHTML = '';
+
+  STATE.platforms.forEach(p=>{
+    const color = new THREE.Color(platformColorHex(p));
+    if(p.type==='boden'){
+      const geo = new THREE.BoxGeometry(1.4, 1.4, 0.3);
+      const mat = new THREE.MeshLambertMaterial({color});
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set(p.x, p.y, 0.15);
+      scene.add(m);
+      platformMeshes[p.letter] = {top:m};
+    }else{
+      // Pfeiler
+      const h = Math.max(0.1, p.z);
+      const geoP = new THREE.CylinderGeometry(0.18, 0.22, h, 12);
+      const matP = new THREE.MeshLambertMaterial({color: 0x6b4a2a});
+      const pillar = new THREE.Mesh(geoP, matP);
+      pillar.rotation.x = Math.PI/2;
+      pillar.position.set(p.x, p.y, h/2);
+      scene.add(pillar);
+      // Plattform-Scheibe oben
+      const geoT = new THREE.CylinderGeometry(0.55, 0.55, 0.12, 18);
+      const matT = new THREE.MeshLambertMaterial({color});
+      const top = new THREE.Mesh(geoT, matT);
+      top.rotation.x = Math.PI/2;
+      top.position.set(p.x, p.y, p.z);
+      scene.add(top);
+      platformMeshes[p.letter] = {pillar, top};
+    }
+
+    // Label
+    const lbl = document.createElement('div');
+    lbl.className = 'label3d';
+    lbl.dataset.letter = p.letter;
+    lbl.textContent = `${p.letter} (${p.x}|${p.y}|${p.z})`;
+    labelLayer.appendChild(lbl);
+  });
+}
+
+function applyHighlights3D(){
+  if(!THREE_OK || !scene) return;
+  STATE.platforms.forEach(p=>{
+    const m = platformMeshes[p.letter];
+    if(!m) return;
+    const hi = STATE.highlight.includes(p.letter);
+    const targets = [m.top, m.pillar].filter(Boolean);
+    targets.forEach(t=>{
+      if(t.material && t.material.emissive){
+        t.material.emissive.setHex(hi ? 0xffcc00 : 0x000000);
+        t.material.emissiveIntensity = hi ? 0.6 : 0;
+      }
+    });
+    const lbl = labelLayer && labelLayer.querySelector(`[data-letter="${p.letter}"]`);
+    if(lbl) lbl.classList.toggle('hi', hi);
+  });
+}
+
+function updateAvatar3D(){
+  if(!THREE_OK || !scene) return;
+  if(STATE.avatar){
+    if(!avatarMesh){
+      const geo = new THREE.SphereGeometry(0.35, 16, 12);
+      const mat = new THREE.MeshLambertMaterial({color: 0xff8800, emissive:0x331a00});
+      avatarMesh = new THREE.Mesh(geo, mat);
+      scene.add(avatarMesh);
+    }
+    avatarMesh.position.set(STATE.avatar.x, STATE.avatar.y, STATE.avatar.z);
+    avatarMesh.visible = true;
+  }else if(avatarMesh){
+    avatarMesh.visible = false;
+  }
+}
+
+function animate(){
+  if(!THREE_OK) return;
+  requestAnimationFrame(animate);
+  if(STATE.view!=='3d') return;
+  controls.update();
+  updateAvatar3D();
+  renderer.render(scene, camera);
+  updateLabels3D();
+}
+
+function updateLabels3D(){
+  if(!labelLayer) return;
+  const wrap = document.getElementById('threeWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  STATE.platforms.forEach(p=>{
+    const lbl = labelLayer.querySelector(`[data-letter="${p.letter}"]`);
+    if(!lbl) return;
+    const v = new THREE.Vector3(p.x, p.y, p.z + 0.4);
+    v.project(camera);
+    const sxp = (v.x*0.5 + 0.5) * w;
+    const syp = (-v.y*0.5 + 0.5) * h;
+    if(v.z < 1){
+      lbl.style.display = 'block';
+      lbl.style.left = sxp + 'px';
+      lbl.style.top = syp + 'px';
+    }else{
+      lbl.style.display = 'none';
+    }
+  });
+}
+
+function onResize3D(){
+  if(!THREE_OK || !renderer) return;
+  const wrap = document.getElementById('threeWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w/h;
+  camera.updateProjectionMatrix();
+}
+
+/* =====================================================================
+   VIEW TOGGLE
+   ===================================================================== */
+function setView(v){
+  STATE.view = v;
+  document.getElementById('btn2D').classList.toggle('active', v==='2d');
+  document.getElementById('btn3D').classList.toggle('active', v==='3d');
+  document.getElementById('svgWrap').style.display = v==='2d' ? 'block':'none';
+  document.getElementById('threeWrap').style.display = v==='3d' ? 'block':'none';
+  if(v==='3d'){
+    if(!THREE_OK){
+      document.getElementById('warning3d').style.display='block';
+      document.getElementById('btn2D').click();
+      return;
+    }
+    if(!scene) init3D();
+    onResize3D();
+    applyHighlights3D();
+  }else{
+    render2D(currentRenderOpts());
+  }
+}
+
+function currentRenderOpts(){
+  return { hideLabels: STATE.tab==='drag' };
+}
+
+function refreshView(){
+  if(STATE.view==='2d') render2D(currentRenderOpts());
+  else { applyHighlights3D(); updateAvatar3D(); }
+}
+
+document.getElementById('btn2D').onclick = ()=> setView('2d');
+document.getElementById('btn3D').onclick = ()=> setView('3d');
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+function dist(a,b){
+  return Math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 + (a.z-b.z)**2);
+}
+function mid(a,b){
+  return { x:(a.x+b.x)/2, y:(a.y+b.y)/2, z:(a.z+b.z)/2 };
+}
+function vec(a,b){
+  return { x:b.x-a.x, y:b.y-a.y, z:b.z-a.z };
+}
+function approxEq(a,b,tol=0.05){ return Math.abs(a-b)<=tol; }
+function fmt(v, dec=2){
+  if(Math.abs(v - Math.round(v))<0.001) return String(Math.round(v));
+  return v.toFixed(dec);
+}
+function randPair(){
+  const ps = STATE.platforms;
+  let a,b;
+  do{ a = ps[Math.floor(Math.random()*ps.length)];
+      b = ps[Math.floor(Math.random()*ps.length)]; }
+  while(a.letter===b.letter);
+  return [a,b];
+}
+function renderMath(){
+  if(window.renderMathInElement){
+    renderMathInElement(document.getElementById('panel'), {
+      delimiters:[{left:'$$',right:'$$',display:true},
+                  {left:'$',right:'$',display:false}],
+      throwOnError:false
+    });
+  }
+}
+
+/* =====================================================================
+   TABS
+   ===================================================================== */
+document.querySelectorAll('#tabs button').forEach(btn=>{
+  btn.onclick = ()=>{
+    document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    STATE.tab = btn.dataset.tab;
+    STATE.highlight = [];
+    STATE.avatar = null;
+    renderTab();
+    refreshView();
+  };
+});
+
+function renderTab(){
+  const fn = {
+    welcome: renderWelcome,
+    quiz: renderQuiz,
+    drag: renderDrag,
+    hilfen: renderHilfen,
+    avatar: renderAvatar,
+    story: renderStory,
+    audio: renderAudio,
+    klausur: renderKlausur,
+  }[STATE.tab];
+  if(fn) fn();
+}
+
+/* =====================================================================
+   MODUS: WELCOME
+   ===================================================================== */
+function renderWelcome(){
+  const p = document.getElementById('panel');
+  p.className='panel welcome';
+  p.innerHTML = `
+    <h2>Willkommen im Kletterwald!</h2>
+    <p>In diesem Kletterwald gibt es <b>${STATE.platforms.length} Plattformen</b>.
+       Jede hat eine Koordinate $(x|y|z)$. Mit Vektoren beschreibst du Wege und Strecken
+       von einer Plattform zur nächsten.</p>
+    <p>Oben rechts kannst du zwischen <b>2D-Karte</b> und <b>3D-Modell</b> wechseln.
+       In den Tabs darüber findest du verschiedene Übungsmodi:</p>
+    <ul>
+      <li><b>🎯 Quiz</b> – Zufallsaufgaben zu Koordinaten, Strecken, Mittelpunkten, Geraden.</li>
+      <li><b>🏷 Beschriftungen</b> – Ziehe die Namen auf die richtigen Plattformen.</li>
+      <li><b>💡 Mit Hilfen</b> – Aufgaben mit gestaffelten Tipps und Lösung.</li>
+      <li><b>🧗 Avatar-Klettern</b> – Gib eine Geradengleichung ein und schau zu, wie der Avatar klettert.</li>
+      <li><b>📖 Geschichte</b> – Eine kleine Story mit Verzweigungen und Rechenaufgaben.</li>
+      <li><b>🔊 Hörbuch</b> – Lass dir eine Mini-Geschichte vorlesen und beantworte Zwischenfragen.</li>
+    </ul>
+    <p>Viel Erfolg – und nicht den Helm vergessen! 🪖</p>
+  `;
+  renderMath();
+}
+
+/* =====================================================================
+   MODUS: QUIZ
+   ===================================================================== */
+function newQuizTask(){
+  const types = ['koord','strecke','mittel','liegt','vekt'];
+  const t = types[Math.floor(Math.random()*types.length)];
+  const [a,b] = randPair();
+  let task = { type:t, a:a.letter, b:b.letter };
+  if(t==='liegt'){
+    // Punkt P entweder auf Geraden AB (Parameter wählen) oder nicht
+    const param = Math.random();
+    const onLine = Math.random()<0.5;
+    const va = vec(a,b);
+    let px = a.x + param*va.x;
+    let py = a.y + param*va.y;
+    let pz = a.z + param*va.z;
+    if(!onLine){
+      px += (Math.random()<0.5?-1:1)*(1+Math.random()*2);
+    }
+    task.point = {x:Math.round(px*10)/10, y:Math.round(py*10)/10, z:Math.round(pz*10)/10};
+    task.expected = onLine;
+  }
+  STATE.quiz.current = task;
+  STATE.highlight = [a.letter, b.letter];
+  renderQuiz();
+  refreshView();
+}
+
+function renderQuiz(){
+  const p = document.getElementById('panel');
+  p.className='panel';
+  if(!STATE.quiz.current){
+    p.innerHTML = `
+      <h2>🎯 Quiz</h2>
+      <p>Hier kommen Zufallsaufgaben zum Kletterwald. Klicke auf „Aufgabe starten".</p>
+      <div class="row"><button id="quizStart">Aufgabe starten</button></div>
+      <p class="score">Punkte: ${STATE.quiz.score} / ${STATE.quiz.total}</p>
+    `;
+    document.getElementById('quizStart').onclick = newQuizTask;
+    return;
+  }
+  const t = STATE.quiz.current;
+  const A = P(t.a), B = P(t.b);
+  let body = '';
+  if(t.type==='koord'){
+    STATE.highlight = [t.a];
+    body = `<p>Bestimme die Koordinaten der Plattform <b>${A.letter} – ${A.name}</b>.</p>
+      <div class="row">x: <input type="number" id="qx" step="any">
+        y: <input type="number" id="qy" step="any">
+        z: <input type="number" id="qz" step="any"></div>`;
+  } else if(t.type==='strecke'){
+    body = `<p>Wie lang ist die Strecke von <b>${A.letter} (${A.name})</b> nach
+      <b>${B.letter} (${B.name})</b>? (1 LE = 1 m, Antwort auf 2 Nachkommastellen)</p>
+      <div class="row">Länge: <input type="number" id="qs" step="any"> m</div>`;
+  } else if(t.type==='mittel'){
+    body = `<p>Berechne den Mittelpunkt $M$ der Strecke $\\overline{${A.letter}${B.letter}}$.</p>
+      <div class="row">x: <input type="number" id="qx" step="any">
+        y: <input type="number" id="qy" step="any">
+        z: <input type="number" id="qz" step="any"></div>`;
+  } else if(t.type==='liegt'){
+    body = `<p>Liegt der Punkt $P(${t.point.x}|${t.point.y}|${t.point.z})$
+      auf der Geraden durch <b>${A.letter}</b> und <b>${B.letter}</b>?</p>
+      <div class="row">
+        <button id="qJa">Ja</button>
+        <button id="qNein" class="alt">Nein</button>
+      </div>`;
+  } else if(t.type==='vekt'){
+    body = `<p>Schreibe den Verbindungsvektor $\\vec{${A.letter}${B.letter}}$.</p>
+      <div class="row">x: <input type="number" id="qx" step="any">
+        y: <input type="number" id="qy" step="any">
+        z: <input type="number" id="qz" step="any"></div>`;
+  }
+  p.innerHTML = `
+    <h2>🎯 Quiz</h2>
+    ${body}
+    <div class="row">
+      ${t.type==='liegt'?'':'<button id="qCheck">Prüfen</button>'}
+      <button id="qNext" class="alt">Nächste Aufgabe</button>
+    </div>
+    <div id="qFb"></div>
+    <p class="score">Punkte: ${STATE.quiz.score} / ${STATE.quiz.total}</p>
+  `;
+  renderMath();
+  if(t.type==='liegt'){
+    document.getElementById('qJa').onclick = ()=>checkQuiz(true);
+    document.getElementById('qNein').onclick = ()=>checkQuiz(false);
+  } else {
+    document.getElementById('qCheck').onclick = ()=>checkQuiz();
+  }
+  document.getElementById('qNext').onclick = newQuizTask;
+}
+
+function checkQuiz(boolAnswer){
+  const t = STATE.quiz.current;
+  const A = P(t.a), B = P(t.b);
+  let ok=false, expected='';
+  if(t.type==='koord'){
+    const x=+document.getElementById('qx').value;
+    const y=+document.getElementById('qy').value;
+    const z=+document.getElementById('qz').value;
+    ok = approxEq(x,A.x) && approxEq(y,A.y) && approxEq(z,A.z);
+    expected = `(${A.x}|${A.y}|${A.z})`;
+  } else if(t.type==='strecke'){
+    const s=+document.getElementById('qs').value;
+    const d = dist(A,B);
+    ok = approxEq(s,d,0.02);
+    expected = d.toFixed(2)+' m';
+  } else if(t.type==='mittel'){
+    const m = mid(A,B);
+    const x=+document.getElementById('qx').value;
+    const y=+document.getElementById('qy').value;
+    const z=+document.getElementById('qz').value;
+    ok = approxEq(x,m.x) && approxEq(y,m.y) && approxEq(z,m.z);
+    expected = `(${fmt(m.x)}|${fmt(m.y)}|${fmt(m.z)})`;
+  } else if(t.type==='liegt'){
+    ok = (boolAnswer === t.expected);
+    expected = t.expected ? 'Ja' : 'Nein';
+  } else if(t.type==='vekt'){
+    const v = vec(A,B);
+    const x=+document.getElementById('qx').value;
+    const y=+document.getElementById('qy').value;
+    const z=+document.getElementById('qz').value;
+    ok = approxEq(x,v.x) && approxEq(y,v.y) && approxEq(z,v.z);
+    expected = `(${v.x}|${v.y}|${v.z})`;
+  }
+  STATE.quiz.total++;
+  if(ok) STATE.quiz.score++;
+  const fb = document.getElementById('qFb');
+  fb.className = 'feedback ' + (ok ? 'ok':'bad');
+  fb.textContent = ok ? '✓ Richtig!' : `✗ Leider falsch. Lösung: ${expected}`;
+  document.querySelector('.score').textContent =
+    `Punkte: ${STATE.quiz.score} / ${STATE.quiz.total}`;
+}
+
+/* =====================================================================
+   MODUS: DRAG
+   ===================================================================== */
+let dragState = { letter:null, source:'pool' };
+
+function renderDrag(){
+  const p = document.getElementById('panel');
+  p.className='panel';
+  p.innerHTML = `
+    <h2>🏷 Beschriftungen ziehen</h2>
+    <p>Ziehe die Namen auf die richtige Plattform in der Karte (am Desktop am einfachsten).
+       Falsche Schilder kehren zurück.</p>
+    <div id="schildpool" class="schildpool"></div>
+    <p id="dragStatus" class="score"></p>
+    <div class="row"><button id="dragReset" class="alt">Neu mischen</button></div>
+  `;
+  setupDragMode();
+  document.getElementById('dragReset').onclick = setupDragMode;
+}
+
+function setupDragMode(){
+  STATE.placedLabels = {};
+  // Karte ohne Labels rendern
+  refreshView();
+  const pool = document.getElementById('schildpool');
+  pool.innerHTML = '';
+  // Mischen
+  const shuffled = [...STATE.platforms].sort(()=>Math.random()-0.5);
+  shuffled.forEach(p=>{
+    const s = document.createElement('div');
+    s.className='schild';
+    s.draggable=true;
+    s.dataset.letter=p.letter;
+    s.textContent = p.name + ' ('+p.letter+')';
+    s.addEventListener('dragstart', e=>{
+      dragState.letter = p.letter;
+      e.dataTransfer.setData('text/plain', p.letter);
+      s.classList.add('dragging');
+    });
+    s.addEventListener('dragend', ()=>s.classList.remove('dragging'));
+    pool.appendChild(s);
+  });
+  attachDropTargets();
+  updateDragStatus();
+}
+
+function attachDropTargets(){
+  const svg = document.getElementById('mainSvg');
+  if(!svg) return;
+  svg.querySelectorAll('.droptarget').forEach(c=>{
+    c.style.pointerEvents = 'all';
+    c.addEventListener('dragover', e=>{ e.preventDefault(); c.classList.add('hover'); });
+    c.addEventListener('dragleave', ()=>c.classList.remove('hover'));
+    c.addEventListener('drop', e=>{
+      e.preventDefault(); c.classList.remove('hover');
+      const letter = e.dataTransfer.getData('text/plain');
+      const target = c.dataset.letter;
+      if(letter===target){
+        // korrekt: Schild verschwindet aus Pool, Label dauerhaft anzeigen
+        document.querySelectorAll(`#schildpool .schild[data-letter="${letter}"]`).forEach(s=>s.remove());
+        const p = P(target);
+        const cx = +c.getAttribute('cx'), cy = +c.getAttribute('cy');
+        const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+        txt.setAttribute('x', cx);
+        txt.setAttribute('y', cy+30);
+        txt.setAttribute('text-anchor','middle');
+        txt.setAttribute('fill','#234d12');
+        txt.setAttribute('font-size','13');
+        txt.setAttribute('font-weight','600');
+        txt.textContent = p.name+' ('+p.letter+')';
+        svg.appendChild(txt);
+        STATE.placedLabels = STATE.placedLabels || {};
+        STATE.placedLabels[target] = true;
+        updateDragStatus();
+      }else{
+        // falsch: kurzes Feedback
+        c.setAttribute('stroke','#c44');
+        setTimeout(()=>c.setAttribute('stroke','#0002'), 600);
+      }
+    });
+  });
+}
+
+function updateDragStatus(){
+  const placed = Object.keys(STATE.placedLabels||{}).length;
+  const total = STATE.platforms.length;
+  const el = document.getElementById('dragStatus');
+  if(!el) return;
+  el.textContent = `Richtig zugeordnet: ${placed} / ${total}` + (placed===total?' – super! 🎉':'');
+}
+
+/* =====================================================================
+   MODUS: HILFEN
+   ===================================================================== */
+const HILFEN_TASKS = [
+  {
+    pair: ['B','G'],
+    frage: 'Stelle die Geradengleichung der Geraden auf, die durch das Basislager B und die Gipfelstation G verläuft.',
+    tipps: [
+      'Eine Geradengleichung im Raum hat die Form $\\vec{x} = \\vec{p} + r\\cdot\\vec{u}$. Du brauchst einen Stützvektor (Punkt auf der Geraden) und einen Richtungsvektor.',
+      ()=>{
+        const B=P('B'),G=P('G');
+        const v=vec(B,G);
+        return `Der Richtungsvektor ist $\\vec{BG} = \\vec{g}-\\vec{b}
+                = \\begin{pmatrix}${G.x}-(${B.x})\\\\${G.y}-(${B.y})\\\\${G.z}-(${B.z})\\end{pmatrix}
+                = \\begin{pmatrix}${v.x}\\\\${v.y}\\\\${v.z}\\end{pmatrix}$.`;
+      },
+      ()=>{
+        const B=P('B'),G=P('G');
+        const v=vec(B,G);
+        return `Lösung: $\\vec{x} = \\begin{pmatrix}${B.x}\\\\${B.y}\\\\${B.z}\\end{pmatrix}
+                + r\\cdot\\begin{pmatrix}${v.x}\\\\${v.y}\\\\${v.z}\\end{pmatrix}$, $r\\in\\mathbb{R}$.`;
+      }
+    ]
+  },
+  {
+    pair: ['T','A'],
+    frage: 'Wie lang ist das Stahlseil vom Treffpunkt T direkt zum Adlerhorst A?',
+    tipps: [
+      'Die Länge der Strecke ist der Betrag des Verbindungsvektors $|\\vec{TA}|$.',
+      ()=>{
+        const T=P('T'), A=P('A');
+        const v=vec(T,A);
+        return `$\\vec{TA}=\\begin{pmatrix}${v.x}\\\\${v.y}\\\\${v.z}\\end{pmatrix}$,
+          also $|\\vec{TA}| = \\sqrt{${v.x}^2+${v.y}^2+${v.z}^2}$.`;
+      },
+      ()=>{
+        const T=P('T'), A=P('A');
+        return `Länge $\\approx ${dist(T,A).toFixed(2)}\\,\\text{m}$.`;
+      }
+    ]
+  },
+  {
+    pair: ['E','R'],
+    frage: 'Bestimme den Mittelpunkt der Strecke zwischen Eichenturm E und Rabenfels R.',
+    tipps: [
+      'Der Mittelpunkt $M$ einer Strecke $\\overline{ER}$ ist $M=\\frac{1}{2}(\\vec{e}+\\vec{r})$.',
+      ()=>{
+        const E=P('E'), R=P('R');
+        return `$M = \\frac{1}{2}\\left(\\begin{pmatrix}${E.x}\\\\${E.y}\\\\${E.z}\\end{pmatrix}
+          +\\begin{pmatrix}${R.x}\\\\${R.y}\\\\${R.z}\\end{pmatrix}\\right)$.`;
+      },
+      ()=>{
+        const E=P('E'), R=P('R'); const m=mid(E,R);
+        return `$M=(${fmt(m.x)}|${fmt(m.y)}|${fmt(m.z)})$.`;
+      }
+    ]
+  },
+  {
+    pair: ['W','F'],
+    frage: 'Liegt der Punkt $P(1|3{,}5|3{,}5)$ auf der Geraden durch Wurzelhütte W und Fuchsbau F?',
+    tipps: [
+      'Setze $P$ in die Geradengleichung ein und prüfe, ob es ein gemeinsames $r$ gibt.',
+      ()=>{
+        const W=P('W'), F=P('F'); const v=vec(W,F);
+        return `$\\vec{WF}=\\begin{pmatrix}${v.x}\\\\${v.y}\\\\${v.z}\\end{pmatrix}$. Aus jeder Koordinate $r$ bestimmen
+          und vergleichen.`;
+      },
+      ()=>{
+        const W=P('W'), F=P('F'); const v=vec(W,F);
+        const r = (1-W.x)/v.x;
+        const y = W.y + r*v.y;
+        const z = W.z + r*v.z;
+        const ok = approxEq(y,3.5,0.001) && approxEq(z,3.5,0.001);
+        return `Aus $x$: $r=${fmt(r)}$. Damit $y=${fmt(y)}$, $z=${fmt(z)}$. ${ok?'Punkt liegt auf der Geraden.':'Punkt liegt NICHT auf der Geraden.'}`;
+      }
+    ]
+  }
+];
+let hilfenIdx = 0;
+/* =====================================================================
+   MODUS: KLAUSUR — kontextfreie Aufgaben + Checkliste + Tipps
+   ===================================================================== */
+const KLAUSUR_CHECK = [
+  { id:'k01', text:'Ortsvektor und Verbindungsvektor aufschreiben können' },
+  { id:'k02', text:'Länge eines Vektors berechnen' },
+  { id:'k03', text:'Vektoraddition und skalare Multiplikation' },
+  { id:'k04', text:'Mittelpunkt einer Strecke berechnen' },
+  { id:'k05', text:'Schwerpunkt eines Dreiecks berechnen' },
+  { id:'k06', text:'Vielfaches eines Vektors erkennen (lineare Abhängigkeit)' },
+  { id:'k07', text:'Geradengleichung in Parameterform aufstellen' },
+  { id:'k08', text:'Punktprobe: Liegt P auf der Geraden g?' },
+  { id:'k09', text:'Spurpunkte mit den drei Koordinatenebenen bestimmen' },
+  { id:'k10', text:'Lagebeziehung: parallel oder identisch?' },
+  { id:'k11', text:'Lagebeziehung: schneidend — Schnittpunkt mit LGS bestimmen' },
+  { id:'k12', text:'Lagebeziehung: windschief erkennen und begründen' },
+];
+
+const KLAUSUR_AUFGABEN = [
+  {id:'K1', titel:'Ortsvektor und Verbindungsvektor', diff:1, themen:['Ortsvektor','Länge'],
+    text:'Gegeben: $A(2|3|-1)$, $B(-1|4|2)$. Bestimme den Verbindungsvektor $\\vec{AB}$ und seine Länge $|\\vec{AB}|$.',
+    tipps:['Verbindungsvektor: $\\vec{AB}=B-A$ (Spitze minus Schaft).','$|\\vec{AB}|=\\sqrt{x^2+y^2+z^2}$ der Komponenten.'],
+    loesung:'$\\vec{AB}=(-3,1,3)$, $|\\vec{AB}|=\\sqrt{9+1+9}=\\sqrt{19}\\approx 4{,}36$.'},
+  {id:'K2', titel:'Mittelpunkt einer Strecke', diff:1, themen:['Mittelpunkt'],
+    text:'Bestimme den Mittelpunkt $M$ der Strecke zwischen $P(-2|4|6)$ und $Q(8|-2|0)$.',
+    tipps:['$M=\\tfrac{1}{2}(\\vec{p}+\\vec{q})$ — komponentenweise mitteln.','Bei ungeraden Summen: halbganzzahlig ist okay.'],
+    loesung:'$M=\\tfrac{1}{2}((-2,4,6)+(8,-2,0))=\\tfrac{1}{2}(6,2,6)=(3|1|3)$.'},
+  {id:'K3', titel:'Vektoraddition', diff:1, themen:['Addition','Skalar'],
+    text:'Gegeben: $\\vec{a}=(3,-1,2)$, $\\vec{b}=(1,4,-3)$. Berechne $2\\vec{a}-3\\vec{b}$.',
+    tipps:['Erst die Skalare auf jeden Vektor anwenden, dann komponentenweise addieren.','$2\\vec{a}=(6,-2,4)$ ist der erste Schritt.'],
+    loesung:'$2\\vec{a}-3\\vec{b}=(6,-2,4)-(3,12,-9)=(3,-14,13)$.'},
+  {id:'K4', titel:'Geradengleichung aus zwei Punkten', diff:2, themen:['Geradengleichung'],
+    text:'Stelle die Geradengleichung in Parameterform durch $A(1|2|3)$ und $B(4|0|5)$ auf.',
+    tipps:['Stützvektor = Ortsvektor eines Punktes (z.B. $\\vec{a}$).','Richtungsvektor = $\\vec{AB}=B-A$.'],
+    loesung:'$g:\\vec{x}=\\begin{pmatrix}1\\\\2\\\\3\\end{pmatrix}+t\\begin{pmatrix}3\\\\-2\\\\2\\end{pmatrix}$.'},
+  {id:'K5', titel:'Schwerpunkt eines Dreiecks', diff:2, themen:['Schwerpunkt'],
+    text:'Berechne den Schwerpunkt $S$ des Dreiecks mit Ecken $A(1|0|0)$, $B(0|3|0)$, $C(0|0|6)$.',
+    tipps:['$\\vec{s}=\\tfrac{1}{3}(\\vec{a}+\\vec{b}+\\vec{c})$.','Komponentenweise das arithmetische Mittel der drei Punkte.'],
+    loesung:'$S=\\tfrac{1}{3}(1,3,6)=(\\tfrac{1}{3}|1|2)$.'},
+  {id:'K6', titel:'Vielfaches-Test (lineare Abhängigkeit)', diff:2, themen:['Vielfaches','Parallel'],
+    text:'Sind $\\vec{v}=(6,-9,3)$ und $\\vec{w}=(-4,6,-2)$ linear abhängig?',
+    tipps:['Suche $k$ mit $\\vec{v}=k\\,\\vec{w}$.','Bestimme $k$ aus einer Komponente, prüfe mit den anderen.'],
+    loesung:'Aus 1. Komp: $6=k\\cdot(-4)\\Rightarrow k=-\\tfrac{3}{2}$. Probe 2.: $-\\tfrac{3}{2}\\cdot 6=-9$ ✓, 3.: $-\\tfrac{3}{2}\\cdot(-2)=3$ ✓ → <strong>linear abhängig</strong> (parallel).'},
+  {id:'K7', titel:'Punktprobe', diff:3, themen:['Punktprobe'],
+    text:'Liegt $P(7|3|-2)$ auf $g:\\vec{x}=\\begin{pmatrix}1\\\\1\\\\0\\end{pmatrix}+t\\begin{pmatrix}2\\\\1\\\\-1\\end{pmatrix}$?',
+    tipps:['Setze $P$ in die Geradengleichung ein.','Bestimme $t$ aus einer Zeile, prüfe mit den anderen.'],
+    loesung:'Aus $x$: $1+2t=7\\Rightarrow t=3$. Probe $y$: $1+3=4\\ne 3$ ✗ → <strong>liegt nicht auf $g$</strong>.'},
+  {id:'K8', titel:'Parallelitäts-Test zweier Geraden', diff:3, themen:['Parallel','Lagebeziehung'],
+    text:'Sind $g_1:\\vec{x}=(1,0,1)+r(2,-1,3)$ und $g_2:\\vec{x}=(4,3,-2)+s(-4,2,-6)$ parallel?',
+    tipps:['Prüfe nur die Richtungsvektoren — sind sie Vielfache voneinander?','Stützpunkt-Probe nötig, falls parallel: identisch oder echt parallel?'],
+    loesung:'$(-4,2,-6)=-2(2,-1,3)$ ✓ — <strong>parallel</strong>. Stützpunkt $(1,0,1)$ in $g_2$? Aus $x$: $4-4s=1\\Rightarrow s=\\tfrac{3}{4}$, $y$: $3+\\tfrac{3}{2}=\\tfrac{9}{2}\\ne 0$ ✗ → <strong>echt parallel</strong>.'},
+  {id:'K9', titel:'Spurpunkt mit dem Boden', diff:3, themen:['Spurpunkt'],
+    text:'Gegeben: $g:\\vec{x}=(2,5,8)+t(1,-2,-4)$. Bestimme den Spurpunkt mit der $xy$-Ebene ($z=0$).',
+    tipps:['$z$-Komponente null setzen: $8-4t=0\\Rightarrow t=?$','Den $t$-Wert in die $x$- und $y$-Komponente einsetzen.'],
+    loesung:'$8-4t=0\\Rightarrow t=2$. Punkt: $(2+2, 5-4, 0)=(4|1|0)$.'},
+  {id:'K10', titel:'Alle drei Spurpunkte', diff:4, themen:['Spurpunkt'],
+    text:'Bestimme alle drei Spurpunkte der Geraden $g:\\vec{x}=(6,-3,4)+t(-3,2,-1)$.',
+    tipps:['Drei Ebenen: $x=0$, $y=0$, $z=0$.','Für jeden Spurpunkt eine Komponente null setzen.'],
+    loesung:'$x=0$: $6-3t=0\\Rightarrow t=2$, Punkt $(0|1|2)$. ·\n$y=0$: $-3+2t=0\\Rightarrow t=\\tfrac{3}{2}$, Punkt $(\\tfrac{3}{2}|0|\\tfrac{5}{2})$. ·\n$z=0$: $4-t=0\\Rightarrow t=4$, Punkt $(-6|5|0)$.'},
+  {id:'K11', titel:'Schnittpunkt zweier Geraden', diff:4, themen:['Schnittpunkt','LGS'],
+    text:'Bestimme den Schnittpunkt von $g_1:\\vec{x}=(1,2,3)+r(1,0,-1)$ und $g_2:\\vec{x}=(0,2,5)+s(2,0,-3)$.',
+    tipps:['Setze die Geradengleichungen gleich: drei Gleichungen, zwei Unbekannte $r$ und $s$.','Wenn $y$-Komponente trivial wird: nutze $x$ und $z$ für $r,s$ und prüfe $y$.'],
+    loesung:'$y$ ist in beiden konstant 2 ✓. $x$: $1+r=2s$, $z$: $3-r=5-3s\\Rightarrow r=3s-2$. Einsetzen in $x$: $1+3s-2=2s\\Rightarrow s=1$, $r=1$. Schnittpunkt: $(2|2|2)$.'},
+  {id:'K12', titel:'Windschief begründen', diff:4, themen:['Windschief','LGS'],
+    text:'Untersuche die Lagebeziehung von $g_1:\\vec{x}=(0,1,0)+r(1,1,1)$ und $g_2:\\vec{x}=(2,0,3)+s(1,-1,0)$.',
+    tipps:['Erst Richtungsvektoren vergleichen — Vielfaches?','Falls nicht parallel: Gleichsetzen → LGS lösen → falls Widerspruch, windschief.'],
+    loesung:'$(1,1,1)$ und $(1,-1,0)$ sind keine Vielfachen → nicht parallel. LGS: $r=2+s$, $1+r=-s$, $r=3$. Aus 3.: $r=3$ → aus 1.: $s=1$. Probe in 2.: $1+3=4\\ne -1$ ✗ → <strong>windschief</strong>.'},
+  {id:'K13', titel:'Parameter so wählen, dass Schnittpunkt entsteht', diff:5, themen:['Parameter','Schnittpunkt'],
+    text:'Für welchen Wert von $a$ schneiden sich $g_1:\\vec{x}=(1,0,2)+r(1,a,1)$ und $g_2:\\vec{x}=(3,4,2)+s(0,1,1)$?',
+    tipps:['Setze gleich. Aus der $z$-Gleichung kannst du eine Beziehung zwischen $r$ und $s$ ableiten.','Setze diese in $x$ und $y$ ein — eine der Gleichungen liefert $a$.'],
+    loesung:'$x$: $1+r=3\\Rightarrow r=2$. $z$: $2+r=2+s\\Rightarrow s=r=2$. $y$: $0+2a=4+2\\Rightarrow a=3$.'},
+  {id:'K14', titel:'Parallele Gerade durch festen Punkt', diff:5, themen:['Parallel','Konstruktion'],
+    text:'Gegeben $g:\\vec{x}=(2,1,0)+r(1,-1,2)$. Bestimme die zu $g$ parallele Gerade $h$ durch $Q(0|4|3)$. Ist $h$ identisch zu $g$ oder echt parallel?',
+    tipps:['Gleichen Richtungsvektor wählen. Stützvektor = $\\vec{q}$.','Punktprobe: Liegt $Q$ auf $g$? Falls ja: identisch; falls nein: echt parallel.'],
+    loesung:'$h:\\vec{x}=(0,4,3)+t(1,-1,2)$. Punktprobe $Q$ auf $g$: aus $x$: $2+r=0\\Rightarrow r=-2$. $y$: $1+2=3\\ne 4$ ✗ → <strong>echt parallel</strong>.'},
+  {id:'K15', titel:'Komplette Lagebeziehung systematisch', diff:5, themen:['Lagebeziehung','Entscheidungsbaum'],
+    text:'Bestimme die Lagebeziehung von $g_1:\\vec{x}=(2,1,4)+r(3,-1,2)$ und $g_2:\\vec{x}=(5,0,6)+s(6,-2,4)$.',
+    tipps:['Schritt 1: Sind die Richtungsvektoren Vielfache?','Schritt 2: Falls ja → Punktprobe (identisch vs. echt parallel). Falls nein → LGS für Schnittpunkt.'],
+    loesung:'$(6,-2,4)=2(3,-1,2)$ ✓ — parallel. Punktprobe $(2,1,4)$ auf $g_2$: $5+6s=2\\Rightarrow s=-\\tfrac{1}{2}$. $y$: $0+1=1$ ✓, $z$: $6-2=4$ ✓ → <strong>identisch</strong>.'},
+  {id:'K16', titel:'Geradenfamilie und Treffpunkt', diff:6, themen:['Verallgemeinerung','Parameter'],
+    text:'Eine Gerade $g_a:\\vec{x}=(1,0,2)+t(1,a,-1)$ hängt von einem Parameter $a$ ab. Zeige: Für jedes $a$ schneidet $g_a$ die Ebene $z=0$ in einem Punkt mit konstanter $x$-Koordinate. Bestimme diese.',
+    tipps:['Bestimme $t$ aus $z=0$, einsetzen in $x$ und $y$.','Beachte, dass die $x$-Komponente nicht vom Parameter $a$ abhängt.'],
+    loesung:'$z=0$: $2-t=0\\Rightarrow t=2$ (unabhängig von $a$). $x$: $1+2=3$ — konstant. $y$: $0+2a=2a$. Spurpunkt $(3|2a|0)$ → $x=3$ für alle $a$, $y$ liegt auf einer Geraden.'},
+];
+
+function renderKlausur(){
+  const p = document.getElementById('panel'); p.className='panel';
+  // Lade gespeicherte Checkliste + Erledigt-Marker
+  let check = {};
+  let done = {};
+  try {
+    check = JSON.parse(localStorage.getItem('schueler-klausur-check') || '{}');
+    done = JSON.parse(localStorage.getItem('schueler-klausur-done') || '{}');
+  } catch(e) {}
+
+  // Filter-State
+  if (typeof STATE.klausurFilter === 'undefined') STATE.klausurFilter = { diff:'alle', thema:'alle' };
+  const F = STATE.klausurFilter;
+
+  // Themen-Liste
+  const themenSet = new Set();
+  KLAUSUR_AUFGABEN.forEach(a => a.themen.forEach(t => themenSet.add(t)));
+  const themen = Array.from(themenSet).sort();
+
+  // Aufgaben filtern
+  const filtered = KLAUSUR_AUFGABEN.filter(a =>
+    (F.diff === 'alle' || a.diff === parseInt(F.diff)) &&
+    (F.thema === 'alle' || a.themen.includes(F.thema))
+  );
+
+  // Checkliste HTML
+  const totalCheck = KLAUSUR_CHECK.length;
+  const doneCheck = Object.values(check).filter(v=>v).length;
+  let checkHTML = `<details ${doneCheck<totalCheck?'open':''}>
+    <summary style="cursor:pointer;font-weight:bold;color:var(--green-dark);">✓ Checkliste — was muss ich können? (${doneCheck}/${totalCheck})</summary>
+    <ul style="list-style:none;padding-left:0;margin-top:8px;">`;
+  KLAUSUR_CHECK.forEach(c => {
+    const checked = check[c.id] ? 'checked' : '';
+    checkHTML += `<li style="padding:3px 0;"><label style="display:flex;align-items:flex-start;gap:6px;cursor:pointer;">
+      <input type="checkbox" data-check="${c.id}" ${checked} style="margin-top:3px;"> <span>${c.text}</span></label></li>`;
+  });
+  checkHTML += '</ul></details>';
+
+  // Filter-Bar
+  const diffNames = {1:'L1 sehr leicht', 2:'L2 leicht', 3:'L3 mittel', 4:'L4 anspruchsvoll', 5:'L5 schwer', 6:'L6 sehr schwer'};
+  let filterHTML = `<div style="margin:10px 0;padding:8px;background:#f0f7ec;border-radius:6px;font-size:9.5pt;">
+    <div><strong>Schwierigkeit:</strong>
+      <button class="klf" data-diff="alle" style="${F.diff==='alle'?'background:var(--green-dark);color:white;':''}">alle</button>
+      ${[1,2,3,4,5,6].map(d=>`<button class="klf" data-diff="${d}" style="${F.diff==String(d)?'background:var(--green-dark);color:white;':''}">L${d}</button>`).join('')}
+    </div>
+    <div style="margin-top:5px;"><strong>Thema:</strong>
+      <button class="klf" data-thema="alle" style="${F.thema==='alle'?'background:var(--green-dark);color:white;':''}">alle</button>
+      ${themen.map(t=>`<button class="klf" data-thema="${t}" style="${F.thema==t?'background:var(--green-dark);color:white;':''}">${t}</button>`).join('')}
+    </div>
+  </div>`;
+
+  // Aufgaben-Cards
+  let aufHTML = '';
+  const doneCount = Object.values(done).filter(v=>v).length;
+  aufHTML += `<p style="font-size:9.5pt;color:#555;">Zeige <strong>${filtered.length}</strong> von ${KLAUSUR_AUFGABEN.length} Aufgaben &middot; Erledigt: <strong>${doneCount}/${KLAUSUR_AUFGABEN.length}</strong></p>`;
+  filtered.forEach(a => {
+    const diffColor = {1:'#c8e6c9',2:'#dcedc8',3:'#fff3b0',4:'#ffe082',5:'#ffccbc',6:'#ff8a80'}[a.diff];
+    const isDone = done[a.id];
+    aufHTML += `<div style="background:white;border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin:8px 0;border-left:5px solid ${diffColor};${isDone?'opacity:0.75;':''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+        <strong style="color:var(--green-dark);">${a.id} · ${a.titel}</strong>
+        <span style="background:${diffColor};padding:1px 8px;border-radius:10px;font-size:9pt;font-weight:bold;">${diffNames[a.diff]}</span>
+      </div>
+      <div style="margin:3px 0 6px 0;">${a.themen.map(t=>`<span style="background:#e3f2fd;color:#0d47a1;padding:1px 6px;border-radius:8px;font-size:8.5pt;margin-right:3px;">${t}</span>`).join('')}</div>
+      <div style="font-size:10pt;">${a.text}</div>
+      ${a.tipps.map((t,i)=>`<details style="margin:4px 0;"><summary style="cursor:pointer;color:#806000;font-size:9.5pt;">💡 Tipp ${i+1}</summary><div style="padding:5px 10px;background:#fffde7;border-left:3px solid #c77700;font-size:9.5pt;">${t}</div></details>`).join('')}
+      <details style="margin:4px 0;"><summary style="cursor:pointer;color:var(--green-dark);font-weight:bold;font-size:9.5pt;">✅ Lösung</summary><div style="padding:6px 10px;background:#f0f0f0;border-left:3px solid #777;font-size:9.5pt;">${a.loesung}</div></details>
+      <button class="kl-done" data-id="${a.id}" style="margin-top:5px;font-size:9pt;">${isDone?'↺ doch noch üben':'✓ verstanden'}</button>
+    </div>`;
+  });
+
+  p.innerHTML = `
+    <h2>📚 Klausurvorbereitung</h2>
+    <p>Kontextfreie Vektor-Aufgaben in 6 Schwierigkeitsstufen — von Ortsvektor bis Lagebeziehung. Jede Aufgabe hat zwei Tipps und eine vollständige Lösung.</p>
+    ${checkHTML}
+    ${filterHTML}
+    ${aufHTML}
+  `;
+
+  // Event-Handler
+  p.querySelectorAll('input[data-check]').forEach(cb => {
+    cb.onchange = () => {
+      check[cb.dataset.check] = cb.checked;
+      localStorage.setItem('schueler-klausur-check', JSON.stringify(check));
+      renderKlausur();
+    };
+  });
+  p.querySelectorAll('.klf').forEach(btn => {
+    btn.style.margin = '2px';
+    btn.style.padding = '3px 9px';
+    btn.style.borderRadius = '12px';
+    btn.style.border = '1px solid var(--border)';
+    btn.style.cursor = 'pointer';
+    btn.style.fontSize = '9pt';
+    if (!btn.style.background) btn.style.background = 'white';
+    btn.onclick = () => {
+      if (btn.dataset.diff) STATE.klausurFilter.diff = btn.dataset.diff;
+      if (btn.dataset.thema) STATE.klausurFilter.thema = btn.dataset.thema;
+      renderKlausur();
+    };
+  });
+  p.querySelectorAll('.kl-done').forEach(btn => {
+    btn.style.padding = '3px 10px';
+    btn.style.borderRadius = '4px';
+    btn.style.cursor = 'pointer';
+    btn.onclick = () => {
+      done[btn.dataset.id] = !done[btn.dataset.id];
+      localStorage.setItem('schueler-klausur-done', JSON.stringify(done));
+      renderKlausur();
+    };
+  });
+
+  if (window.renderMathInElement) renderMathInElement(p, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});
+}
+
+function renderHilfen(){
+  const p = document.getElementById('panel');
+  p.className='panel';
+  const t = HILFEN_TASKS[hilfenIdx % HILFEN_TASKS.length];
+  STATE.highlight = t.pair.slice();
+  const tipps = t.tipps.map(x => typeof x === 'function' ? x() : x);
+  p.innerHTML = `
+    <h2>💡 Mit Hilfen rechnen</h2>
+    <p><b>Aufgabe:</b> ${t.frage}</p>
+    <details class="hilfekarte"><summary>Tipp 1 – Methodisch</summary><div class="body">${tipps[0]}</div></details>
+    <details class="hilfekarte"><summary>Tipp 2 – Rechenschritt</summary><div class="body">${tipps[1]}</div></details>
+    <details class="hilfekarte"><summary>Lösung anzeigen</summary><div class="body">${tipps[2]}</div></details>
+    <div class="row"><button id="hilfNeu">Neue Aufgabe</button></div>
+  `;
+  renderMath();
+  document.getElementById('hilfNeu').onclick = ()=>{
+    hilfenIdx = (hilfenIdx+1) % HILFEN_TASKS.length;
+    renderHilfen();
+    refreshView();
+  };
+  refreshView();
+}
+
+/* =====================================================================
+   MODUS: AVATAR
+   ===================================================================== */
+let avatarAnim = null;
+function renderAvatar(){
+  const p = document.getElementById('panel');
+  p.className='panel';
+  STATE.highlight = ['B','G'];
+  p.innerHTML = `
+    <h2>🧗 Avatar-Klettern</h2>
+    <p>Aufgabe: Bewege den Avatar <b>vom Basislager B nach Gipfelstation G</b>.
+       Gib dazu eine Geradengleichung $\\vec{x}=\\vec{p}+r\\cdot\\vec{u}$ ein und einen Parameterbereich.</p>
+    <div class="row">Stützvektor $\\vec{p}$:
+      <input type="number" id="px" step="any" placeholder="x">
+      <input type="number" id="py" step="any" placeholder="y">
+      <input type="number" id="pz" step="any" placeholder="z">
+    </div>
+    <div class="row">Richtungsvektor $\\vec{u}$:
+      <input type="number" id="ux" step="any" placeholder="x">
+      <input type="number" id="uy" step="any" placeholder="y">
+      <input type="number" id="uz" step="any" placeholder="z">
+    </div>
+    <div class="row">r von <input type="number" id="r0" value="0" step="any">
+      bis <input type="number" id="r1" value="1" step="any"></div>
+    <div class="row">
+      <button id="avStart">Bewegung starten</button>
+      <button id="avStop" class="alt">Stopp</button>
+    </div>
+    <div id="avFb"></div>
+  `;
+  renderMath();
+  refreshView();
+  document.getElementById('avStart').onclick = startAvatar;
+  document.getElementById('avStop').onclick = stopAvatar;
+}
+
+function stopAvatar(){
+  if(avatarAnim){ cancelAnimationFrame(avatarAnim); avatarAnim=null; }
+}
+function startAvatar(){
+  stopAvatar();
+  const p = {x:+document.getElementById('px').value,
+             y:+document.getElementById('py').value,
+             z:+document.getElementById('pz').value};
+  const u = {x:+document.getElementById('ux').value,
+             y:+document.getElementById('uy').value,
+             z:+document.getElementById('uz').value};
+  const r0 = +document.getElementById('r0').value;
+  const r1 = +document.getElementById('r1').value;
+  // Aufgabenüberprüfung: starten bei B, enden bei G
+  const B = P('B'), G = P('G');
+  const start = {x:p.x+r0*u.x, y:p.y+r0*u.y, z:p.z+r0*u.z};
+  const ende  = {x:p.x+r1*u.x, y:p.y+r1*u.y, z:p.z+r1*u.z};
+  const okStart = approxEq(start.x,B.x,0.1)&&approxEq(start.y,B.y,0.1)&&approxEq(start.z,B.z,0.1);
+  const okEnd   = approxEq(ende.x,G.x,0.1)&&approxEq(ende.y,G.y,0.1)&&approxEq(ende.z,G.z,0.1);
+  const fb = document.getElementById('avFb');
+  if(okStart && okEnd){
+    fb.className='feedback ok';
+    fb.textContent = '✓ Gleichung passt – der Avatar klettert von B nach G!';
+  } else {
+    fb.className='feedback bad';
+    fb.textContent = `Bewegung startet bei (${fmt(start.x)}|${fmt(start.y)}|${fmt(start.z)})
+                      und endet bei (${fmt(ende.x)}|${fmt(ende.y)}|${fmt(ende.z)}).`;
+  }
+  // Animation
+  const dur = 3000;
+  const t0 = performance.now();
+  function step(now){
+    const t = Math.min(1, (now-t0)/dur);
+    const r = r0 + t*(r1-r0);
+    STATE.avatar = { x:p.x+r*u.x, y:p.y+r*u.y, z:p.z+r*u.z };
+    refreshView();
+    if(t<1){
+      avatarAnim = requestAnimationFrame(step);
+    } else {
+      avatarAnim = null;
+    }
+  }
+  avatarAnim = requestAnimationFrame(step);
+}
+
+/* =====================================================================
+   MODUS: STORY (verzweigt)
+   ===================================================================== */
+const STORY = {
+  start: {
+    text: 'Du stehst am Treffpunkt T (0|0|0). Wohin willst du zuerst?',
+    choices: [
+      {label:'Basislager B aufsuchen', next:'B'},
+      {label:'Direkt zur Wurzelhütte W', next:'W'},
+    ]
+  },
+  B: {
+    text: 'Du bist am Basislager B(-4|-3|2). Wie weit warst du von T entfernt? Antwort auf 2 Nachkommastellen.',
+    highlight:['T','B'],
+    task: { input:'number', check:(v)=>approxEq(v, dist(P('T'),P('B')), 0.02),
+            solution: ()=>dist(P('T'),P('B')).toFixed(2)+' m' },
+    nextOk: 'B2'
+  },
+  B2: {
+    text: 'Gut! Von hier siehst du den Eichenturm E. Was ist der Mittelpunkt von $\\overline{BE}$? Gib x,y,z ein.',
+    highlight:['B','E'],
+    task: { input:'triple', check:(v)=>{
+              const m=mid(P('B'),P('E'));
+              return approxEq(v[0],m.x)&&approxEq(v[1],m.y)&&approxEq(v[2],m.z);
+            },
+            solution: ()=>{const m=mid(P('B'),P('E')); return `(${fmt(m.x)}|${fmt(m.y)}|${fmt(m.z)})`;} },
+    nextOk: 'final'
+  },
+  W: {
+    text: 'Du bist an der Wurzelhütte W(3|0|2). Verbindungsvektor $\\vec{TW}$? (x,y,z)',
+    highlight:['T','W'],
+    task: { input:'triple', check:(v)=>{
+              const u=vec(P('T'),P('W'));
+              return approxEq(v[0],u.x)&&approxEq(v[1],u.y)&&approxEq(v[2],u.z);
+            },
+            solution: ()=>{const u=vec(P('T'),P('W')); return `(${u.x}|${u.y}|${u.z})`;} },
+    nextOk: 'W2'
+  },
+  W2: {
+    text: 'Du willst von W direkt zum Gipfel G(8|5|6). Wie lang ist der Weg? (2 NK-Stellen)',
+    highlight:['W','G'],
+    task: { input:'number', check:(v)=>approxEq(v,dist(P('W'),P('G')),0.02),
+            solution: ()=>dist(P('W'),P('G')).toFixed(2)+' m' },
+    nextOk: 'final'
+  },
+  final: {
+    text: '🎉 Du hast den Gipfel erreicht! Geschafft.',
+    highlight:['G'],
+    final:true
+  }
+};
+let storyNode = 'start';
+function renderStory(){
+  const p = document.getElementById('panel');
+  p.className='panel';
+  const node = STORY[storyNode];
+  STATE.highlight = node.highlight || [];
+  refreshView();
+  let html = `<h2>📖 Geschichte</h2><p>${node.text}</p>`;
+  if(node.choices){
+    node.choices.forEach((c,i)=>{
+      html += `<button class="story-choice" data-i="${i}">${c.label}</button>`;
+    });
+  } else if(node.task){
+    if(node.task.input==='number'){
+      html += `<div class="row"><input type="number" id="sIn" step="any">
+        <button id="sCheck">Prüfen</button></div>`;
+    } else if(node.task.input==='triple'){
+      html += `<div class="row">
+        <input type="number" id="sX" step="any" placeholder="x">
+        <input type="number" id="sY" step="any" placeholder="y">
+        <input type="number" id="sZ" step="any" placeholder="z">
+        <button id="sCheck">Prüfen</button></div>`;
+    }
+    html += `<div id="sFb"></div>`;
+  }
+  if(node.final){
+    html += `<div class="row"><button id="sRestart">Von vorne</button></div>`;
+  }
+  p.innerHTML = html;
+  renderMath();
+  if(node.choices){
+    p.querySelectorAll('.story-choice').forEach(btn=>{
+      btn.onclick = ()=>{
+        storyNode = node.choices[+btn.dataset.i].next;
+        renderStory();
+      };
+    });
+  }
+  if(node.task){
+    document.getElementById('sCheck').onclick = ()=>{
+      let v;
+      if(node.task.input==='number') v = +document.getElementById('sIn').value;
+      else v = [+document.getElementById('sX').value,
+                +document.getElementById('sY').value,
+                +document.getElementById('sZ').value];
+      const fb = document.getElementById('sFb');
+      if(node.task.check(v)){
+        fb.className='feedback ok';
+        fb.innerHTML = '✓ Richtig! <button id="sNext">Weiter</button>';
+        document.getElementById('sNext').onclick = ()=>{
+          storyNode = node.nextOk; renderStory();
+        };
+      } else {
+        fb.className='feedback bad';
+        fb.textContent = '✗ Stimmt noch nicht. Tipp: Lösung wäre '+node.task.solution();
+      }
+    };
+  }
+  if(node.final){
+    document.getElementById('sRestart').onclick = ()=>{ storyNode='start'; renderStory(); };
+  }
+}
+
+/* =====================================================================
+   MODUS: AUDIO / TTS
+   ===================================================================== */
+const AUDIO_STORY = [
+  { say:'Notruf im Kletterwald! Am Adlerhorst, hoch oben auf sechs Metern, wartet eine verletzte Kletterin auf Hilfe.',
+    highlight:['A'],
+    q:'Auf welcher Höhe befindet sich die Verletzte? (Antwort in Metern)',
+    check:(v)=>approxEq(+v,P('A').z,0.01) },
+  { say:'Das Rettungsteam startet am Treffpunkt T und muss zuerst zum Basislager B, um Material zu holen.',
+    highlight:['T','B'],
+    q:'Wie lang ist der direkte Weg von T nach B? Auf zwei Nachkommastellen.',
+    check:(v)=>approxEq(+v,dist(P('T'),P('B')),0.02) },
+  { say:'Vom Basislager spannen sie ein Stahlseil schräg nach oben zum Adlerhorst.',
+    highlight:['B','A'],
+    q:'Wie lang muss das Stahlseil mindestens sein? Zwei Nachkommastellen.',
+    check:(v)=>approxEq(+v,dist(P('B'),P('A')),0.02) },
+  { say:'Die Rettung gelingt! Die Kletterin schwebt sicher hinab zum Treffpunkt. Alle atmen auf.',
+    highlight:['T','A'], q:null }
+];
+let audioIdx = 0;
+const SS = window.speechSynthesis;
+function renderAudio(){
+  const p = document.getElementById('panel');
+  p.className='panel';
+  if(!SS){
+    p.innerHTML = `<h2>🔊 Hörbuch</h2>
+      <p>Dein Browser unterstützt Web Speech (speechSynthesis) nicht. Dieser Modus ist deaktiviert.</p>`;
+    return;
+  }
+  audioIdx = 0;
+  buildAudioPanel();
+}
+function buildAudioPanel(){
+  const p = document.getElementById('panel');
+  const node = AUDIO_STORY[audioIdx];
+  STATE.highlight = node.highlight || [];
+  refreshView();
+  let html = `<h2>🔊 Hörbuch – Abschnitt ${audioIdx+1} / ${AUDIO_STORY.length}</h2>
+    <p><em>${node.say}</em></p>
+    <div class="row">
+      <button id="aPlay">▶ Vorlesen</button>
+      <button id="aPause" class="alt">⏸ Pause</button>
+      <button id="aStop" class="alt">⏹ Stop</button>
+    </div>`;
+  if(node.q){
+    html += `<p><b>Frage:</b> ${node.q}</p>
+      <div class="row"><input type="number" id="aIn" step="any">
+        <button id="aCheck">Prüfen</button></div>
+      <div id="aFb"></div>`;
+  } else {
+    html += `<div class="row"><button id="aRestart">Von vorne</button></div>`;
+  }
+  p.innerHTML = html;
+  document.getElementById('aPlay').onclick = ()=>{
+    SS.cancel();
+    const u = new SpeechSynthesisUtterance(node.say);
+    u.lang='de-DE'; u.rate=0.95;
+    SS.speak(u);
+  };
+  document.getElementById('aPause').onclick = ()=>{
+    if(SS.speaking && !SS.paused) SS.pause(); else SS.resume();
+  };
+  document.getElementById('aStop').onclick = ()=>SS.cancel();
+  if(node.q){
+    document.getElementById('aCheck').onclick = ()=>{
+      const v = document.getElementById('aIn').value;
+      const ok = node.check(v);
+      const fb = document.getElementById('aFb');
+      fb.className='feedback '+(ok?'ok':'bad');
+      if(ok){
+        fb.innerHTML = '✓ Genau! <button id="aNext">Weiter</button>';
+        document.getElementById('aNext').onclick = ()=>{
+          audioIdx = Math.min(AUDIO_STORY.length-1, audioIdx+1);
+          buildAudioPanel();
+        };
+      } else {
+        fb.textContent = '✗ Noch nicht ganz, hör nochmal hin.';
+      }
+    };
+  } else {
+    document.getElementById('aRestart').onclick = ()=>{ audioIdx=0; buildAudioPanel(); };
+  }
+}
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+window.addEventListener('load', ()=>{
+  if(!THREE_OK){
+    document.getElementById('warning3d').style.display='block';
+    document.getElementById('btn3D').disabled = true;
+    document.getElementById('btn3D').style.opacity = 0.5;
+  }
+  render2D();
+  renderTab();
+  // Touch-Hinweis im Drag-Modus
+});
+</script>
+</body>
+</html>

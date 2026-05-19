@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Kletterwald — Plattform-Editor</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family:'Helvetica','Arial',sans-serif; margin:0; padding:0; background:#f4f7f3; color:#1a1a1a; }
+  header { background:#1a3a1a; color:white; padding:8px 16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+  header h1 { margin:0; font-size:14pt; }
+  .mode-tabs { display:flex; gap:2px; }
+  .mode-tabs button { background:#3a5a3a; color:white; border:1px solid #1a3a1a; padding:5px 10px; font-size:9.5pt; cursor:pointer; border-radius:3px; }
+  .mode-tabs button.active { background:#c77700; border-color:#a35a00; font-weight:bold; }
+  .mode-tabs button:hover:not(.active) { background:#4a6a4a; }
+  header .actions button { margin-left:4px; }
+  button { font-family:inherit; font-size:10pt; padding:5px 10px; border-radius:3px; border:1px solid #888; background:white; cursor:pointer; }
+  button.primary { background:#2e6b2e; color:white; border-color:#1a3a1a; }
+  button.primary:hover { background:#1a4a1a; }
+  button.danger { background:#c44; color:white; border-color:#a30000; }
+  button.warn { background:#c77700; color:white; border-color:#a35a00; }
+  button:hover { background:#e8efe5; }
+  input, select { font-family:inherit; font-size:10pt; padding:3px 6px; border:1px solid #aaa; border-radius:3px; }
+
+  main { display:flex; gap:8px; padding:8px; }
+  #sidebar { width:340px; flex-shrink:0; }
+  #map-panel { flex-grow:1; background:white; border:1px solid #ccc; border-radius:6px; padding:6px; position:relative; }
+  svg { display:block; max-width:100%; height:auto; }
+
+  .section { background:white; border:1px solid #ccc; border-radius:6px; margin-bottom:8px; }
+  .section > h2 { margin:0; padding:6px 10px; background:#e5f0e0; font-size:10.5pt; color:#1a3a1a; cursor:pointer; user-select:none; display:flex; justify-content:space-between; align-items:center;}
+  .section > h2 .badge { background:#2e6b2e; color:white; font-size:8.5pt; padding:1px 6px; border-radius:8px; }
+  .section.collapsed > .section-body { display:none; }
+  .section.collapsed > h2::after { content:'▸'; }
+  .section:not(.collapsed) > h2::after { content:'▾'; }
+  .section-body { padding:8px 10px; font-size:10pt; }
+
+  .form-group { margin:4px 0; }
+  .form-group label { display:inline-block; min-width:70px; font-size:9.5pt; }
+  .form-group input[type=text], .form-group input[type=number] { width:80px; }
+  .form-row { display:flex; gap:4px; }
+
+  table.list { width:100%; border-collapse:collapse; font-size:9pt; }
+  table.list th, table.list td { border-bottom:1px solid #e0e0e0; padding:2px 4px; text-align:center; }
+  table.list th { background:#e5f0e0; font-size:8.5pt; }
+  table.list tr.selected { background:#fff9d0; }
+  table.list tr:hover { background:#f0f7ec; cursor:pointer; }
+  table.list .icon-btn { background:none; border:none; cursor:pointer; padding:0 4px; font-size:10pt; color:#a30000; }
+  .hi { background:#fff0f0; }
+  .boden-row { background:#fff8e7; }
+
+  .hint { font-size:9pt; color:#777; font-style:italic; margin:3px 0; }
+  .error { color:#a30000; font-size:9.5pt; margin-top:4px; min-height:14px; }
+
+  /* Aufgaben-Modus / Geschichten-Modus: Sidebar verstecken */
+  body.fullmap #sidebar { display:none; }
+  body.fullmap #map-panel { padding:20px; }
+  #aufgaben-overlay { display:none; }
+  body.fullmap #aufgaben-overlay { display:block; background:white; border:1px solid #ccc; padding:14px; margin-top:10px; border-radius:6px; }
+  body.fullmap.story-mode #aufgaben-overlay { background:#f7fbf6; border-left:6px solid #2e6b2e; }
+
+  /* SVG-Stile */
+  .grid-sub  { stroke:#edf3eb; stroke-width:0.1; fill:none; }
+  .grid-min  { stroke:#bcd4b6; stroke-width:0.2; fill:none; }
+  .grid-maj  { stroke:#7aa874; stroke-width:0.35; fill:none; }
+  .grid-bold { stroke:#3f7a3a; stroke-width:0.6; fill:none; }
+  .axis      { stroke:#1a3a1a; stroke-width:0.7; fill:none; }
+  .tick      { font:2.6px 'Helvetica',sans-serif; fill:#1a3a1a; }
+  .tick-bold { font:3.2px 'Helvetica',sans-serif; font-weight:bold; fill:#1a3a1a; }
+  .baum      { fill:#2e6b2e; stroke:#1a3a1a; stroke-width:0.4; cursor:pointer; }
+  .baum-hi   { fill:#c44; stroke:#1a3a1a; stroke-width:0.4; cursor:pointer; }
+  .boden     { fill:#c9a45a; stroke:#1a3a1a; stroke-width:0.4; cursor:pointer; }
+  .selected-marker { fill:none; stroke:#0066cc; stroke-width:0.8; stroke-dasharray:1.5,1; pointer-events:none; }
+  .seil-marker     { fill:none; stroke:#0066cc; stroke-width:1.2; stroke-dasharray:2,1; pointer-events:none; opacity:0.7; }
+  .seil { stroke-width:0.7; fill:none; pointer-events:stroke; cursor:pointer; }
+  .seil-hover { stroke-width:1.4 !important; }
+  .pf-label    { font:3.8px 'Helvetica',sans-serif; font-weight:bold; fill:#1a3a1a; pointer-events:none; }
+  .pf-sublabel { font:2.5px 'Helvetica',sans-serif; fill:#444; pointer-events:none; }
+  .pf-name     { font:2.8px 'Helvetica',sans-serif; font-style:italic; fill:#1a3a1a; pointer-events:none; }
+
+  .seil-info { background:#eef5ff; border-left:4px solid #0066cc; padding:6px 10px; font-size:9.5pt; margin:6px 0; border-radius:3px; }
+  .seil-info code { background:white; padding:1px 4px; border-radius:2px; }
+
+  .aufgabe-card { background:#f7fbf6; border-left:4px solid #2e6b2e; padding:8px 12px; margin:8px 0; font-size:10pt; border-radius:3px; }
+  .aufgabe-card .titel { font-weight:bold; color:#2e6b2e; margin-bottom:4px; }
+  .toolbar-mode-hint { background:#fffde7; border:1px solid #e6c870; padding:5px 10px; margin:6px 0; font-size:9.5pt; border-radius:3px; }
+
+  /* Drucken */
+  @media print {
+    @page { size: A4 landscape; margin: 0; }
+    header, #sidebar { display:none !important; }
+    body, main { margin:0; padding:0; background:white; gap:0; }
+    #map-panel { border:none; padding:0; }
+    svg { width:297mm; height:210mm; }
+    .print-hide { display:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Kletterwald-Editor</h1>
+  <div class="mode-tabs">
+    <button data-mode="edit" class="active" onclick="setMode('edit')">✏ Editieren</button>
+    <button data-mode="seil" onclick="setMode('seil')">🪢 Seile</button>
+    <button data-mode="aufgabe" onclick="setMode('aufgabe')">📝 Aufgaben-Modus</button>
+    <button data-mode="story" onclick="setMode('story')">📖 Geschichten-Bühne</button>
+  </div>
+  <div class="actions">
+    <button class="primary" onclick="window.print()">🖨 A4 drucken</button>
+    <button onclick="exportPNG()">📷 PNG</button>
+    <button onclick="exportJSON()">💾 JSON</button>
+    <button onclick="importJSON()">📂 Import</button>
+  </div>
+</header>
+
+<main>
+  <aside id="sidebar">
+
+    <div class="section">
+      <h2 onclick="toggleSection(this)">Sets &amp; Vorlagen</h2>
+      <div class="section-body">
+        <div class="form-group form-row">
+          <select id="set-select" onchange="loadSet(this.value)" style="flex:1;"></select>
+          <button onclick="saveAsNewSet()">+ Neu</button>
+          <button class="danger" onclick="deleteCurrentSet()">✕</button>
+        </div>
+        <div class="form-group">
+          <label>Vorlage:</label>
+          <select id="template-select" style="flex:1;width:160px;">
+            <option value="">— wählen —</option>
+            <option value="quadrat">Quadrat in der Ebene</option>
+            <option value="kollinear">Drei kollineare Punkte</option>
+            <option value="parallel">Paralleles Seil-Paar</option>
+            <option value="windschief">Windschiefes Paar</option>
+            <option value="schwerpunkt">Dreieck mit Schwerpunkt</option>
+            <option value="zipline">Zipline-Setup</option>
+          </select>
+          <button onclick="applyTemplate()">Anwenden</button>
+        </div>
+        <p class="hint">„+ Neu" speichert die aktuelle Konstellation als neues Set.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 onclick="toggleSection(this)">Plattformen <span class="badge" id="pf-count">0</span></h2>
+      <div class="section-body">
+        <input type="text" id="pf-search" placeholder="🔍 Suche (Name oder Buchstabe)" style="width:100%;" oninput="renderList()">
+        <table class="list" id="platform-list"></table>
+        <p class="hint">Klick = auswählen · ✕ = löschen · in Karte klicken/ziehen.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 onclick="toggleSection(this)" id="form-title">Plattform hinzufügen</h2>
+      <div class="section-body">
+        <div class="form-group">
+          <label for="f-letter">Buchstabe</label>
+          <input type="text" id="f-letter" maxlength="1" placeholder="K">
+        </div>
+        <div class="form-group">
+          <label for="f-name">Name</label>
+          <input type="text" id="f-name" list="name-suggestions" placeholder="tippen oder wählen" style="width:155px;">
+          <button onclick="randomName()" title="Zufalls-Vorschlag" style="padding:3px 6px;font-size:9pt;">🎲</button>
+        </div>
+        <datalist id="name-suggestions">
+          <option value="Adlerhorst"><option value="Amselnest"><option value="Affenschaukel">
+          <option value="Basislager"><option value="Bärenhöhle"><option value="Baumkrone"><option value="Bienenstock"><option value="Bussardstand">
+          <option value="Dachsbau"><option value="Drachenburg"><option value="Dohlenplatz">
+          <option value="Eichenturm"><option value="Eulennest"><option value="Eichkätzchen-Hof"><option value="Erlenhütte">
+          <option value="Falkennest"><option value="Fuchsbau"><option value="Feenwiese"><option value="Fichtenkrone">
+          <option value="Gipfelstation"><option value="Geheimnest"><option value="Goldfink-Hütte"><option value="Grünspecht-Stand">
+          <option value="Hexenhütte"><option value="Hirschstand"><option value="Hechtbrücke"><option value="Häherhorst">
+          <option value="Igelweg"><option value="Inselhütte"><option value="Iltis-Versteck">
+          <option value="Jägerstand"><option value="Jungfernsprung">
+          <option value="Kobold-Hütte"><option value="Krähenhorst"><option value="Kuckucksnest"><option value="Kaninchenbau"><option value="Kletternest">
+          <option value="Luchssprung"><option value="Lerchen-Plattform"><option value="Lärchenhaus"><option value="Lichtungshütte">
+          <option value="Marderbau"><option value="Mondhütte"><option value="Moosturm"><option value="Meisennest">
+          <option value="Nachtigallhof"><option value="Nordnest"><option value="Nussbaum-Plattform">
+          <option value="Otterbau"><option value="Ostpfeiler"><option value="Ohreulen-Horst">
+          <option value="Pinienturm"><option value="Panther-Plattform"><option value="Pfauenhof"><option value="Pirol-Hütte">
+          <option value="Quellpunkt"><option value="Querbalken-Hütte">
+          <option value="Rabenfels"><option value="Räuberhöhle"><option value="Rotwild-Stand"><option value="Reh-Plattform">
+          <option value="Spechtnest"><option value="Schwalbenflug"><option value="Sonnen-Plattform"><option value="Schwarzwild-Stand">
+          <option value="Treffpunkt"><option value="Tannenkrone"><option value="Trollhütte"><option value="Taubenturm">
+          <option value="Uhuturm"><option value="Unterstand"><option value="Urwald-Lichtung">
+          <option value="Vogelhaus"><option value="Vagabunden-Versteck">
+          <option value="Wolfsbau"><option value="Wurzelhütte"><option value="Wachturm"><option value="Waldgeist-Hütte">
+          <option value="Zwergenstand"><option value="Ziegenstand"><option value="Zedernturm">
+        </datalist>
+        <div class="form-group form-row">
+          <span><label>x</label><input type="number" id="f-x" step="1" value="0"></span>
+          <span><label>y</label><input type="number" id="f-y" step="1" value="0"></span>
+          <span><label>z</label><input type="number" id="f-z" step="1" min="0" value="3"></span>
+        </div>
+        <div class="form-group">
+          <label for="f-type">Typ</label>
+          <select id="f-type">
+            <option value="baum">normal (grün)</option>
+            <option value="baum-hi">hoch (rot)</option>
+            <option value="boden">Boden (sand)</option>
+          </select>
+        </div>
+        <div class="error" id="form-error"></div>
+        <div style="margin-top:6px;">
+          <button class="primary" onclick="addOrUpdate()" id="submit-btn">+ Hinzufügen</button>
+          <button onclick="resetForm()" id="cancel-btn" style="display:none;">Abbrechen</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section collapsed">
+      <h2 onclick="toggleSection(this)">Seile &amp; Brücken <span class="badge" id="seil-count">0</span></h2>
+      <div class="section-body">
+        <p class="hint">Im Modus „🪢 Seile" zwei Plattformen anklicken → Verbindung entsteht.</p>
+        <div style="margin:6px 0;padding:6px;background:#f0f7ec;border-radius:4px;font-size:9.5pt;">
+          <strong>Typ für neue Verbindungen:</strong><br>
+          <label><input type="radio" name="seilType" value="auto" checked onchange="state.seilType=this.value"> 🔄 Auto (nach Höhe)</label><br>
+          <label><input type="radio" name="seilType" value="seil" onchange="state.seilType=this.value"> 🪢 Seil (immer als Seil)</label><br>
+          <label><input type="radio" name="seilType" value="bruecke" onchange="state.seilType=this.value"> 🌉 Brücke (immer als Brücke)</label>
+        </div>
+        <table class="list" id="seil-list"></table>
+        <div id="seil-info-area"></div>
+      </div>
+    </div>
+
+    <div class="section collapsed">
+      <h2 onclick="toggleSection(this)">Aufgaben-Generator</h2>
+      <div class="section-body">
+        <div class="form-group form-row">
+          <select id="gen-p1" style="flex:1;"></select>
+          <select id="gen-p2" style="flex:1;"></select>
+        </div>
+        <div class="form-group">
+          <label>Typ:</label>
+          <select id="gen-type" style="flex:1;width:170px;">
+            <option value="gerade">Geradengleichung</option>
+            <option value="laenge">Verbindungsvektor + Länge</option>
+            <option value="mittel">Mittelpunkt</option>
+            <option value="punktprobe">Punktprobe</option>
+            <option value="spur">Spurpunkt mit Boden</option>
+            <option value="parallel">Parallelitäts-Check zweier Seile</option>
+          </select>
+        </div>
+        <button onclick="generateTask()" class="primary">→ Aufgabe vorschlagen</button>
+        <button onclick="clearTasks()">Leeren</button>
+        <div id="generated-tasks"></div>
+      </div>
+    </div>
+
+    <div class="section collapsed">
+      <h2 onclick="toggleSection(this)">Druck- &amp; Anzeige-Optionen</h2>
+      <div class="section-body">
+        <div class="form-group">
+          <label>Snap:</label>
+          <select id="snap-select" onchange="state.snap=parseFloat(this.value);">
+            <option value="1">1 LE (ganzzahlig)</option>
+            <option value="0.5">0,5 LE (halbganzzahlig)</option>
+            <option value="0.1">0,1 LE (fein)</option>
+          </select>
+        </div>
+        <p class="hint">Beim Drucken / PNG werden angezeigt:</p>
+        <label><input type="checkbox" id="opt-names" checked onchange="render()"> Namen</label><br>
+        <label><input type="checkbox" id="opt-coords" checked onchange="render()"> Koordinaten</label><br>
+        <label><input type="checkbox" id="opt-letters" checked onchange="render()"> Buchstaben</label><br>
+        <label><input type="checkbox" id="opt-seile" checked onchange="render()"> Seile</label><br>
+        <label><input type="checkbox" id="opt-blank" onchange="render()"> Leeres Raster (Schülerblatt)</label>
+        <p class="hint">„Leer" deaktiviert alle Plattformen — nur das Koordinatensystem wird gedruckt.</p>
+      </div>
+    </div>
+
+  </aside>
+
+  <section id="map-panel">
+    <div id="mode-hint" class="toolbar-mode-hint" style="display:none;"></div>
+    <svg id="map" xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 297 210"></svg>
+    <div id="aufgaben-overlay"></div>
+  </section>
+</main>
+
+<script>
+// ===================== DATEN =====================
+const DEFAULT_PLATFORMS = [
+  { id:'T', letter:'T', name:'Treffpunkt',    x: 0, y: 0, z:0, type:'boden' },
+  { id:'B', letter:'B', name:'Basislager',    x:-4, y:-3, z:2, type:'baum' },
+  { id:'E', letter:'E', name:'Eichenturm',    x:-7, y: 3, z:3, type:'baum' },
+  { id:'F', letter:'F', name:'Fuchsbau',      x:-1, y: 7, z:5, type:'baum' },
+  { id:'W', letter:'W', name:'Wurzelhütte',   x: 3, y: 0, z:2, type:'baum' },
+  { id:'R', letter:'R', name:'Rabenfels',     x: 5, y:-4, z:4, type:'baum' },
+  { id:'A', letter:'A', name:'Adlerhorst',    x: 1, y: 2, z:6, type:'baum-hi' },
+  { id:'S', letter:'S', name:'Spechtnest',    x: 2, y: 1, z:4, type:'baum' },
+  { id:'G', letter:'G', name:'Gipfelstation', x: 8, y: 5, z:6, type:'baum-hi' },
+];
+
+const TEMPLATES = {
+  quadrat: {
+    name: 'Quadrat ABCD in z=3',
+    platforms: [
+      {id:'T', letter:'T', name:'Treffpunkt', x:0, y:0, z:0, type:'boden'},
+      {id:'A', letter:'A', name:'Anfang',     x:-3, y:-3, z:3, type:'baum'},
+      {id:'B', letter:'B', name:'Brückenkopf',x: 3, y:-3, z:3, type:'baum'},
+      {id:'C', letter:'C', name:'Cortina',    x: 3, y: 3, z:3, type:'baum'},
+      {id:'D', letter:'D', name:'Drachenburg',x:-3, y: 3, z:3, type:'baum'},
+      {id:'E', letter:'E', name:'Eckpunkt',   x: 0, y: 0, z:7, type:'baum-hi'},
+    ]
+  },
+  kollinear: {
+    name: 'Drei kollineare Punkte',
+    platforms: [
+      {id:'T', letter:'T', name:'Treffpunkt', x:0, y:0, z:0, type:'boden'},
+      {id:'B', letter:'B', name:'Basislager', x:-4, y:-3, z:2, type:'baum'},
+      {id:'S', letter:'S', name:'Spechtnest', x: 2, y: 1, z:4, type:'baum'},
+      {id:'G', letter:'G', name:'Gipfelstation', x:8, y:5, z:6, type:'baum-hi'},
+    ]
+  },
+  parallel: {
+    name: 'Paralleles Seil-Paar',
+    platforms: [
+      {id:'T', letter:'T', name:'Treffpunkt', x:0, y:0, z:0, type:'boden'},
+      {id:'B', letter:'B', name:'Basislager', x:-4, y:-3, z:2, type:'baum'},
+      {id:'G', letter:'G', name:'Gipfelstation', x:8, y:5, z:6, type:'baum-hi'},
+      {id:'E', letter:'E', name:'Eichenturm', x:-7, y:3, z:3, type:'baum'},
+      {id:'F', letter:'F', name:'Fuchsbau',   x:-1, y:7, z:5, type:'baum'},
+    ]
+  },
+  windschief: {
+    name: 'Windschiefes Paar',
+    platforms: [
+      {id:'T', letter:'T', name:'Treffpunkt', x:0, y:0, z:0, type:'boden'},
+      {id:'A', letter:'A', name:'Adlerhorst', x:1, y:2, z:6, type:'baum-hi'},
+      {id:'R', letter:'R', name:'Rabenfels',  x:5, y:-4, z:4, type:'baum'},
+      {id:'E', letter:'E', name:'Eichenturm', x:-7, y:3, z:3, type:'baum'},
+      {id:'W', letter:'W', name:'Wurzelhütte',x: 3, y: 0, z:2, type:'baum'},
+    ]
+  },
+  schwerpunkt: {
+    name: 'Dreieck mit Schwerpunkt',
+    platforms: [
+      {id:'T', letter:'T', name:'Treffpunkt', x:0, y:0, z:0, type:'boden'},
+      {id:'A', letter:'A', name:'Adlerhorst', x:-3, y:-2, z:5, type:'baum'},
+      {id:'B', letter:'B', name:'Basislager', x: 6, y:-2, z:5, type:'baum'},
+      {id:'C', letter:'C', name:'Cortina',    x: 0, y: 7, z:5, type:'baum'},
+      {id:'S', letter:'S', name:'Schwerpunkt', x:1, y:1, z:5, type:'baum-hi'},
+    ]
+  },
+  zipline: {
+    name: 'Zipline-Setup',
+    platforms: [
+      {id:'T', letter:'T', name:'Treffpunkt', x:0, y:0, z:0, type:'boden'},
+      {id:'S', letter:'S', name:'Startturm',  x:-10, y:-5, z:8, type:'baum-hi'},
+      {id:'M', letter:'M', name:'Mittelhaus', x:-2, y:0, z:5, type:'baum'},
+      {id:'Z', letter:'Z', name:'Zielturm',   x:10, y: 5, z:2, type:'baum'},
+    ]
+  }
+};
+
+// ===================== STATE =====================
+const state = {
+  platforms: [],
+  seile: [],   // { id, fromId, toId, color }
+  snap: 1,
+  mode: 'edit',
+  currentSet: 'standard',
+  selectedId: null,
+  selectedSeilId: null,
+  seilStart: null,
+  generatedTasks: [],
+  dragging: null,
+};
+
+// ===================== STORAGE =====================
+// Geteilte Speicherung: alle Editoren und die Schülerversion lesen dieselbe Quelle
+const STORAGE_KEY = 'kletterwald-state-v2';        // Legacy (Schülerversion lädt von hier)
+const SHARED_KEY  = 'kletterwald-shared-state';    // Neuer kanonischer Schlüssel
+function save() {
+  const data = {
+    platforms: state.platforms,
+    seile: state.seile,
+    currentSet: state.currentSet,
+    version: '2.0',
+    updatedAt: new Date().toISOString(),
+    source: 'editor'
+  };
+  const json = JSON.stringify(data);
+  localStorage.setItem(STORAGE_KEY, json);    // für Rückwärtskompatibilität
+  localStorage.setItem(SHARED_KEY, json);     // kanonischer Speicher
+  saveSets();
+}
+function load() {
+  try {
+    // Erst kanonischer Schlüssel, dann Legacy
+    const raw = localStorage.getItem(SHARED_KEY) || localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      state.platforms = data.platforms || [];
+      state.seile = data.seile || [];
+      state.currentSet = data.currentSet || 'standard';
+      return;
+    }
+  } catch(e) {}
+  state.platforms = JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
+  state.seile = [];
+}
+
+const SETS_KEY = 'kletterwald-sets';
+let sets = {};
+function loadSets() {
+  try { sets = JSON.parse(localStorage.getItem(SETS_KEY) || '{}'); } catch(e) { sets = {}; }
+  if (!sets.standard) sets.standard = { platforms: JSON.parse(JSON.stringify(DEFAULT_PLATFORMS)), seile: [] };
+}
+function saveSets() {
+  sets[state.currentSet] = { platforms: state.platforms, seile: state.seile };
+  localStorage.setItem(SETS_KEY, JSON.stringify(sets));
+}
+function refreshSetList() {
+  const sel = document.getElementById('set-select');
+  sel.innerHTML = '';
+  for (const name of Object.keys(sets)) {
+    const opt = document.createElement('option');
+    opt.value = name; opt.textContent = name;
+    if (name === state.currentSet) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+function loadSet(name) {
+  if (!sets[name]) return;
+  saveSets(); // current speichern
+  state.currentSet = name;
+  state.platforms = JSON.parse(JSON.stringify(sets[name].platforms || []));
+  state.seile = JSON.parse(JSON.stringify(sets[name].seile || []));
+  state.selectedId = null; state.selectedSeilId = null;
+  save(); render();
+}
+function saveAsNewSet() {
+  const name = prompt('Name für neues Set:', 'klausur-' + new Date().toLocaleDateString('de-DE').replace(/\./g,'-'));
+  if (!name) return;
+  if (sets[name] && !confirm(`Set "${name}" überschreiben?`)) return;
+  sets[name] = { platforms: JSON.parse(JSON.stringify(state.platforms)), seile: JSON.parse(JSON.stringify(state.seile)) };
+  state.currentSet = name;
+  save(); refreshSetList(); render();
+}
+function deleteCurrentSet() {
+  if (state.currentSet === 'standard') { alert('Das Standard-Set kann nicht gelöscht werden.'); return; }
+  if (!confirm(`Set "${state.currentSet}" wirklich löschen?`)) return;
+  delete sets[state.currentSet];
+  state.currentSet = 'standard';
+  state.platforms = JSON.parse(JSON.stringify(sets.standard.platforms));
+  state.seile = JSON.parse(JSON.stringify(sets.standard.seile));
+  save(); refreshSetList(); render();
+}
+
+// ===================== JSON IMPORT/EXPORT =====================
+function exportJSON() {
+  const data = { platforms: state.platforms, seile: state.seile, currentSet: state.currentSet };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `kletterwald-${state.currentSet}.json`; a.click();
+  URL.revokeObjectURL(url);
+}
+function importJSON() {
+  const input = document.createElement('input'); input.type='file'; input.accept='.json';
+  input.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (Array.isArray(data)) { state.platforms = data; state.seile = []; }
+        else { state.platforms = data.platforms || []; state.seile = data.seile || []; }
+        save(); render();
+      } catch(err) { alert('Fehler: ' + err.message); }
+    };
+    r.readAsText(file);
+  };
+  input.click();
+}
+
+// ===================== PNG-EXPORT =====================
+function exportPNG() {
+  const svg = document.getElementById('map');
+  const svgData = new XMLSerializer().serializeToString(svg);
+  const blob = new Blob([svgData], {type:'image/svg+xml;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 2970; canvas.height = 2100;  // 10× = ~300 dpi
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(b => {
+      const a = document.createElement('a'); a.href = URL.createObjectURL(b);
+      a.download = `kletterwald-${state.currentSet}.png`; a.click();
+    });
+    URL.revokeObjectURL(url);
+  };
+  img.src = url;
+}
+
+// ===================== SVG =====================
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+function fmt(n) { return (Number.isInteger(n)) ? n : Number(n.toFixed(1)); }
+
+function renderSVG() {
+  const svg = document.getElementById('map');
+  const showNames = document.getElementById('opt-names').checked;
+  const showCoords = document.getElementById('opt-coords').checked;
+  const showLetters = document.getElementById('opt-letters').checked;
+  const showSeile = document.getElementById('opt-seile').checked;
+  const blank = document.getElementById('opt-blank').checked;
+
+  let html = `
+    <defs>
+      <pattern id="sub" width="1" height="1" patternUnits="userSpaceOnUse"><path d="M 1 0 L 0 0 0 1" class="grid-sub"/></pattern>
+      <pattern id="min" width="5" height="5" patternUnits="userSpaceOnUse"><path d="M 5 0 L 0 0 0 5" class="grid-min"/></pattern>
+      <pattern id="maj" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" class="grid-maj"/></pattern>
+    </defs>
+    <rect x="0" y="0" width="297" height="210" fill="white"/>
+    <text x="10" y="8" style="font:5px 'Helvetica';font-weight:bold;fill:#1a3a1a;">Kletterwald — Koordinatensystem A4 (1 LE = 1 cm)</text>
+    <text x="10" y="13" style="font:3px 'Helvetica';fill:#335533;">x ∈ [−13, 13] · y ∈ [−8, 8] · z = Spießlänge in cm · Set: ${escapeHtml(state.currentSet)}</text>
+    <text x="10" y="17" style="font:3px 'Helvetica';font-weight:bold;fill:#a30000;">DRUCKEN: A4 quer, „Tatsächliche Größe / 100 %“ — 1 LE auf dem Lineal = 1 cm</text>
+    <g id="plot-area" transform="translate(148.5, 110)">
+      <rect x="-130" y="-80" width="260" height="160" fill="url(#sub)"/>
+      <rect x="-130" y="-80" width="260" height="160" fill="url(#min)"/>
+      <rect x="-130" y="-80" width="260" height="160" fill="url(#maj)"/>
+      <line x1="-100" y1="-80" x2="-100" y2="80" class="grid-bold"/>
+      <line x1="-50"  y1="-80" x2="-50"  y2="80" class="grid-bold"/>
+      <line x1="50"   y1="-80" x2="50"   y2="80" class="grid-bold"/>
+      <line x1="100"  y1="-80" x2="100"  y2="80" class="grid-bold"/>
+      <line x1="-130" y1="-50" x2="130"  y2="-50" class="grid-bold"/>
+      <line x1="-130" y1="50"  x2="130"  y2="50"  class="grid-bold"/>
+      <rect id="click-area" x="-130" y="-80" width="260" height="160" fill="transparent" stroke="#1a3a1a" stroke-width="0.3"/>
+      <line x1="-134" y1="0" x2="134" y2="0" class="axis"/>
+      <line x1="0" y1="84" x2="0" y2="-84" class="axis"/>
+      <polygon points="134,0 130,-1.4 130,1.4" fill="#1a3a1a"/>
+      <polygon points="0,-84 -1.4,-80 1.4,-80" fill="#1a3a1a"/>
+      <text x="136" y="2" class="pf-label">x</text>
+      <text x="-3" y="-85" class="pf-label">y</text>
+  `;
+
+  for (let i = -13; i <= 13; i++) {
+    if (i === 0) continue;
+    const cls = (i % 5 === 0) ? 'tick-bold' : 'tick';
+    html += `<text x="${i*10}" y="4.5" class="${cls}" text-anchor="middle">${i<0?'−'+Math.abs(i):i}</text>`;
+  }
+  for (let i = -8; i <= 8; i++) {
+    if (i === 0) continue;
+    const cls = (i % 5 === 0) ? 'tick-bold' : 'tick';
+    html += `<text x="-2" y="${-i*10+1.5}" class="${cls}" text-anchor="end">${i<0?'−'+Math.abs(i):i}</text>`;
+  }
+  html += `<text x="-2" y="4.5" class="tick-bold" text-anchor="end">0</text>`;
+
+  if (!blank) {
+    // Seile zuerst (damit Plattformen drüber liegen)
+    if (showSeile) {
+      for (const s of state.seile) {
+        const a = state.platforms.find(p => p.id === s.fromId);
+        const b = state.platforms.find(p => p.id === s.toId);
+        if (!a || !b) continue;
+        const sel = (s.id === state.selectedSeilId);
+        // Typ: explizit aus s.type, sonst Auto-Klassifikation (Brücke wenn z(b) >= z(a))
+        let isBruecke;
+        if (s.type === 'seil') isBruecke = false;
+        else if (s.type === 'bruecke') isBruecke = true;
+        else isBruecke = (b.z >= a.z);  // 'auto' oder unbekannt
+        const seilColor = s.color || (isBruecke ? '#8b5a2b' : '#0066cc');
+        const seilWidth = sel ? 1.6 : (isBruecke ? 1.2 : 0.9);
+        html += `<line class="seil" data-seil="${s.id}" x1="${a.x*10}" y1="${-a.y*10}" x2="${b.x*10}" y2="${-b.y*10}" stroke="${seilColor}" stroke-width="${seilWidth}" opacity="${sel?1:0.85}"/>`;
+        // Icon mittig
+        const midX = (a.x*10 + b.x*10) / 2;
+        const midY = -(a.y*10 + b.y*10) / 2;
+        html += `<text x="${midX}" y="${midY-1}" text-anchor="middle" font-size="3.5" pointer-events="none">${isBruecke ? '🌉' : '🪢'}</text>`;
+      }
+    }
+
+    // Plattformen
+    for (const p of state.platforms) {
+      const cx = p.x * 10, cy = -p.y * 10;
+      const isSelected = (p.id === state.selectedId);
+      const isSeilStart = (state.mode === 'seil' && p.id === state.seilStart);
+      const dx = (cx > 100) ? -3 : 3;
+      const anchor = (cx > 100) ? 'end' : 'start';
+      let shape;
+      if (p.type === 'boden') shape = `<rect x="${cx-2}" y="${cy-2}" width="4" height="4" class="boden" data-id="${p.id}"/>`;
+      else {
+        const r = (p.type === 'baum-hi') ? 2.3 : 1.8;
+        shape = `<circle cx="${cx}" cy="${cy}" r="${r}" class="${p.type}" data-id="${p.id}"/>`;
+      }
+      html += `<g>` + shape;
+      if (isSelected) html += `<circle cx="${cx}" cy="${cy}" r="3.5" class="selected-marker"/>`;
+      if (isSeilStart) html += `<circle cx="${cx}" cy="${cy}" r="4" class="seil-marker"/>`;
+
+      if (showLetters) html += `<text x="${cx+dx}" y="${cy-1.5}" text-anchor="${anchor}" class="pf-label">${p.letter}</text>`;
+      if (showNames)   html += `<text x="${cx+dx}" y="${cy+1.8}" text-anchor="${anchor}" class="pf-name">${escapeHtml(p.name)}</text>`;
+      if (showCoords) {
+        const xs = (p.x<0?'−'+Math.abs(p.x):p.x);
+        const ys = (p.y<0?'−'+Math.abs(p.y):p.y);
+        html += `<text x="${cx+dx}" y="${cy+5}" text-anchor="${anchor}" class="pf-sublabel">(${xs}|${ys}|${p.z})</text>`;
+      }
+      html += `</g>`;
+    }
+  }
+
+  html += `
+    </g>
+    <g transform="translate(12, 200)">
+      <line x1="0" y1="0" x2="10" y2="0" stroke="#1a3a1a" stroke-width="0.6"/>
+      <line x1="0" y1="-1.5" x2="0" y2="1.5" stroke="#1a3a1a" stroke-width="0.6"/>
+      <line x1="10" y1="-1.5" x2="10" y2="1.5" stroke="#1a3a1a" stroke-width="0.6"/>
+      <text x="5" y="-2.3" text-anchor="middle" style="font:2.8px 'Helvetica';font-weight:bold;">1 LE = 1 cm</text>
+    </g>
+  `;
+
+  svg.innerHTML = html;
+  attachSVGHandlers();
+}
+
+function attachSVGHandlers() {
+  const svg = document.getElementById('map');
+  // Klick auf Plattform
+  svg.querySelectorAll('[data-id]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = el.getAttribute('data-id');
+      if (state.mode === 'seil') handleSeilClick(id);
+      else if (state.mode === 'aufgabe' || state.mode === 'story') selectPlatform(id);
+      else selectPlatform(id);
+    });
+    // Drag start
+    el.addEventListener('mousedown', e => {
+      if (state.mode !== 'edit') return;
+      state.dragging = el.getAttribute('data-id');
+      e.preventDefault();
+    });
+  });
+  // Klick auf Seil
+  svg.querySelectorAll('[data-seil]').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      state.selectedSeilId = el.getAttribute('data-seil');
+      render();
+    });
+    el.addEventListener('mouseenter', () => el.classList.add('seil-hover'));
+    el.addEventListener('mouseleave', () => el.classList.remove('seil-hover'));
+  });
+  // Klick auf leeren Bereich → Plattform hinzufügen
+  const click = svg.querySelector('#click-area');
+  if (click) {
+    click.addEventListener('click', e => {
+      if (state.mode !== 'edit') return;
+      const pt = svgPoint(e);
+      const x = Math.round(pt.x / 10 / state.snap) * state.snap;
+      const y = Math.round(-pt.y / 10 / state.snap) * state.snap;
+      if (x < -13 || x > 13 || y < -8 || y > 8) return;
+      // Vor-ausfüllen, nicht direkt hinzufügen (User muss Buchstabe / Name eingeben)
+      document.getElementById('f-x').value = x;
+      document.getElementById('f-y').value = y;
+      document.getElementById('f-letter').focus();
+      flashMessage(`Position vorbereitet: (${x}|${y}). Buchstabe + Name eintragen → "+ Hinzufügen"`);
+    });
+  }
+  // Drag move + end
+  svg.addEventListener('mousemove', e => {
+    if (!state.dragging || state.mode !== 'edit') return;
+    const pt = svgPoint(e);
+    const x = Math.round(pt.x / 10 / state.snap) * state.snap;
+    const y = Math.round(-pt.y / 10 / state.snap) * state.snap;
+    const p = state.platforms.find(p => p.id === state.dragging);
+    if (!p || x < -13 || x > 13 || y < -8 || y > 8) return;
+    if (p.x !== x || p.y !== y) { p.x = x; p.y = y; render(); }
+  });
+  document.addEventListener('mouseup', () => {
+    if (state.dragging) { save(); state.dragging = null; }
+  });
+}
+
+function svgPoint(e) {
+  const svg = document.getElementById('map');
+  const pt = svg.createSVGPoint();
+  pt.x = e.clientX; pt.y = e.clientY;
+  // In plot-area-Koordinaten transformieren
+  const plot = svg.querySelector('#plot-area');
+  const ctm = plot.getScreenCTM().inverse();
+  return pt.matrixTransform(ctm);
+}
+
+let messageTimer = null;
+function flashMessage(msg) {
+  const el = document.getElementById('mode-hint');
+  el.textContent = msg; el.style.display = 'block';
+  if (messageTimer) clearTimeout(messageTimer);
+  messageTimer = setTimeout(() => updateModeHint(), 3500);
+}
+
+// ===================== PLATTFORM-LISTE & FORM =====================
+function renderList() {
+  const tbl = document.getElementById('platform-list');
+  const filter = document.getElementById('pf-search').value.toLowerCase();
+  const list = state.platforms.filter(p => !filter || p.letter.toLowerCase().includes(filter) || p.name.toLowerCase().includes(filter));
+  let html = `<thead><tr><th>L</th><th>Name</th><th>x</th><th>y</th><th>z</th><th></th></tr></thead><tbody>`;
+  for (const p of list) {
+    const rowClass = (p.id === state.selectedId) ? 'selected' : (p.type === 'baum-hi' ? 'hi' : (p.type === 'boden' ? 'boden-row' : ''));
+    html += `<tr class="${rowClass}" data-id="${p.id}">
+      <td><strong>${p.letter}</strong></td>
+      <td style="text-align:left;">${escapeHtml(p.name)}</td>
+      <td>${p.x}</td><td>${p.y}</td><td>${p.z}</td>
+      <td><button class="icon-btn" data-del="${p.id}" title="Löschen">✕</button></td>
+    </tr>`;
+  }
+  html += '</tbody>';
+  tbl.innerHTML = html;
+  tbl.querySelectorAll('tr[data-id]').forEach(tr => {
+    tr.addEventListener('click', e => {
+      if (e.target.matches('[data-del]')) return;
+      selectPlatform(tr.getAttribute('data-id'));
+    });
+  });
+  tbl.querySelectorAll('[data-del]').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); deletePlatform(btn.getAttribute('data-del')); });
+  });
+  document.getElementById('pf-count').textContent = state.platforms.length;
+
+  // Generator-Selects aktualisieren
+  for (const id of ['gen-p1', 'gen-p2']) {
+    const sel = document.getElementById(id);
+    const prev = sel.value;
+    sel.innerHTML = state.platforms.map(p => `<option value="${p.id}">${p.letter} — ${escapeHtml(p.name)}</option>`).join('');
+    if (prev) sel.value = prev;
+  }
+}
+
+function selectPlatform(id) {
+  if (state.selectedId === id) { state.selectedId = null; resetForm(); render(); return; }
+  state.selectedId = id;
+  const p = state.platforms.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('f-letter').value = p.letter;
+  document.getElementById('f-name').value = p.name;
+  document.getElementById('f-x').value = p.x;
+  document.getElementById('f-y').value = p.y;
+  document.getElementById('f-z').value = p.z;
+  document.getElementById('f-type').value = p.type;
+  document.getElementById('form-title').firstChild.nodeValue = `Plattform „${p.letter}" bearbeiten`;
+  document.getElementById('submit-btn').textContent = '💾 Speichern';
+  document.getElementById('cancel-btn').style.display = 'inline-block';
+  render();
+}
+function resetForm() {
+  state.selectedId = null;
+  ['f-letter','f-name'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-x').value = 0;
+  document.getElementById('f-y').value = 0;
+  document.getElementById('f-z').value = 3;
+  document.getElementById('f-type').value = 'baum';
+  document.getElementById('form-title').firstChild.nodeValue = 'Plattform hinzufügen';
+  document.getElementById('submit-btn').textContent = '+ Hinzufügen';
+  document.getElementById('cancel-btn').style.display = 'none';
+  document.getElementById('form-error').textContent = '';
+  render();
+}
+function addOrUpdate() {
+  const errEl = document.getElementById('form-error'); errEl.textContent = '';
+  const letter = document.getElementById('f-letter').value.trim().toUpperCase();
+  const name = document.getElementById('f-name').value.trim();
+  const x = parseFloat(document.getElementById('f-x').value);
+  const y = parseFloat(document.getElementById('f-y').value);
+  const z = parseFloat(document.getElementById('f-z').value);
+  const type = document.getElementById('f-type').value;
+  function err(m) { errEl.textContent = m; }
+  if (!/^[A-Z]$/.test(letter)) return err('Buchstabe muss A–Z sein.');
+  if (!name) return err('Name angeben.');
+  if (isNaN(x) || x < -13 || x > 13) return err('x ∈ [−13,13].');
+  if (isNaN(y) || y < -8 || y > 8) return err('y ∈ [−8,8].');
+  if (isNaN(z) || z < 0) return err('z ≥ 0.');
+  if (type === 'boden' && z !== 0) return err('Boden-Plattform: z = 0.');
+  const conflict = state.platforms.find(p => p.letter === letter && p.id !== state.selectedId);
+  if (conflict) return err(`Buchstabe „${letter}" bereits an „${conflict.name}".`);
+  if (state.selectedId) {
+    const idx = state.platforms.findIndex(p => p.id === state.selectedId);
+    state.platforms[idx] = { id: state.selectedId, letter, name, x, y, z, type };
+  } else {
+    state.platforms.push({ id: letter + '_' + Date.now(), letter, name, x, y, z, type });
+  }
+  save(); resetForm();
+}
+function deletePlatform(id) {
+  const p = state.platforms.find(x => x.id === id); if (!p) return;
+  if (!confirm(`Plattform „${p.letter} — ${p.name}" löschen?`)) return;
+  state.platforms = state.platforms.filter(x => x.id !== id);
+  state.seile = state.seile.filter(s => s.fromId !== id && s.toId !== id);
+  if (state.selectedId === id) resetForm();
+  save(); render();
+}
+
+// ===================== SEILE =====================
+function handleSeilClick(id) {
+  if (!state.seilStart) {
+    state.seilStart = id;
+    flashMessage(`Erste Plattform gewählt: ${id}. Jetzt zweite Plattform klicken.`);
+  } else if (state.seilStart === id) {
+    state.seilStart = null;
+    flashMessage('Auswahl aufgehoben.');
+  } else {
+    const seilId = 's_' + Date.now();
+    state.seile.push({ id: seilId, fromId: state.seilStart, toId: id, type: state.seilType || 'auto' });
+    state.seilStart = null;
+    state.selectedSeilId = seilId;
+    save();
+    flashMessage('Seil hinzugefügt.');
+  }
+  render();
+}
+function deleteSeil(id) {
+  state.seile = state.seile.filter(s => s.id !== id);
+  if (state.selectedSeilId === id) state.selectedSeilId = null;
+  save(); render();
+}
+function renderSeilList() {
+  const tbl = document.getElementById('seil-list');
+  if (state.seile.length === 0) { tbl.innerHTML = '<tr><td colspan="3" style="font-style:italic;color:#777;">Noch keine Seile.</td></tr>'; }
+  else {
+    let html = '<thead><tr><th>Typ</th><th>Verbindung</th><th>Δz</th><th>Länge</th><th></th></tr></thead><tbody>';
+    for (const s of state.seile) {
+      const a = state.platforms.find(p => p.id === s.fromId);
+      const b = state.platforms.find(p => p.id === s.toId);
+      if (!a || !b) continue;
+      const dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z;
+      const len = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      const sel = (s.id === state.selectedSeilId);
+      let isBruecke;
+      if (s.type === 'seil') isBruecke = false;
+      else if (s.type === 'bruecke') isBruecke = true;
+      else isBruecke = (b.z >= a.z);
+      const icon = isBruecke ? '🌉' : '🪢';
+      const explicit = s.type && s.type !== 'auto';
+      const typ = (isBruecke ? 'Brücke' : 'Seil') + (explicit ? ' (manuell)' : '');
+      const dzStr = (dz > 0 ? '+' : '') + dz;
+      html += `<tr class="${sel?'selected':''}" data-seil="${s.id}" title="${typ}${isBruecke ? ' (hoch/horizontal)' : ' (runter)'}">
+        <td>${icon}</td>
+        <td>${a.letter} → ${b.letter}</td>
+        <td style="font-size:8.5pt;">${dzStr}</td>
+        <td>${len.toFixed(2)} cm</td>
+        <td><button class="icon-btn" data-delseil="${s.id}">✕</button></td>
+      </tr>`;
+    }
+    html += '</tbody>';
+    tbl.innerHTML = html;
+    tbl.querySelectorAll('tr[data-seil]').forEach(tr => {
+      tr.addEventListener('click', e => {
+        if (e.target.matches('[data-delseil]')) return;
+        state.selectedSeilId = tr.getAttribute('data-seil'); render();
+      });
+    });
+    tbl.querySelectorAll('[data-delseil]').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); deleteSeil(btn.getAttribute('data-delseil')); });
+    });
+  }
+  document.getElementById('seil-count').textContent = state.seile.length;
+  renderSeilInfo();
+}
+
+function renderSeilInfo() {
+  const info = document.getElementById('seil-info-area');
+  info.innerHTML = '';
+  if (!state.selectedSeilId) return;
+  const s = state.seile.find(x => x.id === state.selectedSeilId); if (!s) return;
+  const a = state.platforms.find(p => p.id === s.fromId);
+  const b = state.platforms.find(p => p.id === s.toId);
+  const v = { x: b.x-a.x, y: b.y-a.y, z: b.z-a.z };
+  const len = Math.sqrt(v.x**2+v.y**2+v.z**2);
+  // Lagebeziehung zu anderen Seilen
+  let lageStr = '';
+  for (const t of state.seile) {
+    if (t.id === s.id) continue;
+    const a2 = state.platforms.find(p => p.id === t.fromId);
+    const b2 = state.platforms.find(p => p.id === t.toId);
+    if (!a2 || !b2) continue;
+    const w = { x: b2.x-a2.x, y: b2.y-a2.y, z: b2.z-a2.z };
+    const beziehung = checkLage(a, v, a2, w);
+    lageStr += `<div>• ${a.letter}${b.letter} ↔ ${a2.letter}${b2.letter}: <strong>${beziehung}</strong></div>`;
+  }
+  info.innerHTML = `<div class="seil-info">
+    <strong>Seil ${a.letter} → ${b.letter}</strong><br>
+    Verbindungsvektor: $\\vec{${a.letter}${b.letter}}=(${v.x};${v.y};${v.z})$<br>
+    Länge: ${len.toFixed(3)} cm<br>
+    ${lageStr || '<em>Keine weiteren Seile zum Vergleich.</em>'}
+  </div>`;
+  if (window.renderMathInElement) renderMathInElement(info, {delimiters:[{left:'$',right:'$',display:false}]});
+}
+
+function checkLage(a1, v1, a2, v2) {
+  // Vielfaches?
+  const ks = [];
+  for (const c of ['x','y','z']) {
+    if (Math.abs(v2[c]) < 1e-9) {
+      if (Math.abs(v1[c]) > 1e-9) return checkSchnitt(a1, v1, a2, v2) || 'windschief';
+    } else { ks.push(v1[c] / v2[c]); }
+  }
+  if (ks.length > 0 && ks.every(k => Math.abs(k - ks[0]) < 1e-6)) {
+    // parallel: identisch?
+    const t = (a2.x - a1.x) / (v1.x !== 0 ? v1.x : 1);
+    if (Math.abs(a1.x + t*v1.x - a2.x) < 1e-6 && Math.abs(a1.y + t*v1.y - a2.y) < 1e-6 && Math.abs(a1.z + t*v1.z - a2.z) < 1e-6) return 'identisch';
+    return 'parallel';
+  }
+  return checkSchnitt(a1, v1, a2, v2) || 'windschief';
+}
+function checkSchnitt(a1, v1, a2, v2) {
+  // a1 + t·v1 = a2 + s·v2 → drei Gleichungen, zwei Unbekannte
+  // Nehme erste zwei Komponenten, prüfe dritte
+  const det = v1.x*(-v2.y) - v1.y*(-v2.x);
+  if (Math.abs(det) < 1e-9) return null;
+  const dx = a2.x - a1.x, dy = a2.y - a1.y;
+  const t = (dx*(-v2.y) - dy*(-v2.x)) / det;
+  const s = (v1.x*dy - v1.y*dx) / det;
+  const z1 = a1.z + t*v1.z;
+  const z2 = a2.z + s*v2.z;
+  if (Math.abs(z1 - z2) < 1e-6) return `schneidend bei (${(a1.x+t*v1.x).toFixed(1)}|${(a1.y+t*v1.y).toFixed(1)}|${z1.toFixed(1)})`;
+  return null;
+}
+
+// ===================== MODI =====================
+function setMode(m) {
+  state.mode = m;
+  document.querySelectorAll('.mode-tabs button').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
+  document.body.classList.toggle('fullmap', m === 'aufgabe' || m === 'story');
+  document.body.classList.toggle('story-mode', m === 'story');
+  state.seilStart = null;
+  updateModeHint();
+  if (m === 'story') renderStoryStage(); else if (m === 'aufgabe') renderAufgabenStage();
+  render();
+}
+function updateModeHint() {
+  const el = document.getElementById('mode-hint');
+  const msgs = {
+    edit: 'Modus „Editieren": Klick in die Karte → Plattform an dieser Stelle vor-vorbereiten. Plattform anklicken & ziehen zum Verschieben.',
+    seil: 'Modus „Seile/Brücken": Klick auf zwei Plattformen → 🌉 Brücke (wenn z-Wert hoch oder gleich) oder 🪢 Seil (wenn runter). Klick auf Verbindung → Details.',
+    aufgabe: 'Modus „Aufgaben": Karte wird groß angezeigt mit Aufgabenbereich darunter. Generator nutzen.',
+    story: 'Modus „Geschichten-Bühne": Karte + Geschichten-Snippet mit AKTUELLEN Plattform-Werten.',
+  };
+  el.textContent = msgs[state.mode] || '';
+  el.style.display = 'block';
+}
+
+function renderAufgabenStage() {
+  const ov = document.getElementById('aufgaben-overlay');
+  let html = '<h2 style="margin-top:0;color:#2e6b2e;font-size:13pt;">Aufgaben für diese Konstellation</h2>';
+  if (state.generatedTasks.length === 0) {
+    html += '<p style="font-style:italic;color:#777;">Im Sidebar im Aufgaben-Generator Aufgaben erzeugen.</p>';
+  } else {
+    state.generatedTasks.forEach((t, i) => {
+      html += `<div class="aufgabe-card"><div class="titel">Aufgabe ${i+1} — ${t.titel}</div>${t.text}</div>`;
+    });
+  }
+  ov.innerHTML = html;
+  if (window.renderMathInElement) renderMathInElement(ov, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});
+}
+
+function renderStoryStage() {
+  const ov = document.getElementById('aufgaben-overlay');
+  // Wähle zwei Plattformen für ein Story-Snippet
+  const B = state.platforms.find(p => p.letter === 'B') || state.platforms.find(p => p.type === 'baum');
+  const G = state.platforms.find(p => p.letter === 'G') || state.platforms.find(p => p.type === 'baum-hi') || state.platforms[state.platforms.length-1];
+  const T = state.platforms.find(p => p.type === 'boden') || { letter:'T', name:'Treffpunkt', x:0, y:0, z:0 };
+  if (!B || !G) { ov.innerHTML = '<p>Mindestens 2 Plattformen + 1 Treffpunkt erforderlich.</p>'; return; }
+  const v = { x: G.x - B.x, y: G.y - B.y, z: G.z - B.z };
+  const len = Math.sqrt(v.x**2 + v.y**2 + v.z**2);
+  const html = `
+    <h2 style="margin-top:0;color:#2e6b2e;font-size:13pt;">📖 Geschichte: Vom Treffpunkt zum Gipfel</h2>
+    <p style="font-style:italic;">Du stehst am Treffpunkt <strong>${T.letter} ${T.name}</strong> (${T.x}|${T.y}|${T.z}). Vor dir liegt der Kletterwald — du willst zur Plattform <strong>${G.letter} ${G.name}</strong> ${fmt3(G)}, aber zuerst musst du das <strong>${B.letter} ${B.name}</strong> ${fmt3(B)} erreichen.</p>
+    <div class="aufgabe-card">
+      <div class="titel">Aufgabe 1 — Vom Boden zum Basislager</div>
+      Bestimme den Verbindungsvektor $\\vec{${T.letter}${B.letter}}$ und seine Länge in cm.
+      <div style="font-size:9pt;color:#555;margin-top:4px;"><em>Antwort:</em> $\\vec{${T.letter}${B.letter}}=(${B.x};${B.y};${B.z})$, Länge $\\approx ${Math.sqrt(B.x**2+B.y**2+B.z**2).toFixed(2)}$ cm.</div>
+    </div>
+    <div class="aufgabe-card">
+      <div class="titel">Aufgabe 2 — Das Hauptseil</div>
+      Stelle die Geradengleichung $g_{${B.letter}${G.letter}}$ vom Basislager zur Gipfelplattform auf.
+      <div style="font-size:9pt;color:#555;margin-top:4px;"><em>Antwort:</em> $g:\\vec{x}=(${B.x};${B.y};${B.z})+t(${v.x};${v.y};${v.z})$, Länge $\\approx ${len.toFixed(2)}$ cm.</div>
+    </div>
+    <p style="font-size:9.5pt;color:#777;">Die Werte werden aus der aktuellen Plattform-Konstellation automatisch berechnet. Wenn du Plattformen verschiebst, ändert sich auch die Aufgabe.</p>
+  `;
+  ov.innerHTML = html;
+  if (window.renderMathInElement) renderMathInElement(ov, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});
+}
+function fmt3(p) { return `(${p.x}|${p.y}|${p.z})`; }
+
+// ===================== AUFGABEN-GENERATOR =====================
+function generateTask() {
+  const id1 = document.getElementById('gen-p1').value;
+  const id2 = document.getElementById('gen-p2').value;
+  const type = document.getElementById('gen-type').value;
+  const a = state.platforms.find(p => p.id === id1);
+  const b = state.platforms.find(p => p.id === id2);
+  if (!a || !b || a.id === b.id) { alert('Bitte zwei verschiedene Plattformen wählen.'); return; }
+  const v = { x: b.x - a.x, y: b.y - a.y, z: b.z - a.z };
+  const len = Math.sqrt(v.x**2 + v.y**2 + v.z**2);
+  let task;
+  switch(type) {
+    case 'gerade':
+      task = { titel: `Geradengleichung ${a.letter}${b.letter}`, text:
+        `Stelle die Geradengleichung der Verbindung von ${a.letter} ${a.name} nach ${b.letter} ${b.name} in Parameterform auf.
+        <details style="margin-top:6px;"><summary>Lösung</summary>$g_{${a.letter}${b.letter}}:\\vec{x}=(${a.x};${a.y};${a.z})+t\\cdot(${v.x};${v.y};${v.z})$</details>` };
+      break;
+    case 'laenge':
+      task = { titel: `Verbindungsvektor ${a.letter}→${b.letter} und Länge`, text:
+        `Berechne den Verbindungsvektor $\\vec{${a.letter}${b.letter}}$ und seine Länge.
+        <details style="margin-top:6px;"><summary>Lösung</summary>$\\vec{${a.letter}${b.letter}}=(${v.x};${v.y};${v.z})$, $|\\vec{${a.letter}${b.letter}}|=${len.toFixed(2)}$ cm.</details>` };
+      break;
+    case 'mittel':
+      const m = { x:(a.x+b.x)/2, y:(a.y+b.y)/2, z:(a.z+b.z)/2 };
+      task = { titel: `Mittelpunkt von ${a.letter}${b.letter}`, text:
+        `Bestimme den Mittelpunkt M der Strecke $\\overline{${a.letter}${b.letter}}$.
+        <details style="margin-top:6px;"><summary>Lösung</summary>$M=(${m.x};${m.y};${m.z})$</details>` };
+      break;
+    case 'punktprobe':
+      // Wähle dritte Plattform — falls vorhanden, prüfe ob auf Gerade
+      const other = state.platforms.find(p => p.id !== a.id && p.id !== b.id);
+      if (!other) { alert('Brauche eine dritte Plattform für die Punktprobe.'); return; }
+      const tval = (v.x !== 0) ? (other.x - a.x) / v.x : null;
+      let liegt = false;
+      if (tval !== null) {
+        liegt = Math.abs(a.y + tval*v.y - other.y) < 1e-6 && Math.abs(a.z + tval*v.z - other.z) < 1e-6;
+      }
+      task = { titel: `Punktprobe: liegt ${other.letter} auf $g_{${a.letter}${b.letter}}$?`, text:
+        `Liegt der Punkt ${other.letter} ${other.name} ${fmt3(other)} auf der Geraden durch ${a.letter} und ${b.letter}?
+        <details style="margin-top:6px;"><summary>Lösung</summary>${liegt ? `Ja, bei $t=${tval.toFixed(2)}$.` : 'Nein — die Probe schlägt fehl in der zweiten oder dritten Koordinate.'}</details>` };
+      break;
+    case 'spur':
+      if (v.z === 0) { alert('Seil parallel zur Bodenebene — kein Spurpunkt.'); return; }
+      const ts = -a.z / v.z;
+      const sx = a.x + ts*v.x, sy = a.y + ts*v.y;
+      task = { titel: `Spurpunkt von $g_{${a.letter}${b.letter}}$ mit dem Boden`, text:
+        `Wo durchstößt die Verlängerung des Seils ${a.letter}${b.letter} die Bodenebene ($z=0$)?
+        <details style="margin-top:6px;"><summary>Lösung</summary>$t=${ts.toFixed(2)}$, Spurpunkt $\\,(${sx.toFixed(2)}\\,|\\,${sy.toFixed(2)}\\,|\\,0)$</details>` };
+      break;
+    case 'parallel':
+      const other2 = state.platforms.find(p => p.id !== a.id && p.id !== b.id);
+      if (!other2) { alert('Brauche eine dritte Plattform.'); return; }
+      task = { titel: `Lagebeziehung von zwei Seilen`, text:
+        `Untersuche die Lagebeziehung der Seile $\\overline{${a.letter}${b.letter}}$ und $\\overline{${a.letter}${other2.letter}}$ (von ${a.letter} ausgehend in zwei verschiedene Richtungen).` };
+      break;
+  }
+  state.generatedTasks.push(task);
+  renderGeneratedList();
+  if (state.mode === 'aufgabe') renderAufgabenStage();
+}
+function renderGeneratedList() {
+  const el = document.getElementById('generated-tasks');
+  el.innerHTML = state.generatedTasks.map((t,i) =>
+    `<div class="aufgabe-card"><div class="titel">${i+1}. ${t.titel}</div>${t.text}</div>`
+  ).join('');
+  if (window.renderMathInElement) renderMathInElement(el, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});
+}
+function clearTasks() { state.generatedTasks = []; renderGeneratedList(); if (state.mode === 'aufgabe') renderAufgabenStage(); }
+
+// ===================== NAMENS-AUTO-FILL =====================
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('f-name').addEventListener('change', e => {
+    const name = e.target.value.trim();
+    const letterField = document.getElementById('f-letter');
+    if (name && !letterField.value && !state.selectedId) letterField.value = name[0].toUpperCase();
+  });
+});
+function randomName() {
+  const options = Array.from(document.querySelectorAll('#name-suggestions option')).map(o => o.value);
+  const taken = new Set(state.platforms.map(p => p.name));
+  const takenLetters = new Set(state.platforms.filter(p => p.id !== state.selectedId).map(p => p.letter));
+  const free = options.filter(n => !taken.has(n) && !takenLetters.has(n[0].toUpperCase()));
+  const pool = free.length > 0 ? free : options.filter(n => !taken.has(n));
+  if (pool.length === 0) { alert('Keine freien Namen.'); return; }
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  document.getElementById('f-name').value = pick;
+  if (!state.selectedId) document.getElementById('f-letter').value = pick[0].toUpperCase();
+}
+
+// ===================== VORLAGEN =====================
+function applyTemplate() {
+  const t = document.getElementById('template-select').value;
+  if (!t || !TEMPLATES[t]) return;
+  if (!confirm(`Vorlage "${TEMPLATES[t].name}" anwenden? Die aktuelle Konstellation wird ersetzt.`)) return;
+  state.platforms = JSON.parse(JSON.stringify(TEMPLATES[t].platforms));
+  state.seile = [];
+  save(); render();
+}
+
+// ===================== SECTIONS =====================
+function toggleSection(h2) { h2.parentElement.classList.toggle('collapsed'); }
+
+// ===================== RENDER =====================
+function render() { renderSVG(); renderList(); renderSeilList(); }
+
+// ===================== INIT =====================
+loadSets();
+load();
+refreshSetList();
+updateModeHint();
+render();
+</script>
+
+</body>
+</html>

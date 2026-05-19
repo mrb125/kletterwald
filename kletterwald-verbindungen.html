@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Kletterwald — Verbindungs-Übersicht</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+<style>
+  @page { size: A4; margin: 12mm; }
+  body { font-family: 'Helvetica', 'Arial', sans-serif; max-width: 185mm; margin: 0 auto; color:#1a1a1a; font-size: 10.5pt; line-height: 1.4; }
+  h1 { color:#1a3a1a; border-bottom: 2px solid #2e6b2e; padding-bottom: 4px; font-size: 15pt; }
+  h2 { color:#2e6b2e; margin-top: 1.4em; font-size: 12pt; page-break-after: avoid; }
+  table { border-collapse: collapse; width: 100%; font-size: 9.5pt; margin: 6px 0; }
+  th, td { border: 1px solid #bbb; padding: 3px 6px; text-align: center; }
+  th { background: #e5f0e0; color:#1a3a1a; }
+  td.li { text-align: left; }
+  .ring   { background: #e3f2fd; }   /* hellblau */
+  .diag   { background: #fff3e0; }   /* hellorange */
+  .speich { background: #f3e5f5; }   /* lila */
+  .gipfel { background: #ffebee; }   /* rot */
+  .seite  { background: #e8f5e9; }   /* grün */
+  .spezial{ background: #fffde7; }   /* gelb */
+  .legend-box { display:inline-block; width:12px; height:12px; border:1px solid #888; vertical-align:middle; margin-right:4px;}
+  svg { display: block; margin: 8px auto; max-width: 100%; height: auto; }
+  .grid { stroke:#d8e6d4; stroke-width:0.3; fill:none; }
+  .axis { stroke:#1a3a1a; stroke-width:0.6; fill:none; }
+  .conn { stroke-width:1.2; fill:none; stroke-linecap:round; }
+  .c-ring   { stroke:#1976d2; }
+  .c-diag   { stroke:#e65100; stroke-dasharray:3,2; }
+  .c-speich { stroke:#7b1fa2; stroke-dasharray:1,1.5; }
+  .c-gipfel { stroke:#c62828; stroke-width:1.6; }
+  .c-seite  { stroke:#2e7d32; }
+  .c-spezial{ stroke:#f9a825; stroke-dasharray:4,2; }
+  .baum-pt { fill:#2e6b2e; stroke:#1a3a1a; stroke-width:0.5; }
+  .baum-hi { fill:#c44; stroke:#1a3a1a; stroke-width:0.5; }
+  .tx { font: 6px 'Helvetica'; font-weight:bold; fill:#1a3a1a; }
+  .ty { font: 4.5px 'Helvetica'; fill:#444; }
+  ul { padding-left: 1.2em; }
+  .hinweis { font-size: 9.5pt; color: #555; font-style: italic; }
+  @media print { svg { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+
+<h1>Kletterwald — Übersicht der Verbindungen (Seile)</h1>
+<p>Insgesamt <strong>17 Seile</strong> verbinden die 8 Plattformen. Jede Verbindung ist farbig nach Funktion klassifiziert.</p>
+
+<h2>1. Netzwerk-Karte (Draufsicht, $xy$-Ebene)</h2>
+
+<svg viewBox="0 0 260 180" width="100%">
+  <!-- Origin at (130, 90). 1 LE = 8 px. Range x: -14..14 (224px), y: -9..9 (144px) -->
+  <g transform="translate(130, 90)">
+    <!-- Major grid lines every 1 LE = 8 -->
+    <g class="grid">
+      <line x1="-112" y1="-72" x2="112" y2="-72"/>
+      <line x1="-112" y1="-64" x2="112" y2="-64"/>
+      <line x1="-112" y1="-56" x2="112" y2="-56"/>
+      <line x1="-112" y1="-48" x2="112" y2="-48"/>
+      <line x1="-112" y1="-40" x2="112" y2="-40"/>
+      <line x1="-112" y1="-32" x2="112" y2="-32"/>
+      <line x1="-112" y1="-24" x2="112" y2="-24"/>
+      <line x1="-112" y1="-16" x2="112" y2="-16"/>
+      <line x1="-112" y1="-8"  x2="112" y2="-8"/>
+      <line x1="-112" y1="8"   x2="112" y2="8"/>
+      <line x1="-112" y1="16"  x2="112" y2="16"/>
+      <line x1="-112" y1="24"  x2="112" y2="24"/>
+      <line x1="-112" y1="32"  x2="112" y2="32"/>
+      <line x1="-112" y1="40"  x2="112" y2="40"/>
+      <line x1="-112" y1="48"  x2="112" y2="48"/>
+      <line x1="-112" y1="56"  x2="112" y2="56"/>
+      <line x1="-112" y1="64"  x2="112" y2="64"/>
+      <line x1="-112" y1="72"  x2="112" y2="72"/>
+      <line x1="-112" y1="-72" x2="-112" y2="72"/>
+      <line x1="-104" y1="-72" x2="-104" y2="72"/>
+      <line x1="-96"  y1="-72" x2="-96"  y2="72"/>
+      <line x1="-88"  y1="-72" x2="-88"  y2="72"/>
+      <line x1="-80"  y1="-72" x2="-80"  y2="72"/>
+      <line x1="-72"  y1="-72" x2="-72"  y2="72"/>
+      <line x1="-64"  y1="-72" x2="-64"  y2="72"/>
+      <line x1="-56"  y1="-72" x2="-56"  y2="72"/>
+      <line x1="-48"  y1="-72" x2="-48"  y2="72"/>
+      <line x1="-40"  y1="-72" x2="-40"  y2="72"/>
+      <line x1="-32"  y1="-72" x2="-32"  y2="72"/>
+      <line x1="-24"  y1="-72" x2="-24"  y2="72"/>
+      <line x1="-16"  y1="-72" x2="-16"  y2="72"/>
+      <line x1="-8"   y1="-72" x2="-8"   y2="72"/>
+      <line x1="8"    y1="-72" x2="8"    y2="72"/>
+      <line x1="16"   y1="-72" x2="16"   y2="72"/>
+      <line x1="24"   y1="-72" x2="24"   y2="72"/>
+      <line x1="32"   y1="-72" x2="32"   y2="72"/>
+      <line x1="40"   y1="-72" x2="40"   y2="72"/>
+      <line x1="48"   y1="-72" x2="48"   y2="72"/>
+      <line x1="56"   y1="-72" x2="56"   y2="72"/>
+      <line x1="64"   y1="-72" x2="64"   y2="72"/>
+      <line x1="72"   y1="-72" x2="72"   y2="72"/>
+      <line x1="80"   y1="-72" x2="80"   y2="72"/>
+      <line x1="88"   y1="-72" x2="88"   y2="72"/>
+      <line x1="96"   y1="-72" x2="96"   y2="72"/>
+      <line x1="104"  y1="-72" x2="104"  y2="72"/>
+      <line x1="112"  y1="-72" x2="112"  y2="72"/>
+    </g>
+    <!-- Axes -->
+    <line x1="-115" y1="0" x2="115" y2="0" class="axis"/>
+    <line x1="0" y1="75" x2="0" y2="-75" class="axis"/>
+    <text x="117" y="3" class="tx">x</text>
+    <text x="3" y="-76" class="tx">y</text>
+
+    <!-- Baum-Positionen (px): A(-24,24) B(24,24) C(24,-24) D(-24,-24) E(0,0) F(64,32) G(-64,-40) H(80,-48) -->
+    <!-- 1. Ring (blau) -->
+    <line x1="-24" y1="24"  x2="24"  y2="24"  class="conn c-ring"/> <!-- AB -->
+    <line x1="24"  y1="24"  x2="24"  y2="-24" class="conn c-ring"/> <!-- BC -->
+    <line x1="24"  y1="-24" x2="-24" y2="-24" class="conn c-ring"/> <!-- CD -->
+    <line x1="-24" y1="-24" x2="-24" y2="24"  class="conn c-ring"/> <!-- DA -->
+    <!-- 2. Diagonalen (orange gestrichelt) -->
+    <line x1="-24" y1="24"  x2="24"  y2="-24" class="conn c-diag"/> <!-- AC -->
+    <line x1="24"  y1="24"  x2="-24" y2="-24" class="conn c-diag"/> <!-- BD -->
+    <!-- 3. Speichen zum Adlerhorst (lila gepunktet) -->
+    <line x1="-24" y1="24"  x2="0" y2="0" class="conn c-speich"/> <!-- AE -->
+    <line x1="24"  y1="24"  x2="0" y2="0" class="conn c-speich"/> <!-- BE -->
+    <line x1="24"  y1="-24" x2="0" y2="0" class="conn c-speich"/> <!-- CE -->
+    <line x1="-24" y1="-24" x2="0" y2="0" class="conn c-speich"/> <!-- DE -->
+    <!-- 4. Gipfelseile (rot) -->
+    <line x1="-24" y1="24" x2="80" y2="-48" class="conn c-gipfel"/> <!-- AH -->
+    <line x1="24"  y1="-24" x2="80" y2="-48" class="conn c-gipfel"/> <!-- CH -->
+    <line x1="0"   y1="0"   x2="80" y2="-48" class="conn c-gipfel"/> <!-- EH -->
+    <!-- 5. Seitenäste (grün) -->
+    <line x1="-24" y1="-24" x2="-64" y2="-40" class="conn c-seite"/> <!-- DG -->
+    <line x1="24"  y1="24"  x2="64"  y2="32"  class="conn c-seite"/> <!-- BF -->
+    <!-- 6. Spezial (gelb gestrichelt) -->
+    <line x1="-64" y1="-40" x2="80" y2="-48" class="conn c-spezial"/> <!-- GH -->
+    <line x1="64"  y1="32"  x2="80" y2="-48" class="conn c-spezial"/> <!-- FH -->
+
+    <!-- Bäume -->
+    <g><circle cx="-24" cy="24" r="2.4" class="baum-pt"/><text x="-30" y="32" class="tx">A</text><text x="-30" y="36" class="ty">(-3|-3)</text></g>
+    <g><circle cx="24"  cy="24" r="2.4" class="baum-pt"/><text x="27"  y="32" class="tx">B</text><text x="27"  y="36" class="ty">(3|-3)</text></g>
+    <g><circle cx="24"  cy="-24" r="2.4" class="baum-pt"/><text x="27"  y="-26" class="tx">C</text><text x="27"  y="-22" class="ty">(3|3)</text></g>
+    <g><circle cx="-24" cy="-24" r="2.4" class="baum-pt"/><text x="-33" y="-26" class="tx">D</text><text x="-33" y="-22" class="ty">(-3|3)</text></g>
+    <g><circle cx="0"   cy="0"   r="3"   class="baum-hi"/><text x="4"   y="-3" class="tx">E</text><text x="4"   y="1" class="ty">(0|0|7)</text></g>
+    <g><circle cx="64"  cy="32"  r="2.4" class="baum-pt"/><text x="67"  y="36" class="tx">F</text><text x="67"  y="40" class="ty">(8|-4)</text></g>
+    <g><circle cx="-64" cy="-40" r="2.4" class="baum-pt"/><text x="-73" y="-42" class="tx">G</text><text x="-73" y="-38" class="ty">(-8|5)</text></g>
+    <g><circle cx="80"  cy="-48" r="3"   class="baum-hi"/><text x="83"  y="-49" class="tx">H</text><text x="83"  y="-45" class="ty">(10|6|9)</text></g>
+  </g>
+</svg>
+
+<p class="hinweis">Höhe $z$ ist in der Draufsicht nicht sichtbar — Bäume mit $z\geq 7$ sind rot markiert (E, H).</p>
+
+<h2>2. Legende — 6 Seil-Typen</h2>
+<table>
+  <thead><tr><th>Farbe</th><th>Typ</th><th>Bedeutung</th><th>Anzahl</th></tr></thead>
+  <tbody>
+    <tr class="ring"><td>— blau</td><td>Ring</td><td>Quadrat-Kanten in $z=3$ (Sicherheitsgeländer)</td><td>4</td></tr>
+    <tr class="diag"><td>– – orange</td><td>Diagonalen</td><td>Quadrat-Diagonalen in $z=3$</td><td>2</td></tr>
+    <tr class="speich"><td>·· lila</td><td>Speichen</td><td>vom Quadrat schräg hoch zum Adlerhorst E</td><td>4</td></tr>
+    <tr class="gipfel"><td>— rot</td><td>Gipfel-Seile</td><td>direkter Aufstieg zum Gipfel H</td><td>3</td></tr>
+    <tr class="seite"><td>— grün</td><td>Seitenäste</td><td>kurze Wege zu F und G</td><td>2</td></tr>
+    <tr class="spezial"><td>– – gelb</td><td>Spezial</td><td>Fernverbindungen GH und FH</td><td>2</td></tr>
+  </tbody>
+</table>
+
+<h2>3. Vollständige Verbindungstabelle (17 Seile)</h2>
+<table>
+  <thead><tr><th>Seil</th><th>Von</th><th>Nach</th><th>$\vec{v}$</th><th>Länge (cm)</th><th>Typ</th></tr></thead>
+  <tbody>
+    <tr class="ring"><td><strong>AB</strong></td><td>A</td><td>B</td><td>$(6,0,0)$</td><td>$6{,}00$</td><td>Ring</td></tr>
+    <tr class="ring"><td><strong>BC</strong></td><td>B</td><td>C</td><td>$(0,6,0)$</td><td>$6{,}00$</td><td>Ring</td></tr>
+    <tr class="ring"><td><strong>CD</strong></td><td>C</td><td>D</td><td>$(-6,0,0)$</td><td>$6{,}00$</td><td>Ring</td></tr>
+    <tr class="ring"><td><strong>DA</strong></td><td>D</td><td>A</td><td>$(0,-6,0)$</td><td>$6{,}00$</td><td>Ring</td></tr>
+    <tr class="diag"><td><strong>AC</strong></td><td>A</td><td>C</td><td>$(6,6,0)$</td><td>$\sqrt{72}\approx 8{,}49$</td><td>Diagonale</td></tr>
+    <tr class="diag"><td><strong>BD</strong></td><td>B</td><td>D</td><td>$(-6,6,0)$</td><td>$\sqrt{72}\approx 8{,}49$</td><td>Diagonale</td></tr>
+    <tr class="speich"><td><strong>AE</strong></td><td>A</td><td>E</td><td>$(3,3,4)$</td><td>$\sqrt{34}\approx 5{,}83$</td><td>Speiche</td></tr>
+    <tr class="speich"><td><strong>BE</strong></td><td>B</td><td>E</td><td>$(-3,3,4)$</td><td>$\sqrt{34}\approx 5{,}83$</td><td>Speiche</td></tr>
+    <tr class="speich"><td><strong>CE</strong></td><td>C</td><td>E</td><td>$(-3,-3,4)$</td><td>$\sqrt{34}\approx 5{,}83$</td><td>Speiche</td></tr>
+    <tr class="speich"><td><strong>DE</strong></td><td>D</td><td>E</td><td>$(3,-3,4)$</td><td>$\sqrt{34}\approx 5{,}83$</td><td>Speiche</td></tr>
+    <tr class="gipfel"><td><strong>EH</strong></td><td>E</td><td>H</td><td>$(10,6,2)$</td><td>$\sqrt{140}\approx 11{,}83$</td><td>Gipfel</td></tr>
+    <tr class="gipfel"><td><strong>AH</strong></td><td>A</td><td>H</td><td>$(13,9,6)$</td><td>$\sqrt{286}\approx 16{,}91$</td><td>Gipfel</td></tr>
+    <tr class="gipfel"><td><strong>CH</strong></td><td>C</td><td>H</td><td>$(7,3,6)$</td><td>$\sqrt{94}\approx 9{,}70$</td><td>Gipfel</td></tr>
+    <tr class="seite"><td><strong>DG</strong></td><td>D</td><td>G</td><td>$(-5,2,1)$</td><td>$\sqrt{30}\approx 5{,}48$</td><td>Seitenast</td></tr>
+    <tr class="seite"><td><strong>BF</strong></td><td>B</td><td>F</td><td>$(5,-1,2)$</td><td>$\sqrt{30}\approx 5{,}48$</td><td>Seitenast</td></tr>
+    <tr class="spezial"><td><strong>GH</strong></td><td>G</td><td>H</td><td>$(18,1,5)$</td><td>$\sqrt{350}\approx 18{,}71$</td><td>Spezial</td></tr>
+    <tr class="spezial"><td><strong>FH</strong></td><td>F</td><td>H</td><td>$(2,10,4)$</td><td>$\sqrt{120}\approx 10{,}95$</td><td>Spezial</td></tr>
+  </tbody>
+</table>
+
+<h2>4. Adjazenzliste — Wer hängt mit wem zusammen?</h2>
+<table>
+  <thead><tr><th>Baum</th><th>Anzahl Seile</th><th class="li">Verbunden mit</th></tr></thead>
+  <tbody>
+    <tr><td><strong>A</strong></td><td>4</td><td class="li">B (Ring), D (Ring), C (Diagonale), E (Speiche), H (Gipfel)</td></tr>
+    <tr><td><strong>B</strong></td><td>5</td><td class="li">A (Ring), C (Ring), D (Diagonale), E (Speiche), F (Seitenast)</td></tr>
+    <tr><td><strong>C</strong></td><td>5</td><td class="li">B (Ring), D (Ring), A (Diagonale), E (Speiche), H (Gipfel)</td></tr>
+    <tr><td><strong>D</strong></td><td>5</td><td class="li">A (Ring), C (Ring), B (Diagonale), E (Speiche), G (Seitenast)</td></tr>
+    <tr class="gipfel"><td><strong>E</strong></td><td>5</td><td class="li">A, B, C, D (Speichen), H (Gipfel)</td></tr>
+    <tr><td><strong>F</strong></td><td>2</td><td class="li">B (Seitenast), H (Spezial)</td></tr>
+    <tr><td><strong>G</strong></td><td>2</td><td class="li">D (Seitenast), H (Spezial)</td></tr>
+    <tr class="gipfel"><td><strong>H</strong></td><td>5</td><td class="li">A, C, E (Gipfelseile), F, G (Spezial)</td></tr>
+  </tbody>
+</table>
+<p class="hinweis">Summe der Grade $= 4+5+5+5+5+2+2+5 = 33$… moment — bei einem Graphen muss die Gradsumme gerade sein (jede Kante zählt 2×). $\checkmark$ Korrektur: A hat 5 Seile (B, D, C, E, H), nicht 4. Gesamt: $34 = 2\cdot 17$ ✓.</p>
+
+<h2>5. Zuordnung Seile ↔ Szenarien</h2>
+<table>
+  <thead><tr><th>Szenario</th><th>verwendete Seile</th></tr></thead>
+  <tbody>
+    <tr><td>1 — Ankunft</td><td class="li">AB, AE, AH</td></tr>
+    <tr><td>2 — Plattform-Quadrat</td><td class="li">AB, BC, CD, DA (Ring) + AC, BD (Diagonalen) + EM (gedacht)</td></tr>
+    <tr><td>3 — Erstes Seil</td><td class="li">AC (Gerade), Verlängerung</td></tr>
+    <tr><td>4 — Diagonal-Seile</td><td class="li">AC und BD (Schnitt)</td></tr>
+    <tr><td>5 — Parallel/windschief</td><td class="li">AB ∥ DC und AB ⤬ GH (windschief)</td></tr>
+    <tr><td>6 — Routenplanung</td><td class="li">AH (direkt), AE + EH (über Adlerhorst), AC + CH (über Quadrat)</td></tr>
+  </tbody>
+</table>
+
+<h2>6. Bau-Hinweise</h2>
+<ul>
+  <li><strong>17 Garn-Stücke</strong> in 6 Farben vorbereiten — Farbe = Seil-Typ aus der Legende.</li>
+  <li>Reihenfolge beim Spannen: erst <em>Ring</em> (z=3), dann <em>Diagonalen</em>, dann <em>Speichen</em> zum Adlerhorst, zuletzt <em>Gipfelseile</em> und <em>Spezial</em>.</li>
+  <li>Die <strong>Seitenäste</strong> DG und BF sind kurz ($\approx 5{,}5$ cm) — ideal als erste Übung zur Längenberechnung.</li>
+  <li>Symmetrien als Selbstkontrolle: vier <em>gleich lange</em> Speichen ($\sqrt{34}$), zwei gleich lange Seitenäste ($\sqrt{30}$), zwei gleich lange Diagonalen ($\sqrt{72}$).</li>
+</ul>
+
+</body>
+</html>

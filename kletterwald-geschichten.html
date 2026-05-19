@@ -1,0 +1,2409 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kletterwald — Geschichten mit Vektoraufgaben</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{
+    delimiters:[
+      {left:'$$',right:'$$',display:true},
+      {left:'$',right:'$',display:false}
+    ],
+    throwOnError: false,
+    errorColor: '#c00'
+  });"></script>
+<style>
+  @page { size: A4; margin: 12mm; }
+  body { font-family:'Georgia','Times New Roman',serif; max-width:186mm; margin:0 auto; color:#1a1a1a; line-height:1.45; font-size:10.5pt; }
+  @media screen { body { max-width: min(98vw, 1100px); } }
+
+  /* ── KaTeX Overflow-Schutz für schmale Bildschirme ── */
+  .katex-display { overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+  .katex { max-width: 100%; }
+  .aufgabe .katex-display, .gl-schritte .katex-display { font-size: 1em; }
+  /* Lösungs-Listen: horizontal scrollbar statt Überlauf */
+  .gl-schritte li { overflow-x: auto; }
+  h1 { color:#1a3a1a; border-bottom:2px solid #2e6b2e; padding-bottom:4px; font-size:15pt; font-family:'Helvetica',sans-serif; }
+  .geschichte { page-break-after: always; padding-top:0; border-radius:10px; overflow:hidden; margin-bottom: 18px; }
+  .geschichte:last-child { page-break-after: auto; }
+
+  /* ── Story-Banner ── */
+  .story-banner {
+    width: 100%; padding: 18px 22px 14px;
+    display: flex; align-items: center; gap: 16px;
+    box-sizing: border-box; position: relative; overflow: hidden;
+  }
+  .story-banner .banner-scene {
+    font-size: 44pt; line-height: 1; flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+  }
+  .story-banner .banner-text { flex: 1; color: white; }
+  .story-banner .banner-text h2 {
+    color: white; font-size: 15pt; margin: 0 0 2px 0;
+    font-family:'Helvetica',sans-serif; font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .story-banner .banner-text .banner-sub {
+    font-size: 9.5pt; opacity: 0.88; font-style: italic;
+    font-family:'Helvetica',sans-serif; color: white;
+  }
+  .story-banner .banner-deco {
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    font-size: 70pt; opacity: 0.12; line-height: 1; pointer-events:none;
+  }
+  /* Originales h2 ausblenden, da es im Banner ist */
+  .geschichte > h2 { display: none; }
+
+
+  h2 { color:#1a3a1a; font-size:14pt; font-family:'Helvetica',sans-serif; margin-bottom:2px; }
+  .untertitel { font-style:italic; color:#666; font-size:10pt; margin-top:0; margin-bottom:12px; font-family:'Helvetica',sans-serif; }
+  .erzaehlung { text-align:justify; margin:6px 0; padding: 10px 14px; border-radius:6px; }
+  .erzaehlung p { margin:5px 0; }
+  .erzaehlung em { font-style:italic; }
+
+  /* ── Pro-Geschichte Farb-Themes ── */
+  /* G1 Notfall: Rot-Orange */
+  .geschichte[data-s="1"] .story-banner { background: linear-gradient(135deg,#7f0000 0%,#c0392b 45%,#e67e22 100%); }
+  .geschichte[data-s="1"] .erzaehlung { background:#fff5f5; border-left:4px solid #e74c3c; }
+  .geschichte[data-s="1"] .erzaehlung em { color:#c0392b; }
+  .geschichte[data-s="1"] .aufgabe[data-diff="1"],.geschichte[data-s="1"] .aufgabe[data-diff="2"] { border-left-color:#c0392b!important; }
+
+  /* G2 Drohne: Stahl-Blau */
+  .geschichte[data-s="2"] .story-banner { background: linear-gradient(135deg,#0d2137 0%,#1a4a72 45%,#2e86c1 100%); }
+  .geschichte[data-s="2"] .erzaehlung { background:#eaf4fb; border-left:4px solid #2e86c1; }
+  .geschichte[data-s="2"] .erzaehlung em { color:#1a4a72; }
+
+  /* G3 Streit: Baustellen-Gelb */
+  .geschichte[data-s="3"] .story-banner { background: linear-gradient(135deg,#5d4000 0%,#b7770d 45%,#f4d03f 100%); }
+  .geschichte[data-s="3"] .erzaehlung { background:#fef9e7; border-left:4px solid #d4ac0d; }
+  .geschichte[data-s="3"] .erzaehlung em { color:#9a7d0a; }
+
+  /* G4 Wettlauf: Violett (Lena rot, Tim blau → Mitte lila) */
+  .geschichte[data-s="4"] .story-banner { background: linear-gradient(135deg,#c0392b 0%,#8e44ad 50%,#1f618d 100%); }
+  .geschichte[data-s="4"] .erzaehlung { background:#f5eef8; border-left:4px solid #8e44ad; }
+  .geschichte[data-s="4"] .erzaehlung em { color:#7d3c98; }
+
+  /* G5 Schatz: Abenteuer-Braun/Gold */
+  .geschichte[data-s="5"] .story-banner { background: linear-gradient(135deg,#3e2000 0%,#784212 40%,#d4ac0d 80%,#f7dc6f 100%); }
+  .geschichte[data-s="5"] .erzaehlung { background:#fdf3e3; border-left:4px solid #ca8a04; }
+  .geschichte[data-s="5"] .erzaehlung em { color:#9b6914; }
+
+  /* G6 Kanzel: Architektur-Blaugrau */
+  .geschichte[data-s="6"] .story-banner { background: linear-gradient(135deg,#1c2833 0%,#2e4057 45%,#5d8aa8 80%,#a8cfe0 100%); }
+  .geschichte[data-s="6"] .erzaehlung { background:#eaf2f8; border-left:4px solid #5d8aa8; }
+  .geschichte[data-s="6"] .erzaehlung em { color:#2e618a; }
+
+  /* G7 3 Drohnen: Elektro-Lila/Nacht */
+  .geschichte[data-s="7"] .story-banner { background: linear-gradient(135deg,#0a0015 0%,#5b2d8e 35%,#c0392b 70%,#e67e22 100%); }
+  .geschichte[data-s="7"] .erzaehlung { background:#f4ecf7; border-left:4px solid #8e44ad; }
+  .geschichte[data-s="7"] .erzaehlung em { color:#6c3483; }
+
+  /* G8 Kletterpark: Natur+Technik */
+  .geschichte[data-s="8"] .story-banner { background: linear-gradient(135deg,#1a3a1a 0%,#1e8449 45%,#2e86c1 100%); }
+  .geschichte[data-s="8"] .erzaehlung { background:#eafaf1; border-left:4px solid #1e8449; }
+  .geschichte[data-s="8"] .erzaehlung em { color:#196f3d; }
+
+  @media print {
+    .story-banner { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+
+  /* Zweispalten-Layout pro Geschichte */
+  .geschichte-body {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;   /* Karte 60 %, Aufgaben 40 % */
+    gap: 18px;
+    align-items: start;
+    padding: 14px 18px 12px;
+  }
+  @media screen and (max-width: 860px) {
+    .geschichte-body { grid-template-columns: 1fr 1fr; }   /* iPad portrait: 50/50 */
+  }
+  /* Aufgaben-Spalte */
+  .tasks-col { min-width: 0; }
+  /* Karten-Spalte: sticky */
+  .karte-col {
+    position: sticky;
+    top: 92px;
+    align-self: start;
+  }
+  .karte-col svg {
+    width: 100%; height: auto; display: block;
+    background: white;
+    border: 1.5px solid #7aa874; border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .karte-caption {
+    font-size: 8.5pt; color: #888; text-align: center;
+    margin-top: 5px; font-style: italic;
+  }
+  .karte-caption::before { content: '✏ '; }
+
+  /* ── 2D/3D Views ── */
+  .karte-view-2d, .karte-view-3d { display: none; }
+  .karte-view-2d.active, .karte-view-3d.active { display: block; }
+  .karte-3d-canvas {
+    width: 100%; aspect-ratio: 1.45 / 1; display: block;
+    border-radius: 8px; border: 1.5px solid #7aa874;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .karte-3d-info {
+    margin-top: 6px; padding: 6px 10px;
+    background: #f0f7ec; border-radius: 5px; border: 1px solid #c8e6c9;
+    font-family: 'Helvetica', sans-serif; font-size: 8pt; color: #444;
+    line-height: 1.6;
+  }
+  .karte-3d-info .ax { font-weight: bold; padding: 1px 5px; border-radius: 3px; }
+  @media print {
+    .karte-view-2d { display: block !important; }
+    .karte-view-3d { display: none !important; }
+  }
+
+  /* ── Gesamt-Lösung (am Ende jeder Geschichte) ── */
+  .gesamt-loesung {
+    margin: 18px 0 10px 0;
+    border: 2px solid #2e6b2e; border-radius: 7px; overflow: hidden;
+  }
+  .gesamt-loesung > summary {
+    background: #2e6b2e; color: white;
+    padding: 8px 16px; cursor: pointer; user-select: none;
+    font-family: 'Helvetica', sans-serif; font-weight: bold; font-size: 10.5pt;
+    list-style: none; display: flex; align-items: center; gap: 8px;
+  }
+  .gesamt-loesung > summary::-webkit-details-marker { display: none; }
+  .gesamt-loesung > summary .gl-arrow { transition: transform 0.2s; }
+  .gesamt-loesung[open] > summary .gl-arrow { transform: rotate(90deg); }
+  .gl-inhalt {
+    padding: 12px 18px 14px; background: #f7fbf6;
+    display: grid; gap: 14px;
+  }
+  .gl-aufgabe {
+    border-left: 3px solid #7aa874; padding-left: 12px;
+  }
+  .gl-titel {
+    font-weight: bold; color: #1a4a1a;
+    font-family: 'Helvetica', sans-serif; font-size: 10pt; margin-bottom: 4px;
+  }
+  .gl-schritte { margin: 4px 0 0 18px; padding: 0; }
+  .gl-schritte li {
+    margin: 5px 0; font-family: 'Helvetica', sans-serif;
+    font-size: 10pt; line-height: 1.55;
+  }
+  .gl-ergebnis {
+    display: inline-block; background: #d4edce; border-radius: 4px;
+    padding: 2px 8px; font-weight: bold; margin-top: 2px;
+  }
+  @media print { .gesamt-loesung { display: none !important; } }
+
+  /* ── Interaktive Karte Toolbar ── */
+  .karte-toolbar {
+    display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
+    margin-bottom: 5px; padding: 4px 7px;
+    background: #f0f7ec; border: 1px solid #b0d4aa; border-radius: 6px;
+    font-family: 'Helvetica', sans-serif;
+  }
+  .kt-color {
+    width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid white;
+    cursor: pointer; flex-shrink: 0;
+    box-shadow: 0 0 0 1px #bbb; transition: transform 0.1s;
+  }
+  .kt-color.active { box-shadow: 0 0 0 2.5px #1a3a1a; transform: scale(1.25); }
+  .kt-color:hover { transform: scale(1.15); }
+  .kt-btn {
+    padding: 2px 8px; border-radius: 4px; border: 1px solid #aaa;
+    background: white; cursor: pointer; font-size: 8.5pt; line-height: 1.5;
+    font-family: 'Helvetica', sans-serif;
+  }
+  .kt-btn.active { background: #2e6b2e; color: white; border-color: #1a3a1a; }
+  .kt-btn:hover:not(.active) { background: #e8f5e9; }
+  .kt-sep { color: #bbb; font-size: 11pt; line-height: 1; }
+  .karte-col svg .karte-platform { cursor: pointer; }
+  .karte-col svg .user-line-group { cursor: pointer; }
+  @media print { .karte-toolbar { display: none !important; } }
+
+  /* ── 2D→3D / 3D→2D Schalter ── */
+  .kt-goto3d, .kt-goto2d {
+    display: block; width: 100%; margin-top: 5px;
+    padding: 4px 0; border-radius: 5px; cursor: pointer;
+    font-family: 'Helvetica', sans-serif; font-size: 8.5pt; font-weight: bold;
+    border: 1.5px solid #7aa874; transition: background 0.15s;
+  }
+  .kt-goto3d { background: #eef7ec; color: #2e6b2e; text-align: center; }
+  .kt-goto3d:hover { background: #d4edcf; }
+  .kt-goto2d { background: #2e6b2e; color: white; text-align: center; margin-top: 0; margin-bottom: 5px; }
+  .kt-goto2d:hover { background: #1a4a1a; }
+
+  /* Schmale Bildschirme (Hochformat-Handy): untereinander */
+  @media screen and (max-width: 600px) {
+    .geschichte-body { grid-template-columns: 1fr; }
+    .karte-col { position: static; }
+  }
+  @media print {
+    .geschichte-body { display: block; padding: 0; }
+    .karte-col { position: static; width: 100%; margin-bottom: 8mm; }
+    .karte-col svg { height: 120mm !important; width: 100% !important; }
+    .aufgabe { min-height: 60mm; page-break-inside: avoid; }
+    body { max-width: 186mm !important; }
+  }
+
+  .aufgabe {
+    background:#f7fbf6; border-left:5px solid #2e6b2e; border-radius:5px;
+    padding:12px 16px; margin:14px 0;
+    font-family:'Helvetica',sans-serif; font-size:10.5pt;
+    display:block;
+    page-break-inside: avoid;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .aufgabe-view { display:none; }
+  .aufgabe-content { display:block; }
+  /* Geschichten-Icon oben rechts */
+  .task-icon { position:absolute; top:10px; right:10px; font-size:22pt; opacity:0.35; pointer-events:none; }
+  /* Schwierigkeits-basiertes Farbband */
+  .aufgabe[data-diff="1"] { border-left-color:#1b5e20; background:#f6fbf3; }
+  .aufgabe[data-diff="2"] { border-left-color:#33691e; background:#f6fbf3; }
+  .aufgabe[data-diff="3"] { border-left-color:#c77700; background:#fdf9ed; }
+  .aufgabe[data-diff="4"] { border-left-color:#bf6f00; background:#fdf6e8; }
+  .aufgabe[data-diff="5"] { border-left-color:#bf360c; background:#fdf3ee; }
+  .aufgabe[data-diff="6"] { border-left-color:#7a0000; background:#fdf0ee; }
+
+/* Tipps */
+  .tipps-block { margin: 8px 0; }
+  .tipp {
+    background:#fffde7; border-left:3px solid #c77700;
+    padding:4px 12px; margin:5px 0; border-radius:3px;
+    font-size: 9.5pt;
+  }
+  .tipp summary { cursor:pointer; color:#806000; font-weight:bold; user-select:none; }
+  .tipp-body { padding:5px 0 3px 0; }
+
+  /* Einzeldruck */
+  @media print {
+    .aufgabe { page-break-after: always; min-height: 180mm; }
+    .aufgabe:last-of-type { page-break-after: avoid; }
+  }
+  .aufgabe-content { flex:1; min-width:0; }
+  .aufgabe-view { width:220px; flex-shrink:0; }
+  @media (max-width: 700px) { .aufgabe { flex-direction: column; } .aufgabe-view { width: 100%; } }
+  .mini-svg { width:100%; height:auto; display:block; background:white; border:1.5px solid #7aa874; border-radius:4px; }
+  .mini-caption { font-size:8.5pt; color:#888; text-align:center; margin-top:3px; font-style:italic; }
+  .mini-caption::before { content:'✏ '; }
+
+  .aufgabe-titel { font-weight:bold; color:#2e6b2e; font-size:10.5pt; margin-bottom:4px; }
+  .aufgabe ol { margin:3px 0 3px 18px; padding:0; }
+  .aufgabe li { margin:2px 0; }
+  .loesung { background:#f0f0f0; border-left:3px solid #777; padding:5px 10px; font-size:9.5pt; margin:6px 0; }
+  .loesung summary { cursor:pointer; font-weight:bold; color:#444; }
+  .meta { font-size:9pt; color:#777; font-style:italic; margin-top:8px; padding-top:5px; border-top:1px dotted #aaa; font-family:'Helvetica',sans-serif; }
+  .plattform-mini { font-size:9pt; color:#555; background:#fafafa; padding:5px 8px; border-radius:4px; margin:6px 0; font-family:'Helvetica',sans-serif; }
+
+  /* Story-Navigation (fixiert unter Edit-Bar) */
+  .story-nav {
+    position: fixed; top: 38px; left: 0; right: 0; z-index: 998;
+    background: #f0f7ec; border-bottom: 2px solid #2e6b2e;
+    padding: 5px 14px; display: flex; align-items: center; gap: 8px;
+    font-family:'Helvetica',sans-serif; font-size: 10pt;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+  }
+  .story-nav .nav-arrow {
+    background: white; border: 1px solid #7aa874; color: #1a3a1a;
+    padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 13pt;
+    line-height: 1; font-weight: bold;
+  }
+  .story-nav .nav-arrow:hover { background: #2e6b2e; color: white; }
+  .story-nav .nav-arrow:disabled { opacity: 0.3; cursor: default; }
+  .story-nav select {
+    flex: 1; padding: 5px 8px; border: 1px solid #7aa874; border-radius: 4px;
+    font-family:'Helvetica',sans-serif; font-size: 10pt; background: white; color: #1a3a1a;
+    cursor: pointer; max-width: 380px;
+  }
+  .story-nav .nav-counter {
+    color: #555; font-size: 9.5pt; white-space: nowrap;
+  }
+  .story-nav .nav-all-btn {
+    background: #fffde7; border: 1px solid #c77700; color: #806000;
+    padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 9pt;
+    white-space: nowrap;
+  }
+  .story-nav .nav-all-btn:hover { background: #c77700; color: white; }
+
+  /* Geschichten: standardmäßig ausblenden, aktive anzeigen */
+  .geschichte { display: none; page-break-after: always; padding-top: 4mm; }
+  .geschichte.active { display: block; }
+  /* Beim Drucken alle zeigen */
+  @media print { .geschichte { display: block !important; } }
+
+  body { padding-top: 80px; }
+  body.editing .story-nav { top: 38px; }
+  /* Editierbare Felder im Edit-Modus hervorheben */
+
+  /* Kompetenz-Badges */
+  .kompetenzen { margin: 3px 0 6px 0; display: flex; flex-wrap: wrap; gap: 4px; }
+  .komp {
+    display: inline-block; padding: 1px 7px; border-radius: 8px;
+    font-size: 8.5pt; background: #e3f2fd; color: #0d47a1;
+    font-family:'Helvetica',sans-serif; font-weight: normal;
+  }
+  .komp-titel { font-size: 8.5pt; color: #777; font-style: italic; margin-right: 4px; align-self: center; }
+
+  /* Lösungs-Link in der Aufgabe */
+  .loesung-link {
+    display: inline-block; margin-top: 6px; color: #2e6b2e;
+    font-size: 9pt; font-style: italic; text-decoration: none;
+    border-bottom: 1px dotted #2e6b2e;
+  }
+  .loesung-link:hover { color: #c77700; border-color: #c77700; }
+
+  /* Lösungs-Anhang am Ende */
+  #loesungs-anhang {
+    margin-top: 30px; page-break-before: always;
+    border-top: 3px solid #2e6b2e; padding-top: 14px;
+    font-family:'Helvetica',sans-serif;
+  }
+  #loesungs-anhang h2 {
+    color: #1a3a1a; font-size: 16pt; margin-bottom: 12px;
+  }
+  .loe-block {
+    background: #f0f0f0; border-left: 4px solid #777;
+    padding: 8px 14px; margin: 10px 0; border-radius: 3px;
+    font-size: 10pt; page-break-inside: avoid;
+  }
+  .loe-block h3 {
+    margin: 0 0 4px 0; color: #2e6b2e; font-size: 10.5pt;
+  }
+  .loe-block .zurueck { font-size: 8.5pt; float: right; }
+  .loe-block .zurueck a { color: #777; text-decoration: none; }
+  .loe-block .zurueck a:hover { color: #2e6b2e; }
+
+  /* Schwierigkeits-Badges */
+  .diff { display:inline-block; padding:1px 7px; border-radius:9px; font-size:8.5pt; font-weight:bold; margin-left:6px; vertical-align:middle; font-family:'Helvetica',sans-serif; }
+  .d1 { background:#c8e6c9; color:#1b5e20; }
+  .d2 { background:#dcedc8; color:#33691e; }
+  .d3 { background:#fff3b0; color:#806000; }
+  .d4 { background:#ffe082; color:#a35a00; }
+  .d5 { background:#ffccbc; color:#bf360c; }
+  .d6 { background:#ff8a80; color:#7a0000; }
+  .diff-legende { font-size:9pt; background:#fafafa; padding:6px 10px; border-radius:4px; margin:8px 0; font-family:'Helvetica',sans-serif; }
+  .diff-legende .diff { margin-left:0; margin-right:4px; }
+
+  /* Edit-Modus */
+  .edit-bar {
+    position:fixed; top:0; left:0; right:0; z-index:999;
+    background:#1a3a1a; color:white; padding:6px 14px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'Helvetica',sans-serif; font-size:10.5pt;
+    box-shadow:0 2px 6px rgba(0,0,0,0.2);
+  }
+  .edit-bar button { font-family:inherit; font-size:9.5pt; padding:4px 10px; margin-left:4px; border-radius:3px; border:1px solid #888; background:white; cursor:pointer; }
+  .edit-bar button.primary { background:#c77700; color:white; border-color:#a35a00; }
+  .edit-bar button.danger { background:#c44; color:white; border-color:#a30000; }
+  body.editing { padding-top:45px; }
+  body.editing [data-edit-id] { outline:1px dashed #c77700; outline-offset:2px; background:#fffaf0; cursor:text; }
+  body.editing [data-edit-id]:focus { outline:2px solid #2e6b2e; background:white; }
+
+  @media print {
+    .edit-bar { display:none !important; }
+    .loesung { background:#fafafa; }
+    details { page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="edit-bar" id="edit-bar">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <strong>📖 Kletterwald-Geschichten</strong>
+    <span id="edit-status" style="opacity:0.75;font-style:italic;font-size:9pt;">Vorschau</span>
+    <span id="sync-status" style="opacity:0.85;font-size:8.5pt;"></span>
+  </div>
+  <div>
+    <button onclick="refreshPlatforms()" title="Plattformen aus Editor neu laden">🔄</button>
+    <button onclick="toggleEdit()" id="toggle-btn" class="primary">✏ Bearbeiten</button>
+    <button onclick="saveChanges()" id="save-btn" style="display:none;">💾 Speichern</button>
+    <button onclick="resetText()" class="danger" title="Änderungen verwerfen">↺</button>
+    <button onclick="window.print()">🖨 Drucken</button>
+  </div>
+</div>
+
+<div class="story-nav" id="story-nav">
+  <button class="nav-arrow" id="nav-prev" onclick="changeStory(-1)" title="Vorherige Geschichte">‹</button>
+  <select id="story-select" onchange="showStory(+this.value)">
+    <option value="1">1 · Die Notfall-Rettung</option>
+    <option value="2">2 · Die Drohnen-Vermessung</option>
+    <option value="3">3 · Der Streit der Bauleiter</option>
+    <option value="4">4 · Lena und Tim – Wettlauf</option>
+    <option value="5">5 · Die Schatzsuche im Wald</option>
+    <option value="6">6 · Die schwebende Kanzel</option>
+    <option value="7">7 · Kollision der drei Drohnen</option>
+    <option value="8">8 · Der neue Kletterpark</option>
+  </select>
+  <button class="nav-arrow" id="nav-next" onclick="changeStory(+1)" title="Nächste Geschichte">›</button>
+  <span class="nav-counter" id="nav-counter">1 / 8</span>
+  <button class="nav-all-btn" onclick="toggleAllStories()" id="btn-all">📋 Alle</button>
+</div>
+
+<!-- Globale Infoleiste — wird per JS ausgeblendet wenn nur 1 Geschichte sichtbar -->
+<div id="global-info" style="display:none;">
+<h1>Kletterwald — Acht Geschichten</h1>
+<p class="plattform-mini">
+<strong>Treffpunkt am Boden:</strong> T (0|0|0)<br>
+<strong>Plattformen:</strong> B Basislager (−4|−3|2) · E Eichenturm (−7|3|3) · F Fuchsbau (−1|7|5) · W Wurzelhütte (3|0|2) · R Rabenfels (5|−4|4) · A Adlerhorst (1|2|6) · S Spechtnest (2|1|4) · G Gipfelstation (8|5|6)
+</p>
+<p class="diff-legende">
+<strong>Schwierigkeitsstufen:</strong>
+<span class="diff d1">L1 sehr leicht</span>
+<span class="diff d2">L2 leicht</span>
+<span class="diff d3">L3 mittel</span>
+<span class="diff d4">L4 anspruchsvoll</span>
+<span class="diff d5">L5 schwer</span>
+<span class="diff d6">L6 sehr schwer</span>
+&nbsp;&nbsp;
+<span style="display:inline-block;padding:1px 8px;border-radius:9px;background:#8b5a2b;color:white;font-size:9pt;font-weight:bold;">🌉 Brücke</span>
+<span style="display:inline-block;padding:1px 8px;border-radius:9px;background:#0066cc;color:white;font-size:9pt;font-weight:bold;">🪢 Seil</span>
+</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- GESCHICHTE 1: Notfall-Rettung -->
+<!-- ============================================================ -->
+<div class="geschichte">
+<h2>1 · Die Notfall-Rettung</h2>
+<p class="untertitel">Geraden · Punktprobe · Routenvergleich &nbsp;—&nbsp; K2 Problemlösen</p>
+
+<div class="erzaehlung">
+<p>Es ist Mittwochnachmittag, kurz nach drei. Du stehst am <em>Treffpunkt T</em> am Eingang des Kletterwalds, als plötzlich der Funk knattert: <em>„Hilfe! Ein Kind sitzt fest auf der Gipfelstation und traut sich nicht mehr runter."</em></p>
+<p>Du musst zuerst zum Basislager hochklettern — von dort führen die Seile weiter. Mathematik vor Adrenalin.</p>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 1.1 — Vom Boden zum Basislager <span class="diff d2">L2 leicht</span></div>
+Vom Treffpunkt $T(0|0|0)$ aus musst du erst zum Basislager B hochklettern.
+<ol>
+<li>Bestimme $\overrightarrow{TB}$ und seine Länge in cm.</li>
+<li>Stelle die Geradengleichung $g_{TB}$ auf. Welches Intervall von $t$ entspricht dem Seil zwischen Boden und Plattform?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$\overrightarrow{TB}=(-4,-3,2)$, $|\overrightarrow{TB}|=\sqrt{29}\approx 5{,}39$ cm. ·
+$g_{TB}:\vec{x}=\vec{0}+t(-4,-3,2)$, Seil: $t\in[0;1]$.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["T","B"],"lines":[{"f":"T","t":"B","c":"#c77700"}]}'></div>
+</div>
+
+<div class="erzaehlung">
+<p>Vom Basislager schaust du hoch zum Gipfel. Direkt? Oder über das Spechtnest? Du brauchst die Geradengleichung.</p>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 1.2 — Das Hauptseil zum Gipfel <span class="diff d3">L3 mittel</span></div>
+<ol>
+<li>Stelle $g_{BG}$ in Parameterform mit möglichst einfachem Richtungsvektor auf.</li>
+<li>Liegt $S(2|1|4)$ auf $g_{BG}$? An welcher Stelle (Anteil der Strecke)?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$\overrightarrow{BG}=(12,8,4)=4(3,2,1)$. $g_{BG}:\vec{x}=(-4,-3,2)+t(3,2,1)$, Strecke $t\in[0;4]$. ·
+$S$: $-4+3t=2\Rightarrow t=2$. Probe: $-3+4=1$ ✓, $2+2=4$ ✓ → liegt drauf, bei <strong>50 %</strong>.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","G","S"],"lines":[{"f":"B","t":"G","c":"#c44"}]}'></div>
+</div>
+
+<div class="erzaehlung">
+<p>Jonas funkt: „Die Zipline B→G ist gesperrt — du musst über die Wurzelhütte!"</p>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 1.3 — Direkt oder Umweg? <span class="diff d3">L3 mittel</span></div>
+<ol>
+<li>Berechne $|\overrightarrow{BG}|$ in cm.</li>
+<li>Berechne $|\overrightarrow{BW}|+|\overrightarrow{WG}|$.</li>
+<li>Um wie viele cm ist der Umweg länger? Bei 5 cm/s: wie viel Zeit verlierst du?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$|\overrightarrow{BG}|=\sqrt{224}\approx 14{,}97$ cm. $|\overrightarrow{BW}|+|\overrightarrow{WG}|=\sqrt{58}+\sqrt{66}\approx 15{,}74$ cm. Umweg $\approx 0{,}77$ cm → ca. 0,15 s.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","W","G"],"lines":[{"f":"B","t":"W","c":"#0066cc"},{"f":"W","t":"G","c":"#0066cc"},{"f":"B","t":"G","c":"#c44","d":true}]}'></div>
+</div>
+
+<details class="gesamt-loesung">
+  <summary><span class="gl-arrow">▶</span> Musterlösung — alle Aufgaben mit Zwischenschritten</summary>
+  <div class="gl-inhalt">
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 1.1 — Vom Boden zum Basislager</div>
+      <ol class="gl-schritte">
+        <li><strong>Verbindungsvektor:</strong> $\overrightarrow{TB} = B - T = \begin{pmatrix}-4\\-3\\2\end{pmatrix}-\begin{pmatrix}0\\0\\0\end{pmatrix} = \begin{pmatrix}-4\\-3\\2\end{pmatrix}$</li>
+        <li><strong>Länge:</strong> $|\overrightarrow{TB}| = \sqrt{(-4)^2+(-3)^2+2^2} = \sqrt{16+9+4} = \sqrt{29} \approx 5{,}39$ cm</li>
+        <li><strong>Geradengleichung:</strong> $g_{TB}: \vec{x} = \begin{pmatrix}0\\0\\0\end{pmatrix}+t\begin{pmatrix}-4\\-3\\2\end{pmatrix}$</li>
+        <li><strong>Intervall:</strong> $t=0$ entspricht T (Boden), $t=1$ entspricht B (Plattform) → Seil: $t\in[0;\,1]$ <span class="gl-ergebnis">✓</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 1.2 — Das Hauptseil zum Gipfel</div>
+      <ol class="gl-schritte">
+        <li><strong>Richtungsvektor:</strong> $\overrightarrow{BG}=G-B=(8-(-4)\;|\;5-(-3)\;|\;6-2)=(12\;|\;8\;|\;4)=4\cdot(3\;|\;2\;|\;1)$ → einfachster Richtungsvektor: $(3|2|1)$</li>
+        <li><strong>Geradengleichung:</strong> $g_{BG}:\vec{x}=\begin{pmatrix}-4\\-3\\2\end{pmatrix}+t\begin{pmatrix}3\\2\\1\end{pmatrix}$; Strecke $t\in[0;\,4]$ (bei $t=4$: $(-4{+}12\;|\;-3{+}8\;|\;2{+}4)=(8|5|6)=G$ ✓)</li>
+        <li><strong>Punktprobe S(2|1|4):</strong> Aus $x$-Gleichung: $-4+3t=2 \Rightarrow t=2$</li>
+        <li>Probe $y$: $-3+2\cdot 2 = 1$ ✓ &nbsp; Probe $z$: $2+2=4$ ✓ &nbsp; → S liegt auf $g_{BG}$, bei $t=2$ von 4, also genau bei <span class="gl-ergebnis">50 % der Strecke</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 1.3 — Direkt oder Umweg?</div>
+      <ol class="gl-schritte">
+        <li><strong>Direkter Weg B→G:</strong> $|\overrightarrow{BG}|=4\cdot\sqrt{3^2+2^2+1^2}=4\sqrt{14}=\sqrt{224}\approx 14{,}97$ cm</li>
+        <li><strong>Umweg B→W:</strong> $\overrightarrow{BW}=(7|3|0) \Rightarrow |\overrightarrow{BW}|=\sqrt{49+9+0}=\sqrt{58}\approx 7{,}62$ cm</li>
+        <li><strong>Umweg W→G:</strong> $\overrightarrow{WG}=(5|5|4) \Rightarrow |\overrightarrow{WG}|=\sqrt{25+25+16}=\sqrt{66}\approx 8{,}12$ cm</li>
+        <li><strong>Umweg gesamt:</strong> $\sqrt{58}+\sqrt{66}\approx 15{,}74$ cm &nbsp;|&nbsp; Mehrweg: $15{,}74-14{,}97\approx 0{,}77$ cm</li>
+        <li><strong>Zeitverlust:</strong> $\frac{0{,}77\text{ cm}}{5\text{ cm/s}}\approx$ <span class="gl-ergebnis">0,15 s Mehrzeit</span></li>
+      </ol>
+    </div>
+
+  </div>
+</details>
+<p class="meta">Eingebundene Teilaufgaben: L1, L3, M1, M5.</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- GESCHICHTE 2: Drohnen-Vermessung -->
+<!-- ============================================================ -->
+<div class="geschichte">
+<h2>2 · Die Drohnen-Vermessung des TÜV</h2>
+<p class="untertitel">Geradengleichung · Punktprobe · Lagebeziehungen &nbsp;—&nbsp; K3 Modellieren · K6 Darstellen</p>
+
+<div class="erzaehlung">
+<p>Frau Dr. Külpmann vom TÜV steht mit verschränkten Armen am Eingang. Eine Drohne surrt: <em>„Wir prüfen heute die Sicherheitsabstände. Die Drohne fliegt eine gerade Linie über den Wald — alle Plattformen, die sie überfliegt, werden vermessen."</em></p>
+<p>Die Drohne startet am Basislager $B(-4|-3|2)$ und fliegt geradeaus in Richtung Fuchsbau $F(-1|7|5)$.</p>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 2.1 — Die Flugbahn <span class="diff d2">L2 leicht</span></div>
+Bestimme den Richtungsvektor $\overrightarrow{BF}$ und schreibe die Flugbahn als Geradengleichung in Parameterform auf. Was bedeuten $t=0$ und $t=1$ geometrisch?
+<details class="loesung"><summary>Lösung</summary>
+$\overrightarrow{BF}=(3|10|3)$. $g:\vec{x}=(-4,-3,2)+t(3,10,3)$. $t=0$: Basislager B. $t=1$: $(-1|7|5)$ = Fuchsbau F.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","F"],"lines":[{"f":"B","t":"F","c":"#c44"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 2.2 — Welche Plattformen erfasst die Drohne? <span class="diff d3">L3 mittel</span></div>
+Prüfe per Punktprobe für die Plattformen S, E, A und G, ob sie auf $g$ liegen.
+<details class="loesung"><summary>Lösung</summary>
+<strong>S(2|1|4):</strong> $t=2$ aus $x$ → $y$-Probe: $-3+20=17\ne 1$ ✗ &nbsp;|&nbsp; <strong>E(−7|3|3):</strong> $t=1$ → $y$: $-3+10=7\ne 3$ ✗ &nbsp;|&nbsp; <strong>A(1|2|6):</strong> $t=\tfrac{5}{3}$ → $y$: $-3+\tfrac{50}{3}\ne 2$ ✗ &nbsp;|&nbsp; <strong>G(8|5|6):</strong> $t=4$ → $y$: $-3+40=37\ne 5$ ✗ &nbsp;→ Keine dieser Plattformen liegt auf $g$.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","F","S","E","A","G"],"lines":[{"f":"B","t":"F","c":"#c44"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 2.3 — Kreuzt die Drohnenbahn das Seil EG? <span class="diff d3">L3 mittel</span></div>
+Untersuche die Lagebeziehung von $g$ und dem Seil $\overline{EG}$. Stelle das LGS auf und löse es. Falls ein Schnittpunkt existiert: Liegt er auf dem Seilabschnitt?
+<details class="loesung"><summary>Lösung</summary>
+$h:\vec{x}=(-7,3,3)+s(15,2,3)$. LGS: $t-5s=-1$, $5t-s=3$, $t-s=\tfrac{1}{3}$ → $s=\tfrac{1}{3}$, $t=\tfrac{2}{3}$ ✓ alle drei Gleichungen. Schnittpunkt: $(-2|\tfrac{11}{3}|4)$. Da $s=\tfrac{1}{3}\in[0;1]$: Schnittpunkt liegt auf dem Seil — <strong>Kreuzungsrisiko!</strong>
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","F","E","G"],"lines":[{"f":"B","t":"F","c":"#c44"},{"f":"E","t":"G","c":"#0066cc"}]}'></div>
+</div>
+
+<details class="gesamt-loesung">
+  <summary><span class="gl-arrow">▶</span> Musterlösung — alle Aufgaben mit Zwischenschritten</summary>
+  <div class="gl-inhalt">
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 2.1 — Die Flugbahn</div>
+      <ol class="gl-schritte">
+        <li><strong>Richtungsvektor:</strong> $\overrightarrow{BF}=F-B=(-1-(-4)\;|\;7-(-3)\;|\;5-2)=(3|10|3)$</li>
+        <li><strong>Geradengleichung:</strong> $g:\vec{x}=\begin{pmatrix}-4\\-3\\2\end{pmatrix}+t\begin{pmatrix}3\\10\\3\end{pmatrix}$</li>
+        <li>$t=0$: Startpunkt Basislager $B(-4|-3|2)$ &nbsp;|&nbsp; $t=1$: $(-1|7|5)$ = <span class="gl-ergebnis">Fuchsbau F</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 2.2 — Welche Plattformen erfasst die Drohne?</div>
+      <ol class="gl-schritte">
+        <li><strong>Methode:</strong> Aus $x$: $-4+3t=x_0 \Rightarrow t=\frac{x_0+4}{3}$, dann Probe in $y$ und $z$</li>
+        <li><strong>S(2|1|4):</strong> $t=2$ → Probe $y$: $-3+20=17\neq 1$ ✗</li>
+        <li><strong>E(−7|3|3):</strong> $t=1$ → Probe $y$: $-3+10=7\neq 3$ ✗</li>
+        <li><strong>A(1|2|6):</strong> $t=\tfrac{5}{3}$ → Probe $y$: $-3+\tfrac{50}{3}\neq 2$ ✗</li>
+        <li><strong>G(8|5|6):</strong> $t=4$ → Probe $y$: $-3+40=37\neq 5$ ✗ &nbsp;&nbsp; <span class="gl-ergebnis">Keine Plattform auf g (außer Start B und Ziel F)</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 2.3 — Kreuzt die Drohnenbahn das Seil EG?</div>
+      <ol class="gl-schritte">
+        <li><strong>Seil EG als Gerade:</strong> $\overrightarrow{EG}=G-E=(15|2|3)$ &nbsp;→&nbsp; $h:\vec{x}=\begin{pmatrix}-7\\3\\3\end{pmatrix}+s\begin{pmatrix}15\\2\\3\end{pmatrix}$</li>
+        <li><strong>Gleichsetzen</strong> $g=h$ komponentenweise:
+          <ul>
+            <li>$(x)$: $-4+3t=-7+15s$ &nbsp;→&nbsp; $t-5s=-1$ &nbsp;&nbsp;(I)</li>
+            <li>$(y)$: $-3+10t=3+2s$ &nbsp;→&nbsp; $5t-s=3$ &nbsp;&nbsp;(II)</li>
+            <li>$(z)$: $2+3t=3+3s$ &nbsp;→&nbsp; $t-s=\tfrac{1}{3}$ &nbsp;&nbsp;(III)</li>
+          </ul>
+        </li>
+        <li><strong>LGS lösen</strong> [(I) und (III)]: aus (III) $t=s+\tfrac{1}{3}$, in (I): $(s+\tfrac{1}{3})-5s=-1 \Rightarrow -4s=-\tfrac{4}{3} \Rightarrow \mathbf{s=\tfrac{1}{3}}$, $\mathbf{t=\tfrac{2}{3}}$</li>
+        <li><strong>Probe in (II):</strong> $5\cdot\tfrac{2}{3}-\tfrac{1}{3}=\tfrac{10}{3}-\tfrac{1}{3}=3$ ✓ — LGS konsistent</li>
+        <li><strong>Schnittpunkt:</strong> $\vec{x}=\begin{pmatrix}-4\\-3\\2\end{pmatrix}+\tfrac{2}{3}\begin{pmatrix}3\\10\\3\end{pmatrix}=\begin{pmatrix}-2\\\tfrac{11}{3}\\4\end{pmatrix}$</li>
+        <li><strong>Liegt der Punkt auf dem Seilabschnitt?</strong> $s=\tfrac{1}{3}\in[0;1]$ ✓ → ein Drittel des Wegs von E nach G</li>
+        <li>→ <span class="gl-ergebnis">Drohnenbahn und Seil EG schneiden sich — Kreuzungsrisiko, TÜV muss einschreiten!</span></li>
+      </ol>
+    </div>
+
+  </div>
+</details>
+<p class="meta">Eingebundene Teilaufgaben: L3, L4 (mehrfach), L5/M3.</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- GESCHICHTE 3: Bauleiter-Streit -->
+<!-- ============================================================ -->
+<div class="geschichte">
+<h2>3 · Der Streit der Bauleiter</h2>
+<p class="untertitel">Argumentieren · Lagebeziehungen · Brief &nbsp;—&nbsp; K1, K5</p>
+
+<div class="erzaehlung">
+<p>In der Bauhütte streiten Anna (Nord) und Ben (Süd):</p>
+<p>Anna: <em>„Das Seil vom Adlerhorst zum Rabenfels und das Seil vom Eichenturm zur Wurzelhütte — die kreuzen sich da oben. Wir müssen das Seil verlegen!"</em></p>
+<p>Ben kontert: <em>„Die laufen aneinander vorbei. Du verlierst!"</em></p>
+<p>Du sollst entscheiden. 15 Minuten.</p>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 3.1 — Parallel? <span class="diff d2">L2 leicht</span></div>
+Bestimme $\overrightarrow{AR}$ und $\overrightarrow{EW}$. Untersuche, ob das eine ein Vielfaches des anderen ist.
+<details class="loesung"><summary>Lösung</summary>
+$\overrightarrow{AR}=(4,-6,-2)$, $\overrightarrow{EW}=(10,-3,-1)$. $k=0{,}4$ aus 1. Komp; aber $-6\ne 0{,}4\cdot(-3)$ → <strong>nicht parallel</strong>.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["A","R","E","W"],"lines":[{"f":"A","t":"R","c":"#c44"},{"f":"E","t":"W","c":"#0066cc"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 3.2 — Schneiden? <span class="diff d4">L4 anspruchsvoll</span></div>
+Stelle beide Geradengleichungen auf und prüfe das LGS.
+<details class="loesung"><summary>Lösung</summary>
+$g_{AR}:(1,2,6)+t(4,-6,-2)$, $g_{EW}:(-7,3,3)+s(10,-3,-1)$. Aus 3. $s=2t-3$; in 2. eingesetzt: $2-6t=12-6t\Rightarrow 2=12$ ✗ → kein Schnitt → <strong>windschief</strong>.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["A","R","E","W"],"lines":[{"f":"A","t":"R","c":"#c44"},{"f":"E","t":"W","c":"#0066cc"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 3.3 — Das Gutachten <span class="diff d4">L4 anspruchsvoll</span></div>
+Schreibe einen kurzen Brief (3–5 Sätze) an die Geschäftsführung. Beginne mit dem Ergebnis. Mathematisch korrekt, aber in Worten. <strong>Wer hatte Recht?</strong>
+<details class="loesung"><summary>Lösungsvorschlag</summary>
+<em>„Die Seile sind windschief. Ihre Richtungsvektoren sind keine Vielfachen, also nicht parallel. Setzt man beide Geradengleichungen gleich, ergibt sich der Widerspruch 2 = 12 — es gibt keinen gemeinsamen Punkt. Die Seile laufen aneinander vorbei. Ben hatte Recht; keine Verlegung nötig."</em>
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["A","R","E","W"],"lines":[{"f":"A","t":"R","c":"#c44"},{"f":"E","t":"W","c":"#0066cc"}]}'></div>
+</div>
+
+<details class="gesamt-loesung">
+  <summary><span class="gl-arrow">▶</span> Musterlösung — alle Aufgaben mit Zwischenschritten</summary>
+  <div class="gl-inhalt">
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 3.1 — Parallel?</div>
+      <ol class="gl-schritte">
+        <li><strong>Richtungsvektoren berechnen:</strong> $\overrightarrow{AR}=R-A=(5-1\;|\;-4-2\;|\;4-6)=(4|-6|-2)$</li>
+        <li>$\overrightarrow{EW}=W-E=(3-(-7)\;|\;0-3\;|\;2-3)=(10|-3|-1)$</li>
+        <li><strong>Vielfaches-Test:</strong> Annahme $\overrightarrow{AR}=k\cdot\overrightarrow{EW}$. Aus $x$: $k=\frac{4}{10}=0{,}4$</li>
+        <li>Probe $y$: $0{,}4\cdot(-3)=-1{,}2\neq -6$ ✗ → <span class="gl-ergebnis">nicht parallel</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 3.2 — Schneiden?</div>
+      <ol class="gl-schritte">
+        <li><strong>Geradengleichungen:</strong> $g_{AR}:\vec{x}=(1,2,6)+t(4,-6,-2)$ &nbsp; und &nbsp; $g_{EW}:\vec{x}=(-7,3,3)+s(10,-3,-1)$</li>
+        <li><strong>Gleichsetzen — LGS aufstellen:</strong>
+          <br>(I) $1+4t=-7+10s$
+          <br>(II) $2-6t=3-3s$
+          <br>(III) $6-2t=3-s$</li>
+        <li><strong>Aus (III):</strong> $s=2t-3$; einsetzen in (II): $2-6t=3-3(2t-3)=3-6t+9=12-6t$</li>
+        <li>→ $2=12$ — <strong>Widerspruch!</strong> Das LGS hat keine Lösung.</li>
+        <li>→ Nicht parallel (3.1), nicht schneidend → <span class="gl-ergebnis">windschief — Ben hatte Recht, keine Verlegung nötig</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 3.3 — Das Gutachten (Muster)</div>
+      <ol class="gl-schritte">
+        <li><strong>Ergebnis zuerst:</strong> Die Seile AR und EW sind windschief — kein gemeinsamer Punkt, keine Kollisionsgefahr.</li>
+        <li><strong>Begründung 1:</strong> Richtungsvektoren $(4|-6|-2)$ und $(10|-3|-1)$ sind keine Vielfachen → nicht parallel.</li>
+        <li><strong>Begründung 2:</strong> Das Gleichungssystem liefert den Widerspruch $2=12$ → kein Schnittpunkt.</li>
+        <li>Windschief bedeutet: Die Geraden laufen im Raum aneinander vorbei, ohne sich zu berühren. <span class="gl-ergebnis">Ben hatte Recht.</span></li>
+      </ol>
+    </div>
+
+  </div>
+</details>
+<p class="meta">Eingebundene Teilaufgaben: L5, M3, S6. Schreibauftrag fördert K5 Kommunizieren.</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- GESCHICHTE 4: Lena & Tim -->
+<!-- ============================================================ -->
+<div class="geschichte">
+<h2>4 · Lena und Tim — Wettlauf zum Gipfel</h2>
+<p class="untertitel">Geraden mit Zeit-Parameter · Modellierung &nbsp;—&nbsp; K3</p>
+
+<div class="erzaehlung">
+<p>8:59 Uhr stehen Lena und Tim am Treffpunkt T. Wette: Wer ist als Erste am Gipfel?</p>
+<p>Lena klettert sofort zum Basislager hoch und startet pünktlich um <strong>9:00</strong> dort die Hauptseilbahn — pro Minute Richtungsvektor $(3|2|1)$.</p>
+<p>Tim trödelt am Treffpunkt, klettert zur Wurzelhütte und startet erst um <strong>9:02</strong> — pro Minute $(-1|1|2)$.</p>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 4.1 — Die zwei Bahnen <span class="diff d3">L3 mittel</span></div>
+Sei $t$ in Minuten seit 9:00. Stelle $\vec{L}(t)$ und $\vec{T}(t)$ auf. Achtung: Tims Zeit-Versatz!
+<details class="loesung"><summary>Lösung</summary>
+$\vec{L}(t)=(-4,-3,2)+t(3,2,1)$, $t\ge 0$. $\vec{T}(t)=(3,0,2)+(t-2)(-1,1,2)$, $t\ge 2$.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","G","W","A"],"lines":[{"f":"B","t":"G","c":"#c44"},{"f":"W","t":"A","c":"#0066cc"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 4.2 — Wer ist um 9:03 wo? <span class="diff d3">L3 mittel</span></div>
+Bestimme die Position beider zum Zeitpunkt $t=3$.
+<details class="loesung"><summary>Lösung</summary>
+$\vec{L}(3)=(5|3|5)$ — keine Plattform. $\vec{T}(3)=(2|1|4)$ = <strong>Spechtnest</strong>.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","G","W","S"],"lines":[{"f":"B","t":"G","c":"#c44"},{"f":"W","t":"A","c":"#0066cc"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 4.3 — Wann sind beide auf gleicher Höhe? <span class="diff d4">L4 anspruchsvoll</span></div>
+Setze $z_L=z_T$. Wo befindet sich jeder zu diesem Zeitpunkt? Sind sie am selben Ort?
+<details class="loesung"><summary>Lösung</summary>
+$2+t=2t-2\Rightarrow t=4$. $\vec{L}(4)=(8|5|6)$ = <strong>G</strong>, $\vec{T}(4)=(1|2|6)$ = <strong>A</strong>. Gleiche Höhe, verschiedene Orte. Lena gewinnt!
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["G","A"],"lines":[{"f":"B","t":"G","c":"#c44"},{"f":"W","t":"A","c":"#0066cc"}]}'></div>
+</div>
+
+<details class="gesamt-loesung">
+  <summary><span class="gl-arrow">▶</span> Musterlösung — alle Aufgaben mit Zwischenschritten</summary>
+  <div class="gl-inhalt">
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 4.1 — Die zwei Bahnen</div>
+      <ol class="gl-schritte">
+        <li><strong>Lena</strong> startet bei $t=0$ am Basislager $B(-4|-3|2)$, Richtung $(3|2|1)$ pro Minute:<br>$\vec{L}(t)=\begin{pmatrix}-4\\-3\\2\end{pmatrix}+t\begin{pmatrix}3\\2\\1\end{pmatrix},\quad t\ge0$</li>
+        <li><strong>Tim</strong> startet erst bei $t=2$ (um 9:02) an der Wurzelhütte $W(3|0|2)$, Richtung $(-1|1|2)$:<br>$\vec{T}(t)=\begin{pmatrix}3\\0\\2\end{pmatrix}+(t-2)\begin{pmatrix}-1\\1\\2\end{pmatrix},\quad t\ge2$<br>(Vor $t=2$ bleibt Tim bei W — Zeitversatz $(t-2)$ statt $t$!)</li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 4.2 — Wer ist um 9:03 wo? ($t=3$)</div>
+      <ol class="gl-schritte">
+        <li><strong>Lena bei $t=3$:</strong> $\vec{L}(3)=(-4+9\;|\;-3+6\;|\;2+3)=(5|3|5)$ → keine bekannte Plattform</li>
+        <li><strong>Tim bei $t=3$:</strong> $\vec{T}(3)=(3,0,2)+(3-2)(-1,1,2)=(3-1\;|\;0+1\;|\;2+2)=(2|1|4)$ = <span class="gl-ergebnis">Spechtnest S</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 4.3 — Wann sind beide auf gleicher Höhe?</div>
+      <ol class="gl-schritte">
+        <li><strong>$z$-Komponenten gleichsetzen:</strong> $z_L=2+t$ &nbsp; und &nbsp; $z_T=2+2(t-2)=2t-2$</li>
+        <li>$2+t=2t-2 \Rightarrow 4=t$ &nbsp;→ &nbsp;Zeitpunkt $t=4$ (also 9:04 Uhr)</li>
+        <li><strong>Lena bei $t=4$:</strong> $\vec{L}(4)=(-4+12\;|\;-3+8\;|\;2+4)=(8|5|6)$ = Gipfelstation G ← Lena ist am Ziel!</li>
+        <li><strong>Tim bei $t=4$:</strong> $\vec{T}(4)=(3,0,2)+(2)(-1,1,2)=(1|2|6)$ = Adlerhorst A</li>
+        <li>Gleiche Höhe $z=6$, verschiedene Orte → <span class="gl-ergebnis">Lena gewinnt!</span></li>
+      </ol>
+    </div>
+
+  </div>
+</details>
+<p class="meta">Eingebundene Teilaufgaben: L3, L4, S3 (vereinfacht).</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- GESCHICHTE 5: Schatzsuche im Wald -->
+<!-- ============================================================ -->
+<div class="geschichte">
+<h2>5 · Die Schatzsuche im Wald</h2>
+<p class="untertitel">Vektoraddition · Wegbeschreibung · Spurpunkt &nbsp;—&nbsp; K3 Modellieren · K6 Darstellen</p>
+
+<div class="erzaehlung">
+<p>Der alte Förster Wendelin ist verstorben. In seinem Nachlass findest du eine vergilbte Karte mit folgender Wegbeschreibung — angeblich zu einer im Wald vergrabenen Notfall-Kasse:</p>
+<p style="background:#fff8e7;padding:8px 12px;border-left:4px solid #c9a45a;font-style:italic;">
+<em>„Vom Treffpunkt T aus: gehe</em><br>
+<em>① zuerst um $(4|2|2)$ — du bist im Geäst;</em><br>
+<em>② dann um $(1|3|4)$ — du klimmst höher;</em><br>
+<em>③ zuletzt senkrecht zum Boden hinab.</em><br>
+<em>Dort, wo du landest, ruht die Kasse."</em>
+</p>
+<p>Du musst die Endpunkte rechnerisch bestimmen, bevor du loskletterst.</p>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 5.1 — Der erste Wegabschnitt <span class="diff d1">L1 sehr leicht</span></div>
+<ol>
+<li>Schreibe die erste Anweisung als Vektor $\vec{v_1}$.</li>
+<li>Bestimme den Endpunkt $P_1$ ausgehend vom Treffpunkt T.</li>
+<li>Welche bekannte Plattform liegt in der Nähe von $P_1$? Vergleiche mit dem Rabenfels R(5|−4|4).</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$\vec{v_1}=(4,2,2)$. $P_1=T+\vec{v_1}=(4|2|2)$. R liegt in $x=5$, $y=-4$, $z=4$ — nicht in der Nähe. Eher in Richtung Adlerhorst-Mitte.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["T"],"lines":[{"f":"T","t":"P1","c":"#c77700"}],"extra":[{"id":"P1","x":4,"y":2,"z":2,"label":"P₁"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 5.2 — Der zweite Wegabschnitt <span class="diff d1">L1 sehr leicht</span></div>
+<ol>
+<li>Schreibe $\vec{v_2}$ und bestimme den Endpunkt $P_2 = P_1 + \vec{v_2}$.</li>
+<li>Welche Höhe hat $P_2$? Welche Plattform hat dieselbe Höhe?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$\vec{v_2}=(1,3,4)$, $P_2=(5|5|6)$. Höhe $z=6$ — Adlerhorst und Gipfelstation liegen auf gleicher Höhe.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["A","G"],"lines":[{"f":"P1","t":"P2","c":"#c77700"}],"extra":[{"id":"P1","x":4,"y":2,"z":2,"label":"P₁"},{"id":"P2","x":5,"y":5,"z":6,"label":"P₂"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 5.3 — Der Schatz <span class="diff d2">L2 leicht</span></div>
+<ol>
+<li>Die dritte Anweisung „senkrecht hinab zum Boden" bedeutet: $\vec{v_3}=(0|0|-z)$. Bestimme den Schatzort $P_3$.</li>
+<li>Berechne den <strong>Gesamt-Verschiebungsvektor</strong> $\overrightarrow{TP_3}=\vec{v_1}+\vec{v_2}+\vec{v_3}$.</li>
+<li>Wie weit (Luftlinie) ist der Schatz vom Treffpunkt entfernt?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$\vec{v_3}=(0,0,-6)$, $P_3=(5|5|0)$ — Schatz liegt am Boden. ·
+$\overrightarrow{TP_3}=(4+1+0\,;\,2+3+0\,;\,2+4-6)=(5|5|0)$. ·
+$|\overrightarrow{TP_3}|=\sqrt{25+25}=\sqrt{50}\approx 7{,}07$ cm.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["T"],"lines":[{"f":"T","t":"P3","c":"#a30000","d":true},{"f":"P2","t":"P3","c":"#c77700"}],"extra":[{"id":"P2","x":5,"y":5,"z":6,"label":"P₂"},{"id":"P3","x":5,"y":5,"z":0,"label":"💰"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 5.4 — Die direkte Route <span class="diff d3">L3 mittel</span></div>
+<ol>
+<li>Stelle die Geradengleichung der <strong>direkten Route</strong> $g_{TP_3}$ vom Treffpunkt zum Schatz auf.</li>
+<li>Wo durchstößt diese Gerade die Ebene $z=3$? (Spurpunkt mit einer Ebene)</li>
+<li>Welche Plattformhöhe entspricht $z=3$? Liegst du dann „auf Augenhöhe" mit welcher Plattform?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$g:\vec{x}=t(5,5,0)$, $t\in[0;1]$. Da $z$-Komponente konstant 0 → die direkte Route bleibt auf $z=0$. <strong>Die direkte Route durchstößt $z=3$ niemals</strong> — sie verläuft horizontal am Boden.
+Pointierte Beobachtung: Du müsstest also zuerst horizontal über den Boden gehen, kein Klettern nötig!
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["T"],"lines":[{"f":"T","t":"P3","c":"#2e6b2e"}],"extra":[{"id":"P3","x":5,"y":5,"z":0,"label":"💰"}]}'></div>
+</div>
+
+<details class="gesamt-loesung">
+  <summary><span class="gl-arrow">▶</span> Musterlösung — alle Aufgaben mit Zwischenschritten</summary>
+  <div class="gl-inhalt">
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 5.1 — Der erste Wegabschnitt</div>
+      <ol class="gl-schritte">
+        <li><strong>Vektor ablesen:</strong> $\vec{v_1}=(4|2|2)$ (direkt aus Anweisung ①)</li>
+        <li><strong>Endpunkt:</strong> $P_1=T+\vec{v_1}=(0+4\;|\;0+2\;|\;0+2)=(4|2|2)$</li>
+        <li><strong>Vergleich Rabenfels R(5|−4|4):</strong> Alle drei Koordinaten verschieden → R ist nicht in der Nähe. $P_1$ liegt näher am Adlerhorst (gleiche $y$-Richtung).</li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 5.2 — Der zweite Wegabschnitt</div>
+      <ol class="gl-schritte">
+        <li><strong>Vektor ablesen:</strong> $\vec{v_2}=(1|3|4)$</li>
+        <li><strong>Endpunkt:</strong> $P_2=P_1+\vec{v_2}=(4+1\;|\;2+3\;|\;2+4)=(5|5|6)$</li>
+        <li><strong>Höhe $z=6$:</strong> Adlerhorst $A(1|2|6)$ und Gipfelstation $G(8|5|6)$ haben dieselbe Höhe — <span class="gl-ergebnis">$P_2$ schwebt auf Gipfelniveau</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 5.3 — Der Schatz</div>
+      <ol class="gl-schritte">
+        <li><strong>Dritter Schritt:</strong> „senkrecht zum Boden hinab" = $\vec{v_3}=(0|0|-z_{P_2})=(0|0|-6)$</li>
+        <li><strong>Schatzort:</strong> $P_3=P_2+\vec{v_3}=(5|5|6)+(0|0|-6)=(5|5|0)$ → liegt am Boden ($z=0$)</li>
+        <li><strong>Gesamt-Verschiebungsvektor:</strong> $\overrightarrow{TP_3}=\vec{v_1}+\vec{v_2}+\vec{v_3}=(4+1+0\;|\;2+3+0\;|\;2+4-6)=(5|5|0)$</li>
+        <li><strong>Luftlinie:</strong> $|\overrightarrow{TP_3}|=\sqrt{5^2+5^2+0^2}=\sqrt{50}=5\sqrt{2}\approx$ <span class="gl-ergebnis">7,07 cm</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 5.4 — Die direkte Route</div>
+      <ol class="gl-schritte">
+        <li><strong>Geradengleichung:</strong> $g_{TP_3}:\vec{x}=\vec{0}+t\cdot(5,5,0)=t\begin{pmatrix}5\\5\\0\end{pmatrix},\quad t\in[0;\,1]$</li>
+        <li><strong>$z$-Komponente:</strong> $z(t)=0$ für alle $t$ — die Route verläuft vollständig auf dem Boden</li>
+        <li>→ Die Ebene $z=3$ wird <strong>niemals</strong> durchstoßen</li>
+        <li><span class="gl-ergebnis">Pointe:</span> Der Schatz liegt direkt am Boden — du gehst einfach horizontal hin, kein Klettern nötig!</li>
+      </ol>
+    </div>
+
+  </div>
+</details>
+<p class="meta">Inspiriert von IET Vector Treasure Hunt. Fokus: Vektoraddition als Wegbeschreibung. NRW: G1 · K3 · AFB I–II.</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- GESCHICHTE 6: Die schwebende Aussichtskanzel -->
+<!-- ============================================================ -->
+<div class="geschichte">
+<h2>6 · Die schwebende Aussichtskanzel</h2>
+<p class="untertitel">Mittelpunkt · Schwerpunkt · Bodenprojektion &nbsp;—&nbsp; K3, K6</p>
+
+<div class="erzaehlung">
+<p>Die Park-Architektin Frau Steigerwald hat einen Plan: eine schwebende Aussichtskanzel, von der man alle drei Hochplattformen sehen soll — Adlerhorst, Fuchsbau und Gipfelstation. Die Kanzel soll <em>genau im Schwerpunkt</em> dieser drei Plattformen schweben, getragen von einer einzelnen Stahlstütze, die senkrecht nach unten zum Boden führt.</p>
+<p>Du sollst berechnen, wo am Boden die Stütze stehen muss und wie hoch die Kanzel schwebt.</p>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 6.1 — Mittelpunkt von zwei Plattformen <span class="diff d1">L1 sehr leicht</span></div>
+Als Aufwärmübung: Bestimme den Mittelpunkt $M_{AF}$ der Strecke $\overline{AF}$ zwischen Adlerhorst $A(1|2|6)$ und Fuchsbau $F(-1|7|5)$.
+<details class="loesung"><summary>Lösung</summary>
+$M_{AF}=\tfrac12(\vec{a}+\vec{f})=\tfrac12((1,2,6)+(-1,7,5))=(0|4{,}5|5{,}5)$.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["A","F"],"lines":[{"f":"A","t":"F","c":"#0066cc"}],"extra":[{"id":"MAF","x":0,"y":4.5,"z":5.5,"label":"M"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 6.2 — Der Schwerpunkt von drei Plattformen <span class="diff d2">L2 leicht</span></div>
+Der Schwerpunkt $S$ eines Dreiecks $P_1P_2P_3$ ist der Punkt mit Ortsvektor
+$$\vec{s}=\tfrac13(\vec{p_1}+\vec{p_2}+\vec{p_3}).$$
+<ol>
+<li>Berechne den Schwerpunkt der drei Plattformen $A(1|2|6)$, $F(-1|7|5)$ und $G(8|5|6)$.</li>
+<li>Hier soll die Aussichtskanzel hängen. Auf welcher Höhe schwebt sie über dem Boden?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$\vec{s}=\tfrac13((1,2,6)+(-1,7,5)+(8,5,6))=\tfrac13(8,14,17)=(\tfrac{8}{3}|\tfrac{14}{3}|\tfrac{17}{3})\approx(2{,}67|4{,}67|5{,}67)$. ·
+Höhe $z\approx 5{,}67$ cm über dem Boden.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["A","F","G"],"lines":[{"f":"A","t":"F","c":"#bcd4b6"},{"f":"F","t":"G","c":"#bcd4b6"},{"f":"G","t":"A","c":"#bcd4b6"}],"extra":[{"id":"SP","x":2.67,"y":4.67,"z":5.67,"label":"S"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 6.3 — Wo steht die Stahlstütze? <span class="diff d3">L3 mittel</span></div>
+Die Stütze führt vom Schwerpunkt $S$ senkrecht nach unten zum Boden ($z=0$).
+<ol>
+<li>Bestimme die Bodenprojektion $S'$ von $S$.</li>
+<li>Stelle die Geradengleichung der Stütze in Parameterform auf.</li>
+<li>Wie lang ist die Stütze?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$S'=(\tfrac{8}{3}\,|\,\tfrac{14}{3}\,|\,0)\approx(2{,}67|4{,}67|0)$. ·
+$g:\vec{x}=(\tfrac{8}{3},\tfrac{14}{3},\tfrac{17}{3})+t(0,0,-1)$. Boden bei $t=\tfrac{17}{3}\approx 5{,}67$ cm Stützhöhe.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["A","F","G"],"lines":[{"f":"SP","t":"SP2","c":"#a30000"}],"extra":[{"id":"SP","x":2.67,"y":4.67,"z":5.67,"label":"S"},{"id":"SP2","x":2.67,"y":4.67,"z":0,"label":"S′"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 6.4 — Alternative Position <span class="diff d4">L4 anspruchsvoll</span></div>
+Frau Steigerwald überlegt: Was wäre, wenn sie die Kanzel stattdessen im Mittelpunkt von $G$ und $A$ aufhängt?
+<ol>
+<li>Berechne diesen Mittelpunkt $M_{GA}$.</li>
+<li>Wie weit (in cm) verschiebt sich die Kanzel gegenüber dem Schwerpunkt aus Aufgabe 6.2?</li>
+<li>In welcher Höhe schwebt die Kanzel jetzt? Höher oder niedriger?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$M_{GA}=\tfrac12((8,5,6)+(1,2,6))=(4{,}5\,|\,3{,}5\,|\,6)$. ·
+$\overrightarrow{SM}=(4{,}5-\tfrac{8}{3}\,|\,3{,}5-\tfrac{14}{3}\,|\,6-\tfrac{17}{3})=(\tfrac{11}{6}\,|\,-\tfrac{7}{6}\,|\,\tfrac{1}{3})$. ·
+$|\overrightarrow{SM}|=\sqrt{(\tfrac{11}{6})^2+(\tfrac{7}{6})^2+(\tfrac{1}{3})^2}=\sqrt{\tfrac{121+49+4}{36}}=\sqrt{\tfrac{174}{36}}\approx 2{,}20$ cm. ·
+Höhe $z=6$ statt $\approx 5{,}67$ → ca. 0,33 cm höher.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["G","A"],"lines":[{"f":"G","t":"A","c":"#0066cc"}],"extra":[{"id":"SP","x":2.67,"y":4.67,"z":5.67,"label":"S"},{"id":"MGA","x":4.5,"y":3.5,"z":6,"label":"M_GA"}]}'></div>
+</div>
+
+<details class="gesamt-loesung">
+  <summary><span class="gl-arrow">▶</span> Musterlösung — alle Aufgaben mit Zwischenschritten</summary>
+  <div class="gl-inhalt">
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 6.1 — Mittelpunkt zweier Plattformen</div>
+      <ol class="gl-schritte">
+        <li><strong>Formel:</strong> $M_{AF}=\tfrac{1}{2}(A+F)=\tfrac{1}{2}\left(\begin{pmatrix}1\\2\\6\end{pmatrix}+\begin{pmatrix}-1\\7\\5\end{pmatrix}\right)=\tfrac{1}{2}\begin{pmatrix}0\\9\\11\end{pmatrix}$</li>
+        <li><span class="gl-ergebnis">$M_{AF}=(0\;|\;4{,}5\;|\;5{,}5)$</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 6.2 — Schwerpunkt der drei Hochplattformen</div>
+      <ol class="gl-schritte">
+        <li><strong>Koordinaten addieren:</strong> $A+F+G=(1-1+8\;|\;2+7+5\;|\;6+5+6)=(8|14|17)$</li>
+        <li><strong>Durch 3 dividieren:</strong> $\vec{s}=\tfrac{1}{3}(8,14,17)=\left(\tfrac{8}{3}\;\Big|\;\tfrac{14}{3}\;\Big|\;\tfrac{17}{3}\right)\approx(2{,}67\;|\;4{,}67\;|\;5{,}67)$</li>
+        <li><span class="gl-ergebnis">Höhe der Kanzel: $z=\tfrac{17}{3}\approx 5{,}67$ cm</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 6.3 — Wo steht die Stahlstütze?</div>
+      <ol class="gl-schritte">
+        <li><strong>Bodenprojektion:</strong> $S'=\left(\tfrac{8}{3}\;\Big|\;\tfrac{14}{3}\;\Big|\;0\right)$ — $x$- und $y$-Koordinate bleiben, $z$ wird 0</li>
+        <li><strong>Geradengleichung der Stütze</strong> (senkrecht nach unten = Richtung $(0|0|-1)$):<br>$g:\vec{x}=\begin{pmatrix}\tfrac{8}{3}\\\tfrac{14}{3}\\\tfrac{17}{3}\end{pmatrix}+t\begin{pmatrix}0\\0\\-1\end{pmatrix}$</li>
+        <li><strong>Länge:</strong> Boden bei $z=0$: $\tfrac{17}{3}-t=0\Rightarrow t=\tfrac{17}{3}$ → <span class="gl-ergebnis">Stützlänge $\approx 5{,}67$ cm</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 6.4 — Alternative Position $M_{GA}$</div>
+      <ol class="gl-schritte">
+        <li><strong>Mittelpunkt G und A:</strong> $M_{GA}=\tfrac{1}{2}(G+A)=\tfrac{1}{2}((8,5,6)+(1,2,6))=\tfrac{1}{2}(9,7,12)=(4{,}5\;|\;3{,}5\;|\;6)$</li>
+        <li><strong>Verschiebungsvektor</strong> vom Schwerpunkt $S\approx(2{,}67|4{,}67|5{,}67)$:<br>$\overrightarrow{SM}=\left(\tfrac{11}{6}\;\Big|\;-\tfrac{7}{6}\;\Big|\;\tfrac{1}{3}\right)$</li>
+        <li><strong>Abstand:</strong> $|\overrightarrow{SM}|=\sqrt{\tfrac{121+49+4}{36}}=\sqrt{\tfrac{174}{36}}\approx$ <span class="gl-ergebnis">2,20 cm Verschiebung</span></li>
+        <li>Höhe: $z=6$ statt $5{,}67$ → Alternative Kanzel hängt <span class="gl-ergebnis">ca. 0,33 cm höher</span></li>
+      </ol>
+    </div>
+
+  </div>
+</details>
+<p class="meta">Inspiriert von B9 (Mittelpunkt/Schwerpunkt). Füllt KLP-Pflichtlücke „Mittelpunkt im Raum". NRW: G1 · K3, K6 · AFB I–II.</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- GESCHICHTE 7: Die drei Vermessungsdrohnen -->
+<!-- ============================================================ -->
+<div class="geschichte">
+<h2>7 · Die drei Vermessungsdrohnen</h2>
+<p class="untertitel">Geraden im Raum · Schnittpunkt vs. Kollision · Zeit-Parameter &nbsp;—&nbsp; K1 Argumentieren · K3 Modellieren</p>
+
+<div class="erzaehlung">
+<p>Sicherheitsinspektorin Frau Falke steht vor einer ungewöhnlichen Aufgabe: Drei neue Vermessungsdrohnen sollen den Kletterpark gleichzeitig kartieren. Jede fliegt geradlinig und mit konstanter Geschwindigkeit. Die Bahnen sind so geplant, dass alle drei Drohnen <em>genau über dem Spechtnest</em> $P(2|1|4)$ vorbeifliegen — eine prominente Eckplattform, die als Referenzpunkt für die Vermessung dient.</p>
+<p>„Drei Bahnen, die durch denselben Punkt führen — das klingt nach einem Crash", murmelt Frau Falke. Doch ihr Assistent winkt ab: <em>„Geometrischer Schnitt ist nicht dasselbe wie eine Kollision. Es kommt auf die Zeit an."</em> Du sollst dem Park-Management erklären, welche Drohnen wirklich zusammenstoßen — und welche trotz gemeinsamer Bahnführung sicher sind.</p>
+<p>Die Bahnen (Parameter $t$ in Minuten nach Start):</p>
+<p style="margin-left:18px;">
+$\vec{r}_1(t)=\begin{pmatrix}-4\\-3\\2\end{pmatrix}+t\begin{pmatrix}3\\2\\1\end{pmatrix}$ &nbsp;&nbsp;
+$\vec{r}_2(t)=\begin{pmatrix}8\\-1\\8\end{pmatrix}+t\begin{pmatrix}-3\\1\\-2\end{pmatrix}$ &nbsp;&nbsp;
+$\vec{r}_3(t)=\begin{pmatrix}-4\\7\\1\end{pmatrix}+t\begin{pmatrix}2\\-2\\1\end{pmatrix}$
+</p>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 7.1 — Startpunkte und Flugrichtungen lesen <span class="diff d1">L1 sehr leicht</span></div>
+Drohne 1 startet am Basislager $B(-4|-3|2)$. Beschreibe in Worten, wie sich die drei Drohnen pro Minute bewegen, und lies aus jeder Gleichung den Startpunkt $S_i$ und den Richtungsvektor $\vec{v}_i$ ab.
+<details class="loesung"><summary>Lösung</summary>
+$S_1=B(-4|-3|2)$, $\vec{v}_1=(3,2,1)$ — pro Minute 3 nach Osten, 2 nach Norden, 1 hoch. ·
+$S_2=(8|-1|8)$, $\vec{v}_2=(-3,1,-2)$ — fliegt nach Westen, leicht nach Norden, sinkt um 2 pro Minute. ·
+$S_3=(-4|7|1)$, $\vec{v}_3=(2,-2,1)$ — nach Osten, nach Süden, steigt langsam.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","S"],"lines":[{"f":"B","t":"P","c":"#c44"},{"f":"S2","t":"P","c":"#0066cc"},{"f":"S3","t":"P","c":"#e08e00"}],"extra":[{"id":"P","x":2,"y":1,"z":4,"label":"P"},{"id":"S2","x":8,"y":-1,"z":8,"label":"S₂"},{"id":"S3","x":-4,"y":7,"z":1,"label":"S₃"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 7.2 — Punktprobe: Alle drei Bahnen führen durch P <span class="diff d3">L3 mittel</span></div>
+Zeige durch Punktprobe, dass jede der drei Bahnen den Spechtnest-Eckpunkt $P(2|1|4)$ enthält. Notiere zu jeder Bahn den zugehörigen Zeit-Parameter $t_i$.
+<details class="loesung"><summary>Lösung</summary>
+Bahn 1: $(-4+3t,\,-3+2t,\,2+t)=(2,1,4)$ → $t_1=2$ (alle drei Gleichungen liefern $t=2$). ✓ ·
+Bahn 2: $(8-3t,\,-1+t,\,8-2t)=(2,1,4)$ → $t_2=2$. ✓ ·
+Bahn 3: $(-4+2t,\,7-2t,\,1+t)=(2,1,4)$ → $t_3=3$. ✓ ·
+Alle drei Bahnen verlaufen geometrisch durch $P$ — aber zu unterschiedlichen Zeiten.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["S"],"lines":[{"f":"B","t":"P","c":"#c44"},{"f":"S2","t":"P","c":"#0066cc"},{"f":"S3","t":"P","c":"#e08e00"}],"extra":[{"id":"P","x":2,"y":1,"z":4,"label":"P (t₁=2, t₂=2, t₃=3)"},{"id":"S2","x":8,"y":-1,"z":8,"label":"S₂"},{"id":"S3","x":-4,"y":7,"z":1,"label":"S₃"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 7.3 — Welche zwei Drohnen kollidieren? <span class="diff d4">L4 anspruchsvoll</span></div>
+Zwei Objekte kollidieren genau dann, wenn sie sich <em>zur selben Zeit</em> am selben Ort befinden. Vergleiche die Zeit-Parameter aus 7.2 paarweise und entscheide:
+<ol>
+<li>Welche Drohnen treffen sich am Punkt $P$ zur gleichen Zeit?</li>
+<li>Welche Drohne ist am Punkt $P$, wenn die anderen schon (oder noch nicht) dort waren?</li>
+<li>Wo befinden sich die Drohnen 1 und 2 zum Zeitpunkt $t=3$? Wo war Drohne 3 zum Zeitpunkt $t=2$?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+1) Drohne 1 und Drohne 2 sind <strong>beide bei $t=2$</strong> am Punkt $P$ — sie <strong>kollidieren</strong>. ·
+2) Drohne 3 erreicht $P$ erst bei $t=3$, also <strong>eine Minute später</strong> — keine Kollision. ·
+3) Bei $t=3$: $\vec{r}_1(3)=(5|3|5)$, $\vec{r}_2(3)=(-1|2|2)$ — beide längst weg von $P$. ·
+Bei $t=2$ war Drohne 3 bei $\vec{r}_3(2)=(0|3|3)$ — noch deutlich entfernt von $P$.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["S"],"lines":[{"f":"B","t":"P","c":"#c44"},{"f":"S2","t":"P","c":"#0066cc"},{"f":"S3","t":"P","c":"#e08e00","d":true},{"f":"P","t":"R3_t2","c":"#e08e00"}],"extra":[{"id":"P","x":2,"y":1,"z":4,"label":"💥 t=2"},{"id":"S2","x":8,"y":-1,"z":8,"label":"S₂"},{"id":"S3","x":-4,"y":7,"z":1,"label":"S₃"},{"id":"R3_t2","x":0,"y":3,"z":3,"label":"D₃(t=2)"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 7.4 — Sicherheits-Bericht (K5 Kommunizieren) <span class="diff d5">L5 schwer</span></div>
+Verfasse einen kurzen Bericht (4–6 Sätze) an die Park-Leitung. Erkläre fachlich präzise, aber für Nicht-Mathematiker verständlich:
+<ol>
+<li>Warum die Bahnen aller drei Drohnen durch denselben Punkt $P$ verlaufen,</li>
+<li>warum trotzdem nur Drohne 1 und Drohne 2 kollidieren,</li>
+<li>und warum Drohne 3 sicher ist, obwohl ihre Bahn ebenfalls durch $P$ führt.</li>
+</ol>
+Verwende dabei die Begriffe <em>geometrischer Schnitt</em> und <em>zeitlicher Schnitt</em> (Kollision).
+<details class="loesung"><summary>Lösung — Beispiel-Bericht</summary>
+„Sehr geehrte Park-Leitung, die Punktprobe zeigt: alle drei Drohnenbahnen schneiden sich <em>geometrisch</em> im Spechtnest-Eckpunkt $P(2|1|4)$ — die Linien im Raum kreuzen sich also tatsächlich an dieser Stelle. Eine <em>Kollision</em> liegt aber nur dann vor, wenn zwei Drohnen $P$ zur selben Zeit erreichen. Für Drohne 1 und 2 ist das der Fall: beide treffen $P$ exakt bei $t=2$ Minuten — diese Bahnen müssen umgeplant werden. Drohne 3 hingegen erreicht $P$ erst bei $t=3$, also eine Minute später, wenn die anderen beiden den Punkt längst verlassen haben (Drohne 1 ist bei $(5|3|5)$, Drohne 2 bei $(-1|2|2)$). Geometrischer Schnitt heißt nicht automatisch Crash — entscheidend ist der Zeit-Parameter. Drohne 3 darf starten."
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","S"],"lines":[{"f":"B","t":"P","c":"#c44"},{"f":"S2","t":"P","c":"#0066cc"},{"f":"S3","t":"P","c":"#e08e00"}],"extra":[{"id":"P","x":2,"y":1,"z":4,"label":"P"},{"id":"S2","x":8,"y":-1,"z":8,"label":"S₂"},{"id":"S3","x":-4,"y":7,"z":1,"label":"S₃"}]}'></div>
+</div>
+
+<details class="gesamt-loesung">
+  <summary><span class="gl-arrow">▶</span> Musterlösung — alle Aufgaben mit Zwischenschritten</summary>
+  <div class="gl-inhalt">
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 7.1 — Startpunkte und Flugrichtungen lesen</div>
+      <ol class="gl-schritte">
+        <li><strong>Drohne 1:</strong> $S_1=(-4|-3|2)=$ Basislager B; $\vec{v}_1=(3|2|1)$ — pro Minute 3 nach Ost, 2 nach Nord, 1 hoch</li>
+        <li><strong>Drohne 2:</strong> $S_2=(8|-1|8)$; $\vec{v}_2=(-3|1|-2)$ — fliegt nach West, leicht Nord, sinkt um 2</li>
+        <li><strong>Drohne 3:</strong> $S_3=(-4|7|1)$; $\vec{v}_3=(2|-2|1)$ — nach Ost, nach Süd, steigt langsam</li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 7.2 — Punktprobe: Alle drei Bahnen durch P(2|1|4)</div>
+      <ol class="gl-schritte">
+        <li><strong>Bahn 1:</strong> $(-4+3t\;|\;-3+2t\;|\;2+t)=(2|1|4)$. Aus $z$: $2+t=4\Rightarrow t_1=2$. Probe: $-4+6=2$ ✓, $-3+4=1$ ✓</li>
+        <li><strong>Bahn 2:</strong> $(8-3t\;|\;-1+t\;|\;8-2t)=(2|1|4)$. Aus $z$: $8-2t=4\Rightarrow t_2=2$. Probe: $8-6=2$ ✓, $-1+2=1$ ✓</li>
+        <li><strong>Bahn 3:</strong> $(-4+2t\;|\;7-2t\;|\;1+t)=(2|1|4)$. Aus $z$: $1+t=4\Rightarrow t_3=3$. Probe: $-4+6=2$ ✓, $7-6=1$ ✓</li>
+        <li><span class="gl-ergebnis">Alle drei Bahnen führen geometrisch durch P — aber zu verschiedenen Zeiten: $t_1=2$, $t_2=2$, $t_3=3$</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 7.3 — Welche zwei Drohnen kollidieren?</div>
+      <ol class="gl-schritte">
+        <li><strong>Zeitvergleich:</strong> Drohne 1 und Drohne 2 treffen P beide bei $t=2$ → <span class="gl-ergebnis">Kollision D1 ↔ D2!</span></li>
+        <li>Drohne 3 trifft P erst bei $t=3$ → eine Minute später → sicher</li>
+        <li><strong>Bei $t=3$:</strong> $\vec{r}_1(3)=(-4+9|-3+6|2+3)=(5|3|5)$ und $\vec{r}_2(3)=(8-9|-1+3|8-6)=(-1|2|2)$ — D1 und D2 längst weg</li>
+        <li><strong>Bei $t=2$:</strong> $\vec{r}_3(2)=(-4+4|7-4|1+2)=(0|3|3)$ — D3 noch weit entfernt von P</li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 7.4 — Sicherheits-Bericht (Muster)</div>
+      <ol class="gl-schritte">
+        <li>Alle drei Bahnen schneiden sich <em>geometrisch</em> in $P(2|1|4)$ — die Linien im Raum kreuzen sich an dieser Stelle.</li>
+        <li>Eine <em>Kollision</em> erfordert aber gleichen Ort <strong>zur gleichen Zeit</strong>: D1 und D2 erreichen P beide bei $t_1=t_2=2$ min — diese Bahnen müssen umgeplant werden.</li>
+        <li>D3 erreicht P erst bei $t_3=3$ min: D1 und D2 sind dann bereits bei $(5|3|5)$ bzw. $(-1|2|2)$ — weit weg von P.</li>
+        <li><span class="gl-ergebnis">Geometrischer Schnitt ≠ Kollision. D3 darf starten; D1/D2-Bahn muss geändert werden.</span></li>
+      </ol>
+    </div>
+
+  </div>
+</details>
+<p class="meta">Inspiriert von Edexcel M1 (UK A-Level) „Three Helicopters". Didaktischer Kern: Schnittpunkt ≠ Kollision — Zeit-Parameter entscheidet. NRW: G1 · K1, K3, K5 · AFB II–III.</p>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- GESCHICHTE 8: Park-Erweiterung -->
+<!-- ============================================================ -->
+<div class="geschichte">
+<h2>8 · Die Park-Erweiterung</h2>
+<p class="untertitel">Plattformen + Stützen konstruieren · Bedingungen erfüllen &nbsp;—&nbsp; K2, K3, K5 · alle AFB-Stufen</p>
+
+<div class="erzaehlung">
+<p>Park-Direktor Krämer betritt mit Bauplänen die Lehrer-Hütte. <em>„Wir bekommen Fördergelder! Der Park darf erweitert werden — neue Plattformen, neue Stützen, neue Seile. Aber alles muss zur bestehenden Anlage passen. Können Sie für mich rechnen?"</em></p>
+<p>Du bekommst sechs Aufgaben — manche einfach, manche knifflig. Jede hat einen <em>Schwierigkeitsgrad</em> von L1 (sehr leicht) bis L6 (sehr schwer).</p>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 8.1 — Die Bodenmarkierung <span class="diff d1">L1 sehr leicht</span></div>
+Eine neue Plattform $N_1$ soll auf der Position $(4|3|5)$ entstehen. Bevor die Bauarbeiter eine Stütze einrammen, brauchen sie die Bodenmarkierung — also den Punkt direkt unter $N_1$ auf dem Boden ($z=0$).
+<ol>
+<li>Gib die Koordinaten der Bodenmarkierung $N_1'$ an.</li>
+<li>Wie hoch muss die senkrechte Stütze sein?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$N_1'=(4|3|0)$. Stützhöhe = 5 cm.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["T"],"lines":[{"f":"N1","t":"N1B","c":"#a30000"}],"extra":[{"id":"N1","x":4,"y":3,"z":5,"label":"N₁"},{"id":"N1B","x":4,"y":3,"z":0,"label":"N₁′"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 8.2 — Die schräge Stütze <span class="diff d2">L2 leicht</span></div>
+Die Plattform $N_2(3|-2|7)$ kann nicht senkrecht gestützt werden, weil dort ein Brunnen steht. Stattdessen läuft die Stütze vom <em>Treffpunkt T</em> diagonal hoch zu $N_2$.
+<ol>
+<li>Berechne den Verbindungsvektor $\overrightarrow{TN_2}$.</li>
+<li>Wie lang muss die schräge Stütze sein? (in cm)</li>
+<li>Vergleiche: Wie viel länger ist die schräge Stütze gegenüber einer hypothetischen senkrechten Stütze von $(3|-2|0)$?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$\overrightarrow{TN_2}=(3,-2,7)$, $|\overrightarrow{TN_2}|=\sqrt{9+4+49}=\sqrt{62}\approx 7{,}87$ cm. Senkrecht wäre 7 cm. Differenz $\approx 0{,}87$ cm — Diagonale ist nur knapp länger.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["T"],"lines":[{"f":"T","t":"N2","c":"#c77700"}],"extra":[{"id":"N2","x":3,"y":-2,"z":7,"label":"N₂"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 8.3 — Paralleles Seil halber Länge <span class="diff d3">L3 mittel</span></div>
+Ein neues Seil vom Basislager B zu einer noch unbekannten Plattform $N_3$ soll
+<ul style="margin:3px 0 6px 18px;"><li>parallel zum bestehenden Seil $\overline{EF}$ verlaufen,</li>
+<li>aber nur <em>halb so lang</em> sein wie $\overline{EF}$.</li></ul>
+Wo könnte $N_3$ liegen? Gib zwei mögliche Positionen an.
+<details class="loesung"><summary>Lösung</summary>
+$\overrightarrow{EF}=(6,4,2)$, halb so lang: $\tfrac{1}{2}\overrightarrow{EF}=(3,2,1)$. ·
+$N_3 = B + (3,2,1) = (-1|-1|3)$ ODER $N_3 = B + (-3,-2,-1) = (-7|-5|1)$ — beide Lösungen verlaufen parallel zu EF, jeweils $\tfrac12 |\overrightarrow{EF}|=\sqrt{14}\approx 3{,}74$ cm lang.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","E","F"],"lines":[{"f":"E","t":"F","c":"#0066cc"},{"f":"B","t":"N3a","c":"#c77700"},{"f":"B","t":"N3b","c":"#c77700","d":true}],"extra":[{"id":"N3a","x":-1,"y":-1,"z":3,"label":"N₃ᵃ"},{"id":"N3b","x":-7,"y":-5,"z":1,"label":"N₃ᵇ"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 8.4 — Parallelogramm-Plattformen <span class="diff d4">L4 anspruchsvoll</span></div>
+Drei neue Plattformen $P, Q, R$ sollen so platziert werden, dass die vier Punkte $P, Q, S, R$ (mit Spechtnest $S$) ein <strong>Parallelogramm</strong> bilden — in dieser Eck-Reihenfolge.
+<ol>
+<li>Wähle $P=(0|0|4)$ und $Q=(5|2|4)$. Wo muss $R$ liegen, damit $PQSR$ ein Parallelogramm ist? <em>(Hinweis: $\overrightarrow{PQ}=\overrightarrow{RS}$.)</em></li>
+<li>Begründe, warum es zu jedem festen Paar $(P,Q)$ <em>genau ein</em> passendes $R$ gibt.</li>
+<li>Diskutiere: Liegen alle vier Punkte automatisch in einer Ebene? Was bedeutet das praktisch für den Bau?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+$\overrightarrow{PQ}=(5,2,0)$. Aus $\overrightarrow{RS}=\overrightarrow{PQ}$ folgt $R=S-\overrightarrow{PQ}=(2-5\,|\,1-2\,|\,4-0)=(-3|-1|4)$. ·
+Eindeutigkeit: Aus $\overrightarrow{PQ}=\overrightarrow{RS}$ folgt $R=S-\overrightarrow{PQ}$ direkt — keine Wahl. ·
+Vier Punkte eines Parallelogramms sind <em>per Definition</em> coplanar — gut für den Bau, weil ein einziges Sicherungsnetz alle vier Plattformen mit ebener Geometrie verbinden kann.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["S"],"lines":[{"f":"P","t":"Q","c":"#0066cc"},{"f":"Q","t":"S","c":"#0066cc"},{"f":"S","t":"R","c":"#0066cc"},{"f":"R","t":"P","c":"#0066cc"}],"extra":[{"id":"P","x":0,"y":0,"z":4,"label":"P"},{"id":"Q","x":5,"y":2,"z":4,"label":"Q"},{"id":"R","x":-3,"y":-1,"z":4,"label":"R"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 8.5 — Plattform im Schwerpunkt und auf einer Geraden <span class="diff d5">L5 schwer</span></div>
+Eine neue Aussichts-Plattform $N_5$ soll <strong>gleichzeitig</strong> zwei Bedingungen erfüllen:
+<ul style="margin:3px 0 6px 18px;">
+<li><strong>(I)</strong> $N_5$ ist der <em>Schwerpunkt</em> der drei Plattformen $B$, $W$ und $G$.</li>
+<li><strong>(II)</strong> $N_5$ liegt auf der <em>Geraden</em> durch $A(1|2|6)$ und $R(5|-4|4)$.</li>
+</ul>
+<ol>
+<li>Berechne den Schwerpunkt aus (I).</li>
+<li>Prüfe per Punktprobe, ob dieser Punkt auf der Geraden aus (II) liegt.</li>
+<li>Wenn nicht: Wie weit (in cm) liegt der Schwerpunkt von der Geraden entfernt? (Lot über quadratische Abstandsfunktion, kein Skalarprodukt nötig: minimiere $|\vec{x}(t)-\vec{n_5}|^2$ als quadratische Funktion in $t$.)</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+(1) $\vec{n_5}=\tfrac13((-4,-3,2)+(3,0,2)+(8,5,6))=\tfrac13(7,2,10)=(\tfrac{7}{3}\,|\,\tfrac{2}{3}\,|\,\tfrac{10}{3})$. ·
+(2) $g_{AR}:(1,2,6)+t(4,-6,-2)$. Aus $x$: $1+4t=\tfrac{7}{3}\Rightarrow t=\tfrac{1}{3}$. Probe $y$: $2-2=0\ne\tfrac{2}{3}$ ✗ → <strong>liegt nicht drauf</strong>. ·
+(3) $d(t)^2=(4t-\tfrac{4}{3})^2+(\tfrac{4}{3}-6t)^2+(\tfrac{8}{3}-2t)^2=56t^2-\tfrac{112}{3}t+\tfrac{32}{3}$. Scheitelpunkt bei $t^*=\tfrac{1}{3}$. Lotfußpunkt $F=(\tfrac{7}{3}\,|\,0\,|\,\tfrac{16}{3})$. $d_{\min}=\sqrt{(\tfrac{2}{3})^2+(-2)^2}=\sqrt{\tfrac{40}{9}}=\tfrac{2\sqrt{10}}{3}\approx 2{,}11$ cm.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["B","W","G","A","R"],"lines":[{"f":"A","t":"R","c":"#0066cc"}],"extra":[{"id":"N5","x":2.33,"y":0.67,"z":3.33,"label":"N₅"}]}'></div>
+</div>
+
+<div class="aufgabe">
+<div class="aufgabe-content">
+<div class="aufgabe-titel">Aufgabe 8.6 — Schwerpunkts-Charakterisierung <span class="diff d6">L6 sehr schwer</span></div>
+Park-Direktor Krämer fragt: <em>„Welche Auswahlen von je drei bestehenden Plattformen ergeben einen Schwerpunkt im <strong>vorderen rechten Quadranten</strong> (also mit $x>0$ und $y>0$)?"</em>
+<ol>
+<li>Formuliere eine <strong>allgemeine</strong> Bedingung an die drei Ortsvektoren $\vec{p_1},\vec{p_2},\vec{p_3}$, sodass der Schwerpunkt im Quadranten $\{x>0,\,y>0\}$ liegt.</li>
+<li>Beweise: Die Bedingung ist sowohl <em>notwendig</em> als auch <em>hinreichend</em>.</li>
+<li>Finde mindestens <strong>drei verschiedene Tripel</strong> aus den existierenden Plattformen $\{T,B,E,F,W,R,A,S,G\}$, die die Bedingung erfüllen.</li>
+<li>Verallgemeinere: Welche Tripel $(X,Y,Z)$ liefern einen Schwerpunkt <em>auf der z-Achse</em> (also $x=y=0$)?</li>
+</ol>
+<details class="loesung"><summary>Lösung</summary>
+(1) Bedingung: $x_1+x_2+x_3>0$ <strong>und</strong> $y_1+y_2+y_3>0$. ·
+(2) Notwendig: aus $\frac{x_1+x_2+x_3}{3}>0$ folgt unmittelbar $x_1+x_2+x_3>0$ (analog für y). Hinreichend: aus den Summen-Ungleichungen folgt $x_S,y_S>0$. Die Bedingung ist also äquivalent. ·
+(3) Beispiele: $(F,W,G)$: $x$-Summe $-1+3+8=10>0$ ✓, $y$-Summe $7+0+5=12>0$ ✓.
+$(A,S,G)$: $1+2+8=11$ ✓, $2+1+5=8$ ✓.
+$(W,R,G)$: $3+5+8=16$ ✓, $0-4+5=1$ ✓.
+(4) Für $x=y=0$: $x_1+x_2+x_3=0$ <strong>und</strong> $y_1+y_2+y_3=0$. Bei den vorhandenen Plattformen existiert genau ein solches Tripel: <strong>$(B, F, R)$</strong> mit $x$-Summe $-4-1+5=0$ ✓ und $y$-Summe $-3+7-4=0$ ✓. Der Schwerpunkt ist $(0\,|\,0\,|\,\tfrac{11}{3})$ — liegt also exakt auf der z-Achse, $\approx 3{,}67$ cm über dem Treffpunkt.
+</details>
+</div>
+<div class="aufgabe-view" data-mini='{"hl":["F","W","G","A","S","R"]}'></div>
+</div>
+
+<details class="gesamt-loesung">
+  <summary><span class="gl-arrow">▶</span> Musterlösung — alle Aufgaben mit Zwischenschritten</summary>
+  <div class="gl-inhalt">
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 8.1 — Die Bodenmarkierung</div>
+      <ol class="gl-schritte">
+        <li><strong>Bodenprojektion:</strong> $N_1=(4|3|5)$ → $z$ auf 0 setzen: $N_1'=(4|3|0)$</li>
+        <li><strong>Stützhöhe</strong> = $z$-Koordinate von $N_1$: <span class="gl-ergebnis">5 cm</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 8.2 — Die schräge Stütze</div>
+      <ol class="gl-schritte">
+        <li><strong>Verbindungsvektor:</strong> $\overrightarrow{TN_2}=N_2-T=(3|-2|7)-(0|0|0)=(3|-2|7)$</li>
+        <li><strong>Länge:</strong> $|\overrightarrow{TN_2}|=\sqrt{3^2+(-2)^2+7^2}=\sqrt{9+4+49}=\sqrt{62}\approx 7{,}87$ cm</li>
+        <li><strong>Senkrechte Stütze</strong> hätte Länge $z=7$ cm</li>
+        <li><strong>Differenz:</strong> $\sqrt{62}-7\approx 7{,}87-7=$ <span class="gl-ergebnis">0,87 cm Mehrlänge</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 8.3 — Paralleles Seil halber Länge</div>
+      <ol class="gl-schritte">
+        <li><strong>Richtungsvektor EF:</strong> $\overrightarrow{EF}=F-E=(-1+7\;|\;7-3\;|\;5-3)=(6|4|2)$</li>
+        <li><strong>Halbe Länge, parallel:</strong> $\tfrac{1}{2}\overrightarrow{EF}=(3|2|1)$ oder $-\tfrac{1}{2}\overrightarrow{EF}=(-3|-2|-1)$</li>
+        <li><strong>Möglichkeit 1 (vorwärts):</strong> $N_3=B+(3,2,1)=(-4+3\;|\;-3+2\;|\;2+1)=(-1|-1|3)$</li>
+        <li><strong>Möglichkeit 2 (rückwärts):</strong> $N_3=B+(-3,-2,-1)=(-7|-5|1)$</li>
+        <li>Länge: $\tfrac{1}{2}|\overrightarrow{EF}|=\tfrac{1}{2}\sqrt{36+16+4}=\tfrac{1}{2}\sqrt{56}=\sqrt{14}\approx$ <span class="gl-ergebnis">3,74 cm ✓</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 8.4 — Parallelogramm-Plattformen</div>
+      <ol class="gl-schritte">
+        <li><strong>Bedingung Parallelogramm PQSR:</strong> $\overrightarrow{PQ}=\overrightarrow{RS}$ (Gegenseiten gleich und gleichgerichtet)</li>
+        <li><strong>$\overrightarrow{PQ}$:</strong> $Q-P=(5-0\;|\;2-0\;|\;4-4)=(5|2|0)$</li>
+        <li><strong>R berechnen:</strong> Aus $\overrightarrow{RS}=\overrightarrow{PQ}$ folgt $S-R=(5|2|0)$, also $R=S-\overrightarrow{PQ}=(2-5\;|\;1-2\;|\;4-0)=(-3|-1|4)$</li>
+        <li><strong>Eindeutigkeit:</strong> $R=S-\overrightarrow{PQ}$ ist direkt bestimmt, keine Freiheitsgrade → <span class="gl-ergebnis">genau ein R</span></li>
+        <li>Parallelogramm-Punkte sind coplanar (vier Punkte liegen in einer Ebene) — gut für ebene Sicherheitsnetze.</li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 8.5 — Plattform im Schwerpunkt und auf Geraden</div>
+      <ol class="gl-schritte">
+        <li><strong>Schwerpunkt (I):</strong> $\vec{n_5}=\tfrac{1}{3}(B+W+G)=\tfrac{1}{3}((-4,-3,2)+(3,0,2)+(8,5,6))=\tfrac{1}{3}(7,2,10)=\left(\tfrac{7}{3}\;\Big|\;\tfrac{2}{3}\;\Big|\;\tfrac{10}{3}\right)$</li>
+        <li><strong>Gerade (II):</strong> $g_{AR}:\vec{x}=(1,2,6)+t(4,-6,-2)$ mit $\overrightarrow{AR}=(4|-6|-2)$</li>
+        <li><strong>Punktprobe:</strong> Aus $x$: $1+4t=\tfrac{7}{3}\Rightarrow t=\tfrac{1}{3}$. Probe $y$: $2-6\cdot\tfrac{1}{3}=2-2=0\neq\tfrac{2}{3}$ ✗ → <span class="gl-ergebnis">liegt nicht auf Geraden</span></li>
+        <li><strong>Abstand (quadratisch minimieren):</strong> $\vec{r}(t)=(1+4t\;|\;2-6t\;|\;6-2t)$. Differenzvektor zu $\vec{n_5}$: $d^2(t)=(4t-\tfrac{4}{3})^2+({\tfrac{2}{3}-6t})^2+(\tfrac{10}{3}-2-2t)^2=56t^2-\tfrac{112}{3}t+\tfrac{32}{3}$</li>
+        <li>Minimum bei $t^*=\tfrac{56}{3}:\tfrac{112}{3}\cdot\tfrac{1}{2}=\tfrac{1}{3}$. Lotfußpunkt $F=(\tfrac{7}{3}|0|\tfrac{16}{3})$. Abstand: $d_{\min}=\sqrt{(\tfrac{2}{3})^2+(-2)^2}=\sqrt{\tfrac{40}{9}}=\tfrac{2\sqrt{10}}{3}\approx$ <span class="gl-ergebnis">2,11 cm</span></li>
+      </ol>
+    </div>
+
+    <div class="gl-aufgabe">
+      <div class="gl-titel">Aufgabe 8.6 — Schwerpunkts-Charakterisierung</div>
+      <ol class="gl-schritte">
+        <li><strong>Bedingung (1):</strong> Schwerpunkt im vorderen rechten Quadranten $\Leftrightarrow$ $\tfrac{x_1+x_2+x_3}{3}>0$ und $\tfrac{y_1+y_2+y_3}{3}>0$ $\Leftrightarrow$ $x_1+x_2+x_3>0$ und $y_1+y_2+y_3>0$</li>
+        <li><strong>Beweis (2):</strong> Notwendig und hinreichend — die Äquivalenz gilt direkt durch Division durch 3 (positiv, ändert Ungleichung nicht)</li>
+        <li><strong>Drei Tripel-Beispiele (3):</strong> $(F,W,G)$: $x$-Summe $-1+3+8=10>0$ ✓, $y$-Summe $7+0+5=12>0$ ✓ &nbsp;|&nbsp; $(A,S,G)$: $1+2+8=11>0$, $2+1+5=8>0$ ✓ &nbsp;|&nbsp; $(W,R,G)$: $3+5+8=16>0$, $0-4+5=1>0$ ✓</li>
+        <li><strong>Auf z-Achse (4):</strong> Tripel $(B,F,R)$: $x$-Summe $-4-1+5=0$ ✓, $y$-Summe $-3+7-4=0$ ✓ → Schwerpunkt $=(0|0|\tfrac{2+5+4}{3})=(0|0|\tfrac{11}{3})$ — <span class="gl-ergebnis">exakt auf der z-Achse, ca. 3,67 cm über T</span></li>
+      </ol>
+    </div>
+
+  </div>
+</details>
+<p class="meta">Inspiriert von Bau-/Konstruktionsaufgaben (Bayern Abi 2018 Hochseilgarten + B9 Schwerpunkt). 6 Schwierigkeitsstufen zum Differenzieren. NRW: G1, G2 · K1, K2, K3, K5 · AFB I–III.</p>
+</div>
+
+
+<script>
+// === Plattform-Daten (Standard) — wird durch Editor-Daten überschrieben, falls vorhanden ===
+const DEFAULT_PLATFORMS = {
+  T: {x: 0, y: 0, z:0, type:'boden',  name:'Treffpunkt'},
+  B: {x:-4, y:-3, z:2, type:'baum',   name:'Basislager'},
+  E: {x:-7, y: 3, z:3, type:'baum',   name:'Eichenturm'},
+  F: {x:-1, y: 7, z:5, type:'baum',   name:'Fuchsbau'},
+  W: {x: 3, y: 0, z:2, type:'baum',   name:'Wurzelhütte'},
+  R: {x: 5, y:-4, z:4, type:'baum',   name:'Rabenfels'},
+  A: {x: 1, y: 2, z:6, type:'baum-hi',name:'Adlerhorst'},
+  S: {x: 2, y: 1, z:4, type:'baum',   name:'Spechtnest'},
+  G: {x: 8, y: 5, z:6, type:'baum-hi',name:'Gipfelstation'},
+};
+
+// PLATFORMS-Objekt aus DEFAULT überschreiben falls Editor-Daten vorhanden
+let PLATFORMS = JSON.parse(JSON.stringify(DEFAULT_PLATFORMS));
+
+function loadPlatformsFromShared() {
+  try {
+    const raw = localStorage.getItem('kletterwald-shared-state')
+             || localStorage.getItem('kletterwald-state-v2');
+    if (!raw) return false;
+    const obj = JSON.parse(raw);
+    if (!Array.isArray(obj.platforms) || obj.platforms.length === 0) return false;
+    const newPlatforms = {};
+    obj.platforms.forEach(p => {
+      const key = p.letter || p.id;
+      newPlatforms[key] = {
+        x: Number(p.x) || 0,
+        y: Number(p.y) || 0,
+        z: Number(p.z) || 0,
+        type: p.type || 'baum',
+        name: p.name || ''
+      };
+    });
+    PLATFORMS = newPlatforms;
+    console.info('🔄 Plattformen aus Editor geladen:', Object.keys(PLATFORMS).join(', '));
+    return true;
+  } catch (e) { console.warn('Sync-Fehler:', e); return false; }
+}
+
+function refreshPlatforms() {
+  const ok = loadPlatformsFromShared();
+  if (typeof renderMinis === 'function') renderMinis();
+  const indicator = document.getElementById('sync-status');
+  if (indicator) {
+    indicator.textContent = ok ? '✓ Aus Editor synchronisiert' : 'Standard-Plattformen';
+    indicator.style.color = ok ? '#2e6b2e' : '#777';
+  }
+}
+
+// Beim Laden + bei Storage-Events synchronisieren
+loadPlatformsFromShared();
+window.addEventListener('storage', (e) => {
+  if (e.key === 'kletterwald-shared-state' || e.key === 'kletterwald-state-v2') {
+    refreshPlatforms();
+  }
+});
+
+// === Mini-SVG-Generator ===
+function makeMini(cfg) {
+  const hl = new Set(cfg.hl || []);
+  const extras = {};
+  for (const e of (cfg.extra || [])) extras[e.id] = e;
+  const allPoints = { ...PLATFORMS };
+  for (const e of (cfg.extra || [])) allPoints[e.id] = { x:e.x, y:e.y, z:e.z, type:'baum', name:e.label, isExtra:true };
+
+  let svg = `<svg viewBox="-140 -90 280 180" class="mini-svg" xmlns="http://www.w3.org/2000/svg">`;
+  // Hintergrund + Raster
+  svg += `<rect x="-130" y="-80" width="260" height="160" fill="white"/>`;
+  for (let i = -13; i <= 13; i++) {
+    svg += `<line x1="${i*10}" y1="-80" x2="${i*10}" y2="80" stroke="${i%5===0?'#7aa874':'#e0eedd'}" stroke-width="${i%5===0?0.6:0.3}"/>`;
+  }
+  for (let i = -8; i <= 8; i++) {
+    svg += `<line x1="-130" y1="${i*10}" x2="130" y2="${i*10}" stroke="${i%5===0?'#7aa874':'#e0eedd'}" stroke-width="${i%5===0?0.6:0.3}"/>`;
+  }
+  // Achsen
+  svg += `<line x1="-135" y1="0" x2="135" y2="0" stroke="#1a3a1a" stroke-width="0.8"/>`;
+  svg += `<line x1="0" y1="85" x2="0" y2="-85" stroke="#1a3a1a" stroke-width="0.8"/>`;
+  svg += `<text x="132" y="-3" font-size="6" font-weight="bold">x</text>`;
+  svg += `<text x="3" y="-82" font-size="6" font-weight="bold">y</text>`;
+
+  // Linien — automatisch Seil (runter) oder Brücke (hoch/horizontal) klassifizieren
+  for (const ln of (cfg.lines || [])) {
+    const a = allPoints[ln.f], b = allPoints[ln.t];
+    if (!a || !b) continue;
+    const dash = ln.d ? ' stroke-dasharray="3,2"' : '';
+    const isBruecke = (b.z >= a.z);
+    // Wenn keine Farbe explizit gesetzt: Brücke=braun, Seil=blau
+    const color = ln.c || (isBruecke ? '#8b5a2b' : '#0066cc');
+    const width = ln.d ? 1.2 : (isBruecke ? 1.8 : 1.4);
+    svg += `<line x1="${a.x*10}" y1="${-a.y*10}" x2="${b.x*10}" y2="${-b.y*10}" stroke="${color}" stroke-width="${width}"${dash} opacity="0.9"/>`;
+    // Mini-Icon in der Mitte zur visuellen Unterscheidung
+    const mx = (a.x*10 + b.x*10) / 2;
+    const my = -(a.y*10 + b.y*10) / 2;
+    if (!ln.d) {
+      svg += `<text x="${mx}" y="${my-1}" text-anchor="middle" font-size="5" font-weight="bold" fill="${color}">${isBruecke ? '🌉' : '🪢'}</text>`;
+    }
+  }
+
+  // Plattformen — alle in grau, Hervorgehobene in Farbe
+  for (const [letter, p] of Object.entries(PLATFORMS)) {
+    const cx = p.x*10, cy = -p.y*10;
+    const isHi = hl.has(letter);
+    const fill = isHi ? (p.type==='boden'?'#c9a45a':(p.type==='baum-hi'?'#c44':'#2e6b2e')) : '#cdcdcd';
+    const stroke = isHi ? '#1a3a1a' : '#999';
+    if (p.type === 'boden') {
+      svg += `<rect x="${cx-2.5}" y="${cy-2.5}" width="5" height="5" fill="${fill}" stroke="${stroke}" stroke-width="0.5"/>`;
+    } else {
+      const r = isHi ? 2.8 : 1.4;
+      svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="0.5"/>`;
+    }
+    if (isHi) {
+      const dx = (cx > 100) ? -4 : 4;
+      const anchor = (cx > 100) ? 'end' : 'start';
+      svg += `<text x="${cx+dx}" y="${cy-2}" font-size="7" font-weight="bold" text-anchor="${anchor}" fill="#1a3a1a">${letter}</text>`;
+    }
+  }
+
+  // Extra-Punkte (P1, P2, P3, MAF, SP, ...)
+  for (const e of (cfg.extra || [])) {
+    const cx = e.x*10, cy = -e.y*10;
+    const dx = (cx > 100) ? -4 : 4;
+    const anchor = (cx > 100) ? 'end' : 'start';
+    svg += `<circle cx="${cx}" cy="${cy}" r="2.5" fill="#c77700" stroke="#1a3a1a" stroke-width="0.5"/>`;
+    svg += `<text x="${cx+dx}" y="${cy-2}" font-size="6.5" font-weight="bold" text-anchor="${anchor}" fill="#c77700">${e.label}</text>`;
+  }
+
+  svg += '</svg>';
+  return svg;
+}
+
+// === Inhaltliche Kompetenzen pro Aufgabe ===
+const KOMPETENZEN = {
+  '1.1': ['Verbindungsvektor', 'Länge', 'Geradengleichung'],
+  '1.2': ['Geradengleichung', 'Punktprobe'],
+  '1.3': ['Längen vergleichen', 'Dreiecksungleichung'],
+  '2.1': ['Geradengleichung Parameterform'],
+  '2.2': ['Punktprobe (mehrfach)'],
+  '2.3': ['Lagebeziehung parallel', 'Vielfaches-Test'],
+  '3.1': ['Parallelitäts-Test'],
+  '3.2': ['LGS lösen', 'Lagebeziehung windschief'],
+  '3.3': ['Argumentation', 'Stellungnahme'],
+  '4.1': ['Geradengleichung mit Zeit-Parameter'],
+  '4.2': ['Punktprobe', 'Position einsetzen'],
+  '4.3': ['Gleichungssystem', 'Höhenvergleich'],
+  '5.1': ['Vektoraddition'],
+  '5.2': ['Vektoraddition'],
+  '5.3': ['Vektoraddition', 'Länge'],
+  '5.4': ['Geradengleichung', 'Spurpunkt mit Ebene'],
+  '6.1': ['Mittelpunkt'],
+  '6.2': ['Schwerpunkt'],
+  '6.3': ['Bodenprojektion', 'senkrechte Gerade', 'Länge'],
+  '6.4': ['Mittelpunkt', 'Vergleich'],
+  '7.1': ['Geradengleichung lesen'],
+  '7.2': ['Punktprobe (mehrfach)'],
+  '7.3': ['Zeit-Vergleich', 'Schnittpunkt vs. Kollision'],
+  '7.4': ['Argumentation', 'Begriffsschärfung'],
+  '8.1': ['Bodenprojektion', 'Stützhöhe'],
+  '8.2': ['Verbindungsvektor', 'Länge'],
+  '8.3': ['Parallelität', 'Skalierung'],
+  '8.4': ['Parallelogramm-Konstruktion'],
+  '8.5': ['Schwerpunkt', 'Punktprobe', 'kürzester Abstand'],
+  '8.6': ['Verallgemeinerung', 'Beweis (notwendig + hinreichend)'],
+};
+
+// === Tipps pro Aufgabe ===
+const TIPPS = {
+  '1.1': ['Verbindungsvektor = Ziel − Start: $\\overrightarrow{TB} = \\vec{b} - \\vec{0}$', 'Länge mit Pythagoras im Raum: $|\\vec{v}| = \\sqrt{v_x^2 + v_y^2 + v_z^2}$'],
+  '1.2': ['Parameterform: $\\vec{x} = \\vec{p} + t \\cdot \\vec{u}$, mit Punkt $B$ als Stützvektor', 'Punktprobe: alle 3 Gleichungen auf denselben $t$-Wert prüfen'],
+  '1.3': ['Berechne beide Strecken mit der Betrag-Formel', 'Zeit = Strecke ÷ Geschwindigkeit'],
+  '2.1': ['Richtungsvektor von $B$ nach $G$: $\\overrightarrow{BG} = G - B$', '$t=0$ entspricht immer dem Startpunkt'],
+  '2.2': ['Setze jede Plattform in die Geradengleichung ein und löse nach $t$ auf', 'Wenn alle 3 Gleichungen dasselbe $t$ ergeben → Punkt liegt auf der Geraden'],
+  '2.3': ['Prüfe zunächst: sind die Richtungsvektoren kollinear (Vielfache)?', 'Wenn parallel: reicht eine Punktprobe zum Entscheiden'],
+  '3.1': ['$\\overrightarrow{AR} = R - A$, $\\overrightarrow{EW} = W - E$ ausrechnen', 'Vielfaches-Test: gibt es ein $k$ mit $\\overrightarrow{AR} = k \\cdot \\overrightarrow{EW}$ für alle drei Komponenten?'],
+  '3.2': ['Beide Geraden aufschreiben, gleichsetzen: $\\vec{x}_{g_1}(t) = \\vec{x}_{g_2}(s)$', 'Drei Gleichungen, zwei Unbekannte — prüfe ob das LGS lösbar ist'],
+  '3.3': ['Beginne mit dem Ergebnis, erkläre dann den Weg', 'Windschief = nicht parallel UND kein Schnittpunkt'],
+  '4.1': ['Lenas Bahn: Stützvektor = $B$, Richtungsvektor = $(3|2|1)$', 'Tims Zeit-Versatz: $t=0$ ist 9:00 Uhr → Tim startet bei $t=2$'],
+  '4.2': ['Einfach $t=3$ einsetzen und ausrechnen', 'Koordinaten mit Plattformtabelle vergleichen'],
+  '4.3': ['$z$-Komponente bei Lena: $2+t$, bei Tim: $2+2(t-2)$', 'Gleichsetzen und nach $t$ auflösen'],
+  '5.1': ['Vektoraddition: $P_1 = T + \\vec{v_1}$', 'Koordinaten addieren: $(0+4 \\,|\\, 0+2 \\,|\\, 0+2)$'],
+  '5.2': ['$P_2 = P_1 + \\vec{v_2}$ — Koordinaten aufaddieren', 'Die $z$-Koordinate gibt die Höhe an'],
+  '5.3': ['Senkrecht hinab: nur die $z$-Komponente ändert sich ($\\vec{v_3} = (0|0|-z_{P_2})$)', 'Gesamtverschiebung = $\\vec{v_1} + \\vec{v_2} + \\vec{v_3}$'],
+  '5.4': ['Geradengleichung: $\\vec{x} = T + t \\cdot \\overrightarrow{TP_3}$', 'Spurpunkt: $z$-Komponente gleich 3 setzen und $t$ berechnen'],
+  '6.1': ['Mittelpunkt: $M = \\frac{\\vec{a} + \\vec{b}}{2}$ — also Koordinaten je addieren und durch 2 teilen'],
+  '6.2': ['Schwerpunkt dreier Punkte: $S = \\frac{\\vec{p_1}+\\vec{p_2}+\\vec{p_3}}{3}$'],
+  '6.3': ['Bodenprojektion: $z$-Koordinate auf 0 setzen, $x$ und $y$ übernehmen', 'Höhe der Stütze = $z$-Koordinate des Schwerpunkts'],
+  '6.4': ['Mittelpunkte beider Diagonalen berechnen — bei Parallelogramm müssen sie gleich sein'],
+  '7.1': ['Lies Stütz- und Richtungsvektor direkt aus der Gleichung ab', 'Startpunkt bei $t=0$, Richtungsvektor ist der Faktor vor $t$'],
+  '7.2': ['Setze den Punkt in alle drei Bahnen ein — jede Bahn hat ihre eigene Parametervariable'],
+  '7.3': ['Gleiches Ort zur gleichen Zeit = Kollision', 'Gleicher Ort zu unterschiedlicher Zeit = Schnittpunkt (kein Zusammenstoß)'],
+  '7.4': ['Unterschied: Kollision erfordert $t_1 = t_2$, Schnittpunkt nur gleiche Position'],
+  '8.1': ['Bodenprojektion: $z=0$ setzen, $x$ und $y$ direkt übernehmen', 'Stützhöhe = $z$-Koordinate der Plattform'],
+  '8.2': ['$\\overrightarrow{AB}$ ausrechnen, dann $|\\overrightarrow{AB}|$ mit Betrag-Formel'],
+  '8.3': ['Vielfaches-Test wie bei 3.1 — aber hier mit Maßstab vergleichen'],
+  '8.4': ['Parallelogramm: Gegenüberliegende Seiten gleich und parallel → $D = C + \\overrightarrow{AB}$ oder $D = A + \\overrightarrow{CB}$'],
+  '8.5': ['Schwerpunkt von 4 Punkten: $S = \\frac{\\vec{a}+\\vec{b}+\\vec{c}+\\vec{d}}{4}$', 'Abstand Punkt–Gerade: Lotfußpunkt bestimmen'],
+  '8.6': ['Bedingung aufstellen: $x_1+x_2+x_3 = 0$ und $y_1+y_2+y_3 = 0$', 'Systematisch Tripel durchprobieren'],
+};
+
+// === Story-Design-Definitionen ===
+const STORY_DESIGNS = [
+  {
+    scene: '🚨🧗',
+    deco:  '⛑️',
+    sub:   'Ein Kind sitzt fest — Mathematik vor Adrenalin',
+    tagline: 'Notfall · Geraden · Punktprobe',
+  },
+  {
+    scene: '🚁📋',
+    deco:  '🛸',
+    sub:   'TÜV-Drohne vermisst den Wald von oben',
+    tagline: 'Messtechnik · Geradengleichung · Parallelität',
+  },
+  {
+    scene: '⚒️🪖',
+    deco:  '😤',
+    sub:   'Wer hat Recht — Anna oder Ben?',
+    tagline: 'Baustreit · Lagebeziehungen · Argumentation',
+  },
+  {
+    scene: '🏃‍♀️🏆🏃‍♂️',
+    deco:  '⚡',
+    sub:   'Wer erreicht zuerst den Gipfel?',
+    tagline: 'Wettlauf · Zeit-Parameter · Modellierung',
+  },
+  {
+    scene: '🗺️🌲',
+    deco:  '💰',
+    sub:   'Der alte Förster hinterließ einen rätselhaften Hinweis …',
+    tagline: 'Schatzsuche · Vektoraddition · Spurpunkt',
+  },
+  {
+    scene: '🏗️🌅',
+    deco:  '✨',
+    sub:   'Eine Kanzel schwebt — aber wo muss die Stütze stehen?',
+    tagline: 'Architektur · Schwerpunkt · Bodenprojektion',
+  },
+  {
+    scene: '🚁🚁🚁',
+    deco:  '💥',
+    sub:   'Drei Drohnen, drei Bahnen — wer kollidiert?',
+    tagline: 'Kollision · Schnittpunkt vs. Kollision · Begriffsschärfe',
+  },
+  {
+    scene: '🌲📐🔧',
+    deco:  '🏗️',
+    sub:   'Entwirf den neuen Kletterpark auf dem Reißbrett',
+    tagline: 'Konstruktion · Parallelogramm · Schwerpunkt · Beweis',
+  },
+];
+
+function makeBanner(g, num, titleText, untertitelEl) {
+  const d = STORY_DESIGNS[num - 1] || {};
+  const sub = untertitelEl ? untertitelEl.textContent : (d.tagline || '');
+
+  const banner = document.createElement('div');
+  banner.className = 'story-banner';
+  banner.innerHTML = `
+    <div class="banner-scene">${d.scene || '🌲'}</div>
+    <div class="banner-text">
+      <h2>${num} · ${titleText.replace(/^\d+\s*·\s*/,'')}</h2>
+      <div class="banner-sub">${sub}</div>
+    </div>
+    <div class="banner-deco">${d.deco || ''}</div>`;
+  return banner;
+}
+
+function enrichTasks() {
+  document.querySelectorAll('.geschichte').forEach((g, gi) => {
+    const num = gi + 1;
+    g.id = 'g' + num;
+    g.dataset.s = num;   // für CSS-Themes
+
+    // Banner aus h2 + Untertitel bauen
+    const h2 = g.querySelector('h2');
+    const untertitel = g.querySelector('.untertitel');
+    const titleText = h2 ? h2.textContent : '';
+    if (h2) {
+      const banner = makeBanner(g, num, titleText, untertitel);
+      g.insertBefore(banner, g.firstChild);
+      h2.style.display = 'none';
+      if (untertitel) untertitel.style.display = 'none';
+    }
+
+    // Restinhalt in .geschichte-body wrappen (alles nach Banner)
+    const bodyDiv = document.createElement('div');
+    bodyDiv.className = 'geschichte-body';
+    while (g.children.length > 1) bodyDiv.appendChild(g.children[1]);
+    g.appendChild(bodyDiv);
+
+    // ── Zwei-Spalten-Layout: tasks-col | karte-col ──
+    // 1) Alle hl-Plattformen + Extras aus data-mini-Attributen sammeln
+    const storyHl = new Set();
+    const storyExtrasMap = new Map();
+    bodyDiv.querySelectorAll('[data-mini]').forEach(el => {
+      try {
+        const cfg = JSON.parse(el.getAttribute('data-mini'));
+        (cfg.hl || []).forEach(l => storyHl.add(l));
+        (cfg.extra || []).forEach(e => {
+          if (!storyExtrasMap.has(e.id)) storyExtrasMap.set(e.id, e);
+        });
+      } catch(e) {}
+    });
+
+    // 2) Gesamten Inhalt in tasks-col verschieben
+    const tasksCol = document.createElement('div');
+    tasksCol.className = 'tasks-col';
+    while (bodyDiv.firstChild) tasksCol.appendChild(bodyDiv.firstChild);
+
+    // 3) Karte-Spalte mit großer Geschichte-SVG
+    const karteCol = document.createElement('div');
+    karteCol.className = 'karte-col';
+    const storyExtras = Array.from(storyExtrasMap.values());
+    karteCol.dataset.hlJson = JSON.stringify([...storyHl]);
+    karteCol.dataset.extrasJson = JSON.stringify(storyExtras);
+    karteCol.innerHTML = makeStoryKarte(storyHl, storyExtras, num)
+      + '<div class="karte-caption">Klick auf zwei Punkte → Verbindung · Linie anklicken → löschen</div>';
+
+    bodyDiv.appendChild(tasksCol);
+    bodyDiv.appendChild(karteCol);
+
+    g.querySelectorAll('.aufgabe').forEach((a, ai) => {
+      const taskId = num + '.' + (ai + 1);
+      a.id = 'a' + taskId.replace('.', '-');
+
+      // data-diff setzen (für CSS-Farbband)
+      const diffSpan = a.querySelector('.diff');
+      if (diffSpan) {
+        for (let d = 1; d <= 6; d++) {
+          if (diffSpan.classList.contains('d' + d)) { a.dataset.diff = d; break; }
+        }
+      }
+
+      // Titel-Text extrahieren
+      const titel = a.querySelector('.aufgabe-titel');
+      let titelText = '';
+      if (titel) titelText = titel.textContent.replace(/L\d.*$/, '').trim();
+
+      // Kompetenzen einfügen
+      const komp = KOMPETENZEN[taskId];
+      if (komp && titel) {
+        const kompDiv = document.createElement('div');
+        kompDiv.className = 'kompetenzen';
+        kompDiv.innerHTML = '<span class="komp-titel">Inhalt:</span>' + komp.map(k => `<span class="komp">${k}</span>`).join('');
+        titel.insertAdjacentElement('afterend', kompDiv);
+      }
+
+      // Lösung entfernen — nur Tipps bleiben
+      const loesung = a.querySelector('.loesung');
+      if (loesung) loesung.remove();
+
+      // Tipps einfügen
+      const tipps = TIPPS[taskId];
+      if (tipps) {
+        const content = a.querySelector('.aufgabe-content');
+        if (content) {
+          const tippsBlock = document.createElement('div');
+          tippsBlock.className = 'tipps-block';
+          tipps.forEach((t, ti) => {
+            tippsBlock.innerHTML += `<details class="tipp"><summary>💡 Tipp ${ti + 1}</summary><div class="tipp-body">${t}</div></details>`;
+          });
+          content.appendChild(tippsBlock);
+        }
+      }
+
+    });
+  });
+
+  // KaTeX für Tipps
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});
+  }
+}
+
+// === Einzelaufgabe drucken ===
+function printSingleTask(taskId, geschichteId) {
+  // Alle Geschichten merken
+  const alle = document.querySelectorAll('.geschichte');
+  const vorher = {};
+  alle.forEach(g => { vorher[g.id] = g.style.display; g.style.display = 'none'; });
+
+  // Nur die eine Geschichte zeigen
+  const g = document.getElementById(geschichteId);
+  if (g) g.style.display = 'block';
+
+  // Alle Aufgaben in der Geschichte ausblenden außer der Zielaufgabe
+  const aufgaben = g ? g.querySelectorAll('.aufgabe') : [];
+  const aufgabenVorher = {};
+  aufgaben.forEach(a => { aufgabenVorher[a.id] = a.style.display; a.style.display = 'none'; });
+  const ziel = document.getElementById(taskId);
+  if (ziel) ziel.style.display = '';
+
+  window.print();
+
+  // Wiederherstellen
+  setTimeout(() => {
+    alle.forEach(g => { g.style.display = vorher[g.id]; });
+    aufgaben.forEach(a => { a.style.display = aufgabenVorher[a.id]; });
+  }, 500);
+}
+
+// === Story-Navigation ===
+let currentStory = 1;
+const TOTAL_STORIES = 8;
+let showAllMode = false;
+
+function showStory(n) {
+  showAllMode = false;
+  currentStory = Math.max(1, Math.min(TOTAL_STORIES, n));
+  document.querySelectorAll('.geschichte').forEach((g, i) => {
+    g.classList.toggle('active', i + 1 === currentStory);
+  });
+  // Select aktualisieren
+  const sel = document.getElementById('story-select');
+  if (sel) sel.value = currentStory;
+  // Counter
+  const ctr = document.getElementById('nav-counter');
+  if (ctr) ctr.textContent = currentStory + ' / ' + TOTAL_STORIES;
+  // Arrows
+  document.getElementById('nav-prev').disabled = (currentStory === 1);
+  document.getElementById('nav-next').disabled = (currentStory === TOTAL_STORIES);
+  // Scroll nach oben
+  window.scrollTo(0, 0);
+  // 3D-Animationen pausieren (alle außer ggf. der aktiven)
+  Object.entries(karte3DScenes).forEach(([k, s]) => {
+    if (s.animId) { cancelAnimationFrame(s.animId); s.animId = null; }
+  });
+  // All-Button
+  const btn = document.getElementById('btn-all');
+  if (btn) btn.textContent = '📋 Alle';
+  // Info ausblenden im Einzelmodus
+  const info = document.getElementById('global-info');
+  if (info) info.style.display = 'none';
+}
+
+function changeStory(delta) {
+  showStory(currentStory + delta);
+}
+
+function toggleAllStories() {
+  showAllMode = !showAllMode;
+  document.querySelectorAll('.geschichte').forEach(g => {
+    g.classList.toggle('active', showAllMode);
+  });
+  const btn = document.getElementById('btn-all');
+  if (btn) btn.textContent = showAllMode ? '📌 Einzeln' : '📋 Alle';
+  const info = document.getElementById('global-info');
+  if (info) info.style.display = showAllMode ? '' : 'none';
+  if (!showAllMode) showStory(currentStory);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  enrichTasks();
+  renderMinis();
+  initAllKarteInteractivity();
+  showStory(1);
+  // Tastatur-Navigation
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeStory(+1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeStory(-1);
+  });
+});
+
+// === Blankes Zeichengitter generieren ===
+// Zeigt nur Raster + Achsen + blasse Plattform-Orientierungspunkte (keine vorgezeichneten Linien/Lösungen)
+function makeBlankGrid(cfg) {
+  const hl = new Set(cfg.hl || []);
+
+  let svg = `<svg viewBox="-140 -90 280 180" class="mini-svg" xmlns="http://www.w3.org/2000/svg">`;
+  svg += `<rect x="-130" y="-80" width="260" height="160" fill="white"/>`;
+
+  // Raster
+  for (let i = -13; i <= 13; i++) {
+    svg += `<line x1="${i*10}" y1="-80" x2="${i*10}" y2="80" stroke="${i%5===0?'#b0ccaa':'#e8f0e4'}" stroke-width="${i%5===0?0.5:0.25}"/>`;
+  }
+  for (let i = -8; i <= 8; i++) {
+    svg += `<line x1="-130" y1="${i*10}" x2="130" y2="${i*10}" stroke="${i%5===0?'#b0ccaa':'#e8f0e4'}" stroke-width="${i%5===0?0.5:0.25}"/>`;
+  }
+
+  // Achsen
+  svg += `<line x1="-132" y1="0" x2="132" y2="0" stroke="#8aaa80" stroke-width="0.8"/>`;
+  svg += `<line x1="0" y1="83" x2="0" y2="-83" stroke="#8aaa80" stroke-width="0.8"/>`;
+  svg += `<polygon points="132,0 128,-1.5 128,1.5" fill="#8aaa80"/>`;
+  svg += `<polygon points="0,-83 -1.5,-79 1.5,-79" fill="#8aaa80"/>`;
+  svg += `<text x="129" y="-2" font-size="6" fill="#8aaa80" font-weight="bold">x</text>`;
+  svg += `<text x="2" y="-80" font-size="6" fill="#8aaa80" font-weight="bold">y</text>`;
+
+  // Plattformen als blasse Orientierungspunkte (sehr klein, kein Label)
+  for (const [letter, p] of Object.entries(PLATFORMS)) {
+    const cx = p.x*10, cy = -p.y*10;
+    const isHl = hl.has(letter);
+    if (p.type === 'boden') {
+      svg += `<rect x="${cx-2}" y="${cy-2}" width="4" height="4" fill="${isHl?'#c9a45a':'#ddd'}" stroke="${isHl?'#999':'#ccc'}" stroke-width="0.5" opacity="${isHl?0.7:0.4}"/>`;
+    } else {
+      svg += `<circle cx="${cx}" cy="${cy}" r="${isHl?2.5:1.5}" fill="${isHl?(p.type==='baum-hi'?'#e88':'#7bb87b'):'#ccc'}" stroke="${isHl?'#888':'#bbb'}" stroke-width="0.4" opacity="${isHl?0.6:0.35}"/>`;
+    }
+    // Beschriftung nur für hervorgehobene Plattformen
+    if (isHl) {
+      const dx = (cx > 90) ? -4 : 4;
+      const anchor = (cx > 90) ? 'end' : 'start';
+      svg += `<text x="${cx+dx}" y="${cy-2.5}" font-size="6.5" font-weight="bold" text-anchor="${anchor}" fill="#666" opacity="0.7">${letter}</text>`;
+    }
+  }
+
+  svg += '</svg>';
+  return svg;
+}
+
+// === Große Geschichte-Karte generieren — interaktiv ===
+function makeStoryKarte(hlSet, extras, storyNum) {
+  function labelPos(cx, cy) {
+    let dx = 6, anchor = 'start';
+    if (cx > 85) { dx = -6; anchor = 'end'; }
+    let dy = -6;
+    if (cy < -64) dy = 14;
+    return { dx, dy, anchor };
+  }
+
+  // ── Toolbar (nur in 2D sichtbar, da sie innerhalb .karte-view-2d liegt) ──
+  const colors = ['#c44','#0066cc','#2e6b2e','#c77700','#8e44ad'];
+  const toolbar = `<div class="karte-toolbar">
+    <span class="kt-sep" style="font-size:8pt;color:#555;margin-right:1px">Farbe:</span>
+    ${colors.map((c,i)=>`<button class="kt-color${i===0?' active':''}" data-color="${c}" style="background:${c}" title="${c}"></button>`).join('')}
+    <span class="kt-sep">|</span>
+    <button class="kt-btn kt-mode active" data-arrow="1" title="Vektor mit Pfeil">⟶ Vektor</button>
+    <button class="kt-btn kt-mode" data-arrow="0" title="Strecke ohne Pfeil">— Strecke</button>
+    <span class="kt-sep">|</span>
+    <button class="kt-btn kt-undo" title="Letzte Linie löschen">↩ Undo</button>
+    <button class="kt-btn kt-clear" title="Alles löschen">✕ Alle</button>
+  </div>`;
+
+  // ── SVG ──
+  let svg = `<svg viewBox="-148 -96 296 192" xmlns="http://www.w3.org/2000/svg">`;
+  svg += `<rect x="-130" y="-80" width="260" height="160" fill="white"/>`;
+
+  // Raster
+  for (let i = -13; i <= 13; i++) {
+    const b = i % 5 === 0;
+    svg += `<line x1="${i*10}" y1="-80" x2="${i*10}" y2="80" stroke="${b?'#b0ccaa':'#e8f0e4'}" stroke-width="${b?0.55:0.22}"/>`;
+  }
+  for (let j = -8; j <= 8; j++) {
+    const b = j % 5 === 0;
+    svg += `<line x1="-130" y1="${j*10}" x2="130" y2="${j*10}" stroke="${b?'#b0ccaa':'#e8f0e4'}" stroke-width="${b?0.55:0.22}"/>`;
+  }
+  svg += `<rect x="-130" y="-80" width="260" height="160" fill="none" stroke="#7aa874" stroke-width="0.6"/>`;
+
+  // Achsen
+  svg += `<line x1="-136" y1="0" x2="136" y2="0" stroke="#2a4a2a" stroke-width="1.1"/>`;
+  svg += `<line x1="0" y1="87" x2="0" y2="-87" stroke="#2a4a2a" stroke-width="1.1"/>`;
+  svg += `<polygon points="136,0 131,-2.2 131,2.2" fill="#2a4a2a"/>`;
+  svg += `<polygon points="0,-87 -2.2,-82 2.2,-82" fill="#2a4a2a"/>`;
+  svg += `<text x="138" y="3" font-size="9" font-weight="bold" fill="#1a3a1a">x</text>`;
+  svg += `<text x="-4" y="-88" font-size="9" font-weight="bold" fill="#1a3a1a" text-anchor="end">y</text>`;
+
+  // Tick-Labels
+  for (let i = -13; i <= 13; i++) {
+    if (i === 0) continue;
+    const b = i % 5 === 0;
+    svg += `<text x="${i*10}" y="7" text-anchor="middle" font-size="${b?5.5:4}" font-weight="${b?'bold':'normal'}" fill="${b?'#1a3a1a':'#999'}">${i}</text>`;
+  }
+  svg += `<text x="1" y="7" text-anchor="start" font-size="5.5" font-weight="bold" fill="#1a3a1a">0</text>`;
+  for (let j = -8; j <= 8; j++) {
+    if (j === 0) continue;
+    const b = j % 5 === 0;
+    svg += `<text x="-2" y="${-j*10+2}" text-anchor="end" font-size="${b?5.5:4}" font-weight="${b?'bold':'normal'}" fill="${b?'#1a3a1a':'#999'}">${j}</text>`;
+  }
+
+  // ── Plattform-Visuals (pointer-events:none — Klicks gehen durch zu den Hit-Targets) ──
+  for (const [letter, p] of Object.entries(PLATFORMS)) {
+    const cx = p.x * 10, cy = -p.y * 10;
+    const isHl = hlSet.has(letter);
+    const { dx, dy, anchor } = labelPos(cx, cy);
+
+    if (p.type === 'boden') {
+      const sz = isHl ? 6 : 3.5;
+      svg += `<rect x="${cx-sz/2}" y="${cy-sz/2}" width="${sz}" height="${sz}" fill="${isHl?'#c9a45a':'#e0e0e0'}" stroke="${isHl?'#1a3a1a':'#bbb'}" stroke-width="${isHl?0.8:0.4}" pointer-events="none"/>`;
+    } else {
+      const r = isHl ? 4.5 : 2.2;
+      const fill = isHl ? (p.type==='baum-hi' ? '#c44' : '#2e6b2e') : '#d8d8d8';
+      svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" stroke="${isHl?'#1a3a1a':'#bbb'}" stroke-width="${isHl?0.8:0.4}" pointer-events="none"/>`;
+    }
+    if (isHl) {
+      const lx = cx + dx, ly = cy + dy;
+      svg += `<text x="${lx}" y="${ly}" font-size="8" font-weight="bold" text-anchor="${anchor}" fill="#1a3a1a" pointer-events="none">${letter}</text>`;
+      svg += `<text x="${lx}" y="${ly+8}" font-size="5" text-anchor="${anchor}" fill="#444" pointer-events="none">${p.name}</text>`;
+      svg += `<text x="${lx}" y="${ly+14}" font-size="4.5" text-anchor="${anchor}" fill="#888" pointer-events="none">(${p.x}|${p.y}|${p.z})</text>`;
+    } else {
+      const dx2 = (cx > 90) ? -3 : 3;
+      const anch2 = (cx > 90) ? 'end' : 'start';
+      svg += `<text x="${cx+dx2}" y="${cy-2}" font-size="5" text-anchor="${anch2}" fill="#bbb" pointer-events="none">${letter}</text>`;
+    }
+  }
+
+  // ── Extra-Punkte ──
+  for (const e of extras) {
+    const cx = e.x * 10, cy = -e.y * 10;
+    if (cx < -128 || cx > 128 || cy < -78 || cy > 78) continue;
+    const { dx, dy, anchor } = labelPos(cx, cy);
+    svg += `<circle cx="${cx}" cy="${cy}" r="3.5" fill="#c77700" stroke="#1a3a1a" stroke-width="0.7" opacity="0.8" pointer-events="none"/>`;
+    svg += `<text x="${cx+dx}" y="${cy+dy}" font-size="6.5" font-weight="bold" text-anchor="${anchor}" fill="#c77700" pointer-events="none">${e.label}</text>`;
+  }
+
+  // ── User-Layer für gezogene Linien (wird per JS befüllt) ──
+  svg += `<g class="user-layer"></g>`;
+
+  // ── Unsichtbare Hit-Targets für Plattformen (oben, damit Klicks registriert werden) ──
+  for (const [letter, p] of Object.entries(PLATFORMS)) {
+    const cx = p.x * 10, cy = -p.y * 10;
+    svg += `<circle cx="${cx}" cy="${cy}" r="9" fill="transparent" class="karte-platform" data-letter="${letter}" data-cx="${cx}" data-cy="${cy}" style="cursor:pointer"/>`;
+  }
+  // Extras ebenfalls klickbar
+  for (const e of extras) {
+    const cx = e.x * 10, cy = -e.y * 10;
+    if (cx < -128 || cx > 128 || cy < -78 || cy > 78) continue;
+    svg += `<circle cx="${cx}" cy="${cy}" r="9" fill="transparent" class="karte-platform" data-letter="${e.id}" data-cx="${cx}" data-cy="${cy}" style="cursor:pointer"/>`;
+  }
+
+  svg += `</svg>`;
+
+  const view3d = `<div class="karte-view-3d">
+    <button class="kt-goto2d">← 2D Karte</button>
+    <canvas class="karte-3d-canvas"></canvas>
+    <div class="karte-3d-info">
+      <strong>Steuerung:</strong>
+      🖱 <b>Drehen</b> — Maus ziehen &nbsp;·&nbsp;
+      🔍 <b>Zoom</b> — Scrollrad &nbsp;·&nbsp;
+      ✋ <b>Verschieben</b> — Rechtsklick ziehen<br>
+      Achsen: <span class="ax" style="background:#fee;color:#c00">x →</span>
+      <span class="ax" style="background:#efe;color:#196">y →</span>
+      <span class="ax" style="background:#eef;color:#06c">z ↑ Höhe</span> &nbsp;·&nbsp;
+      Große Kugeln = Geschichte-Plattformen · Grau = übrige
+    </div>
+  </div>`;
+
+  return `<div class="karte-view-2d active">${toolbar}${svg}<button class="kt-goto3d">↗ 3D ansehen</button></div>` + view3d;
+}
+
+// === Karte Interaktivität ===
+const karteState = {};
+function getKarteState(n) {
+  if (!karteState[n]) karteState[n] = { color: '#c44', arrow: true, selFirst: null, lineCount: 0 };
+  return karteState[n];
+}
+
+function initAllKarteInteractivity() {
+  document.querySelectorAll('.karte-col').forEach((col, i) => initOneKarte(col, i + 1));
+}
+
+function initOneKarte(col, n) {
+  const state = getKarteState(n);
+
+  // Farb-Buttons
+  col.querySelectorAll('.kt-color').forEach(btn => {
+    btn.addEventListener('click', () => {
+      col.querySelectorAll('.kt-color').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.color = btn.dataset.color;
+    });
+  });
+
+  // Modus-Buttons (Vektor / Strecke)
+  col.querySelectorAll('.kt-mode').forEach(btn => {
+    btn.addEventListener('click', () => {
+      col.querySelectorAll('.kt-mode').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      state.arrow = btn.dataset.arrow === '1';
+      clearKarteSel(col, state);
+    });
+  });
+
+  // Undo
+  col.querySelector('.kt-undo')?.addEventListener('click', () => {
+    const ul = col.querySelector('.user-layer');
+    const groups = ul?.querySelectorAll('.user-line-group');
+    if (groups?.length) groups[groups.length - 1].remove();
+  });
+
+  // Alles löschen
+  col.querySelector('.kt-clear')?.addEventListener('click', () => {
+    col.querySelector('.user-layer')?.replaceChildren();
+    clearKarteSel(col, state);
+  });
+
+  // 2D/3D Toggle
+  col.querySelector('.kt-goto3d')?.addEventListener('click', () => toggle2D3D(col, n, 3));
+  col.querySelector('.kt-goto2d')?.addEventListener('click', () => toggle2D3D(col, n, 2));
+
+  // Plattform-Klicks
+  col.querySelectorAll('.karte-platform').forEach(el => {
+    el.addEventListener('click', e => {
+      e.stopPropagation();
+      handleKarteClick(col, state, n,
+        el.dataset.letter,
+        parseFloat(el.dataset.cx),
+        parseFloat(el.dataset.cy));
+    });
+  });
+}
+
+function handleKarteClick(col, state, n, letter, cx, cy) {
+  if (!state.selFirst) {
+    state.selFirst = { letter, cx, cy };
+    setKarteRing(col, cx, cy, true);
+  } else if (state.selFirst.letter === letter) {
+    setKarteRing(col, state.selFirst.cx, state.selFirst.cy, false);
+    state.selFirst = null;
+  } else {
+    const { cx: x1, cy: y1 } = state.selFirst;
+    setKarteRing(col, x1, y1, false);
+    state.selFirst = null;
+    drawKarteLine(col, n, x1, y1, cx, cy, state.color, state.arrow);
+  }
+}
+
+function setKarteRing(col, cx, cy, show) {
+  const ul = col.querySelector('.user-layer');
+  if (!ul) return;
+  const existing = ul.querySelector('.karte-sel-ring');
+  if (existing) existing.remove();
+  if (!show) return;
+  const ns = 'http://www.w3.org/2000/svg';
+  const ring = document.createElementNS(ns, 'circle');
+  ring.setAttribute('cx', cx); ring.setAttribute('cy', cy); ring.setAttribute('r', '9');
+  ring.setAttribute('fill', '#f0c04030'); ring.setAttribute('stroke', '#f0c040');
+  ring.setAttribute('stroke-width', '2.5'); ring.setAttribute('class', 'karte-sel-ring');
+  ring.setAttribute('pointer-events', 'none');
+  ul.prepend(ring);
+}
+
+function clearKarteSel(col, state) {
+  col.querySelector('.karte-sel-ring')?.remove();
+  state.selFirst = null;
+}
+
+function drawKarteLine(col, n, x1, y1, x2, y2, color, arrow) {
+  const ul = col.querySelector('.user-layer');
+  if (!ul) return;
+  getKarteState(n).lineCount++;
+  const ns = 'http://www.w3.org/2000/svg';
+  const g = document.createElementNS(ns, 'g');
+  g.setAttribute('class', 'user-line-group');
+
+  // Linie
+  const line = document.createElementNS(ns, 'line');
+  line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+  line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+  line.setAttribute('stroke', color); line.setAttribute('stroke-width', '2.2');
+  line.setAttribute('pointer-events', 'none');
+  g.appendChild(line);
+
+  // Pfeilspitze
+  if (arrow) {
+    const ang = Math.atan2(y2 - y1, x2 - x1), sz = 6;
+    const ax = x2 - sz * Math.cos(ang - 0.4), ay = y2 - sz * Math.sin(ang - 0.4);
+    const bx = x2 - sz * Math.cos(ang + 0.4), by = y2 - sz * Math.sin(ang + 0.4);
+    const tri = document.createElementNS(ns, 'polygon');
+    tri.setAttribute('points', `${x2},${y2} ${ax},${ay} ${bx},${by}`);
+    tri.setAttribute('fill', color); tri.setAttribute('pointer-events', 'none');
+    g.appendChild(tri);
+  }
+
+  // Unsichtbares dickes Hit-Target zum Löschen per Klick
+  const hit = document.createElementNS(ns, 'line');
+  hit.setAttribute('x1', x1); hit.setAttribute('y1', y1);
+  hit.setAttribute('x2', x2); hit.setAttribute('y2', y2);
+  hit.setAttribute('stroke', 'transparent'); hit.setAttribute('stroke-width', '12');
+  hit.setAttribute('style', 'cursor:pointer');
+  hit.addEventListener('click', () => g.remove());
+  g.appendChild(hit);
+
+  ul.appendChild(g);
+}
+
+// ── 2D/3D Toggle ──
+function toggle2D3D(col, n, dim) {
+  const v2 = col.querySelector('.karte-view-2d');
+  const v3 = col.querySelector('.karte-view-3d');
+  if (dim === 2) {
+    v2?.classList.add('active'); v3?.classList.remove('active');
+    const s = karte3DScenes[n];
+    if (s?.animId) { cancelAnimationFrame(s.animId); s.animId = null; }
+  } else {
+    v2?.classList.remove('active'); v3?.classList.add('active');
+    loadThreeJS(() => init3DScene(col, n));
+  }
+}
+
+// ── Three.js lazy-laden ──
+const karte3DScenes = {};
+function loadThreeJS(cb) {
+  if (window.THREE?.OrbitControls) { cb(); return; }
+  const done = () => { if (window.THREE) cb(); };
+  if (window.THREE) {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js';
+    s.onload = done; document.head.appendChild(s); return;
+  }
+  const s1 = document.createElement('script');
+  s1.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js';
+  s1.onload = () => {
+    const s2 = document.createElement('script');
+    s2.src = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js';
+    s2.onload = cb; document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}
+
+// ── 3D-Szene aufbauen ──
+function init3DScene(col, n) {
+  const canvas = col.querySelector('.karte-3d-canvas');
+  if (!canvas || !window.THREE) return;
+  const T = THREE;
+
+  // Bereits initialisiert — Animation fortsetzen
+  if (karte3DScenes[n]) {
+    const s = karte3DScenes[n];
+    if (!s.animId) {
+      function resume() { s.animId = requestAnimationFrame(resume); s.controls.update(); s.renderer.render(s.scene, s.camera); }
+      resume();
+    }
+    return;
+  }
+
+  const hlSet  = new Set(JSON.parse(col.dataset.hlJson    || '[]'));
+
+  // Größe
+  const w = Math.max(col.clientWidth || 400, 200);
+  const h = Math.round(w / 1.45);
+
+  const renderer = new T.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setClearColor(0xf0f7ec, 1);
+
+  const scene = new T.Scene();
+  scene.background = new T.Color(0xf0f7ec);
+
+  // Kamera: Draufsicht leicht schräg
+  const camera = new T.PerspectiveCamera(45, w / h, 0.1, 200);
+  camera.position.set(14, 16, 12);
+  camera.lookAt(0, 3, 0);
+
+  // Licht
+  scene.add(new T.AmbientLight(0xffffff, 0.8));
+  const sun = new T.DirectionalLight(0xfff8e1, 0.55);
+  sun.position.set(10, 15, 8);
+  scene.add(sun);
+
+  // Boden-Gitter (XZ-Ebene in Three = z=0 in Mathe)
+  const grid = new T.GridHelper(28, 28, 0x7aa874, 0xd4ebd0);
+  scene.add(grid);
+  const ground = new T.Mesh(
+    new T.PlaneGeometry(28, 18),
+    new T.MeshLambertMaterial({ color: 0xe8f5e9, transparent: true, opacity: 0.35, side: T.DoubleSide })
+  );
+  ground.rotation.x = -Math.PI / 2; ground.position.y = 0.005;
+  scene.add(ground);
+
+  // Hilfs-Funktion: Linie zeichnen
+  const mkLn = (pts, col) => scene.add(new T.Line(
+    new T.BufferGeometry().setFromPoints(pts.map(([x,y,z]) => new T.Vector3(x,y,z))),
+    new T.LineBasicMaterial({ color: col })
+  ));
+
+  // Achsen  (Mathe→THREE: p(x,y,z) → THREE(x, z, -y))
+  mkLn([[-13,0,0],[13,0,0]], 0xcc3333);   // x-Achse rot
+  mkLn([[0,0,-8],[0,0,8]],   0x2e6b2e);   // y-Achse grün (z_three = -y_math … symmetrisch)
+  mkLn([[0,0,0],[0,8,0]],    0x0066cc);   // z-Achse blau = Höhe
+
+  // Plattformen
+  for (const [letter, p] of Object.entries(PLATFORMS)) {
+    const isHl = hlSet.has(letter);
+    const pos  = new T.Vector3(p.x, p.z, -p.y);  // Mathe→THREE
+    const r    = isHl ? 0.38 : 0.2;
+    const color = isHl
+      ? (p.type === 'boden' ? 0xc9a45a : p.type === 'baum-hi' ? 0xcc4444 : 0x2e6b2e)
+      : 0xbbbbbb;
+
+    const sphere = new T.Mesh(
+      new T.SphereGeometry(r, 14, 10),
+      new T.MeshLambertMaterial({ color })
+    );
+    sphere.position.copy(pos);
+    scene.add(sphere);
+
+    // Stiel zum Boden
+    if (p.z > 0) mkLn([[p.x, 0, -p.y], [p.x, p.z, -p.y]], isHl ? 0x8b5a2b : 0xcccccc);
+
+    // Text-Label für hervorgehobene Plattformen
+    if (isHl) {
+      const lbl = makeTextSprite3D(letter, color);
+      lbl.position.set(pos.x + 0.25, pos.y + 0.65, pos.z);
+      scene.add(lbl);
+    }
+  }
+
+  // OrbitControls
+  const controls = new T.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 3, 0);
+  controls.enableDamping = true; controls.dampingFactor = 0.06;
+  controls.minDistance = 4; controls.maxDistance = 60;
+  controls.update();
+
+  // Render-Schleife
+  let animId;
+  function animate() {
+    animId = requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  // Responsive: bei Größenänderung Kamera + Renderer anpassen
+  function onResize() {
+    const nw = col.clientWidth;
+    if (!nw || nw === renderer.domElement.width) return;
+    const nh = Math.round(nw / 1.45);
+    renderer.setSize(nw, nh);
+    camera.aspect = nw / nh;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', onResize);
+
+  karte3DScenes[n] = { renderer, scene, camera, controls, animId, onResize };
+}
+
+// ── Text-Sprite für 3D-Labels ──
+function makeTextSprite3D(text, hexColor) {
+  const c = document.createElement('canvas');
+  c.width = 80; c.height = 44;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#' + hexColor.toString(16).padStart(6,'0');
+  ctx.font = 'bold 28px Helvetica, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(text, 40, 32);
+  const mat = new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthTest: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(1.3, 0.7, 1);
+  return sprite;
+}
+
+// === Mini-Views injizieren (aufgabe-view Elemente innerhalb tasks-col) ===
+function renderMinis() {
+  document.querySelectorAll('[data-mini]').forEach(el => {
+    try {
+      const cfg = JSON.parse(el.getAttribute('data-mini'));
+      el.innerHTML = makeBlankGrid(cfg) + '<div class="mini-caption">Zeichenfeld</div>';
+    } catch(err) { console.error('Mini-View Fehler:', err, el); }
+  });
+}
+
+// === Edit-Modus ===
+const EDIT_STORAGE = 'kletterwald-geschichten-edits-v2';
+function editableSelector() { return '.erzaehlung, .aufgabe-content'; }
+function getBlocks() { return Array.from(document.querySelectorAll(editableSelector())); }
+
+function applySavedEdits() {
+  try {
+    const raw = localStorage.getItem(EDIT_STORAGE);
+    if (!raw) return;
+    const edits = JSON.parse(raw);
+    getBlocks().forEach((el, idx) => {
+      if (edits[idx] !== undefined) el.innerHTML = edits[idx];
+    });
+    if (window.renderMathInElement) renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});
+  } catch(e) { console.error(e); }
+}
+
+let editMode = false;
+function toggleEdit() {
+  editMode = !editMode;
+  document.body.classList.toggle('editing', editMode);
+  getBlocks().forEach(el => el.contentEditable = editMode ? 'true' : 'false');
+  document.getElementById('toggle-btn').textContent = editMode ? '👁 Vorschau' : '✏ Bearbeiten';
+  document.getElementById('save-btn').style.display = editMode ? 'inline-block' : 'none';
+  document.getElementById('edit-status').textContent = editMode ? 'Bearbeitungsmodus AN' : 'Vorschau';
+}
+function saveChanges() {
+  const edits = {};
+  getBlocks().forEach((el, idx) => { edits[idx] = el.innerHTML; });
+  localStorage.setItem(EDIT_STORAGE, JSON.stringify(edits));
+  document.getElementById('edit-status').textContent = 'Gespeichert um ' + new Date().toLocaleTimeString();
+}
+function resetText() {
+  if (!confirm('Alle Änderungen verwerfen?')) return;
+  localStorage.removeItem(EDIT_STORAGE); location.reload();
+}
+window.addEventListener('DOMContentLoaded', () => setTimeout(applySavedEdits, 300));
+</script>
+
+</body>
+</html>

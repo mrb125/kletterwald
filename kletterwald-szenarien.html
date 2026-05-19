@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Kletterwald — Geraden-Szenarien Q1 GK</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+<style>
+  @page { size: A4; margin: 14mm; }
+  body { font-family: 'Helvetica','Arial',sans-serif; max-width: 182mm; margin: 0 auto; color:#1a1a1a; line-height:1.42; font-size:10.5pt; }
+  h1 { color:#1a3a1a; border-bottom: 2px solid #2e6b2e; padding-bottom:4px; font-size:15pt; }
+  h2 { color:#2e6b2e; margin-top:1.4em; font-size:12.5pt; page-break-after:avoid; }
+  h3 { color:#444; font-size:10.5pt; margin: 0.8em 0 0.3em 0; }
+  .karte { border:1.4px solid #7aa874; border-left:6px solid #2e6b2e; border-radius:6px; padding:10px 14px; margin:14px 0; background:#f7fbf6; page-break-inside:avoid; }
+  .kontext { font-style:italic; color:#335533; margin-bottom:6px; }
+  .schwerpunkt { background:#2e6b2e; color:white; padding:1px 8px; border-radius:10px; font-size:9pt; font-weight:bold; margin-left:6px; }
+  .zwischen { background:#fff3b0; color:#806000; padding:1px 8px; border-radius:10px; font-size:9pt; font-weight:bold; margin-left:6px; }
+  .plattformtabelle { width:100%; border-collapse:collapse; font-size:9.5pt; margin:6px 0;}
+  .plattformtabelle th, .plattformtabelle td { border:1px solid #bbb; padding:3px 6px; text-align:center; }
+  .plattformtabelle th { background:#e5f0e0; }
+  .hi { background:#fff0f0; font-weight:bold; }
+  ol.aufgaben { padding-left:1.4em; margin:6px 0; }
+  ol.aufgaben > li { margin:5px 0; }
+  ol.aufgaben ul { margin:2px 0; padding-left:1.2em; }
+  .loesung { background:#f0f0f0; border-left:4px solid #777; padding:8px 12px; font-size:9.8pt; margin:8px 0; }
+  .loesung summary { cursor:pointer; font-weight:bold; color:#444; }
+  .hinweis { font-size:9.5pt; color:#555; font-style:italic; }
+  .merken { background:#fff8d0; border:1px solid #e6c870; padding:6px 10px; border-radius:4px; margin:6px 0; font-size:9.8pt; }
+  hr { border:none; border-top:1px dashed #aaa; margin:16px 0;}
+  @media print { .karte { background:white; } details { page-break-inside:avoid;} }
+</style>
+</head>
+<body>
+
+<h1>Kletterwald — Geraden im Raum (Q1 GK)</h1>
+<p>Die Vorlage <em>kletterwald-A1.svg</em> zeigt 8 Plattformen. Höhe $z$ wird durch die Spießlänge dargestellt. Maßstab: 1 LE = 3 cm.</p>
+
+<table class="plattformtabelle">
+  <thead><tr><th>Kürzel</th><th>Name</th><th>$x$</th><th>$y$</th><th>$z$</th><th>Hinweis</th></tr></thead>
+  <tbody>
+    <tr><td><strong>B</strong></td><td>Basislager</td><td>−4</td><td>−3</td><td>2</td><td>Eingang</td></tr>
+    <tr><td><strong>E</strong></td><td>Eichenturm</td><td>−7</td><td>3</td><td>3</td><td>links hinten</td></tr>
+    <tr><td><strong>F</strong></td><td>Fuchsbau</td><td>−1</td><td>7</td><td>5</td><td>hinten</td></tr>
+    <tr><td><strong>W</strong></td><td>Wurzelhütte</td><td>3</td><td>0</td><td>2</td><td>Mitte vorne</td></tr>
+    <tr><td><strong>R</strong></td><td>Rabenfels</td><td>5</td><td>−4</td><td>4</td><td>rechts unten</td></tr>
+    <tr class="hi"><td><strong>A</strong></td><td>Adlerhorst</td><td>1</td><td>2</td><td>6</td><td>hohe Plattform</td></tr>
+    <tr><td><strong>S</strong></td><td>Spechtnest</td><td>2</td><td>1</td><td>4</td><td>Zwischenstation</td></tr>
+    <tr class="hi"><td><strong>G</strong></td><td>Gipfelstation</td><td>8</td><td>5</td><td>6</td><td>höchste Plattform</td></tr>
+  </tbody>
+</table>
+
+<p class="hinweis">
+<span class="schwerpunkt">Geraden</span> Hauptthema des Szenarios &nbsp;
+<span class="zwischen">Grundlagen</span> Zwischenaufgabe zur Vorbereitung
+</p>
+
+<!-- ===================== SZENARIO 1 ===================== -->
+<div class="karte">
+<h2>Szenario 1: Der Hauptaufstieg <span class="schwerpunkt">Geradengleichung</span></h2>
+<p class="kontext">Vom <em>Basislager B</em> zur <em>Gipfelstation G</em> spannt sich das wichtigste Seil des Kletterwalds. Bevor du es beschreibst, brauchst du Ortsvektoren und den Verbindungsvektor.</p>
+
+<ol class="aufgaben">
+  <li><span class="zwischen">Grundlagen</span> Schreibe die Ortsvektoren $\vec{b}$ und $\vec{g}$ als Spaltenvektoren auf.</li>
+  <li><span class="zwischen">Grundlagen</span> Berechne den Verbindungsvektor $\vec{BG}$ und seine Länge $|\vec{BG}|$ (in LE und in cm).</li>
+  <li><strong>Stelle die Geradengleichung $g_{BG}$ in Parameterform</strong> auf — wähle $\vec{b}$ als Stützvektor.</li>
+  <li>Welche Punkte erhältst du für $t=0$, $t=\tfrac12$ und $t=1$? Was bedeuten sie physikalisch im Kletterwald?</li>
+  <li>Wie kannst du den <em>Richtungsvektor</em> noch wählen, ohne dass sich die Gerade ändert? Gib eine Alternative an.</li>
+</ol>
+
+<details class="loesung"><summary>Lösung 1</summary>
+<p>$\vec{b}=\begin{pmatrix}-4\\-3\\2\end{pmatrix}$, $\vec{g}=\begin{pmatrix}8\\5\\6\end{pmatrix}$. $\vec{BG}=\begin{pmatrix}12\\8\\4\end{pmatrix}$, $|\vec{BG}|=\sqrt{224}=4\sqrt{14}\approx 14{,}97$ LE $\approx 44{,}9$ cm. ·
+$g_{BG}:\vec{x}=\begin{pmatrix}-4\\-3\\2\end{pmatrix}+t\begin{pmatrix}12\\8\\4\end{pmatrix}$. ·
+$t=0\!:\!B$ (Start), $t=\tfrac12\!:\!(2|1|4)$ (Mitte zwischen B und G), $t=1\!:\!G$ (Ende). ·
+Alternative Richtung z.B. $\begin{pmatrix}3\\2\\1\end{pmatrix}=\tfrac14\vec{BG}$ — dann $t\in[0;4]$ für das Seil.</p>
+</details>
+</div>
+
+<!-- ===================== SZENARIO 2 ===================== -->
+<div class="karte">
+<h2>Szenario 2: Wer hängt am Hauptseil? <span class="schwerpunkt">Punktprobe</span></h2>
+<p class="kontext">Du vermutest, dass das Spechtnest S mitten am Hauptseil liegt. Stimmt das? Und welche anderen Plattformen liegen auf der <em>Geraden</em> (auch verlängert) durch B und G?</p>
+
+<ol class="aufgaben">
+  <li><span class="zwischen">Grundlagen</span> Berechne den <strong>Mittelpunkt</strong> $M$ der Strecke $\overline{BG}$.</li>
+  <li>Verwende die Gerade aus Szenario 1 mit Richtung $\begin{pmatrix}3\\2\\1\end{pmatrix}$:
+    $g:\vec{x}=\begin{pmatrix}-4\\-3\\2\end{pmatrix}+t\begin{pmatrix}3\\2\\1\end{pmatrix}$.
+    <ul>
+      <li>Liegt das <strong>Spechtnest S(2|1|4)</strong> auf $g$? Welcher $t$-Wert?</li>
+      <li>Liegt der <strong>Adlerhorst A(1|2|6)</strong> auf $g$?</li>
+      <li>Liegt die <strong>Wurzelhütte W(3|0|2)</strong> auf $g$?</li>
+    </ul>
+  </li>
+  <li>Welche Plattformen hängen also am Seil B→G (zwischen oder auf seiner Verlängerung)?</li>
+  <li><span class="zwischen">Grundlagen</span> Vergleiche $S$ mit dem Mittelpunkt $M$ aus Aufgabe 1. Was fällt auf?</li>
+</ol>
+
+<div class="merken">
+<strong>Merken:</strong> Eine Punktprobe heißt: Ich setze den Punkt in $\vec{x}$ ein, löse <em>eine</em> Zeile nach $t$ auf und prüfe mit den anderen Zeilen, ob dasselbe $t$ herauskommt.
+</div>
+
+<details class="loesung"><summary>Lösung 2</summary>
+<p>$M=\tfrac12(\vec{b}+\vec{g})=(2|1|4)=S$. ·
+$S$: $-4+3t=2\Rightarrow t=2$, Probe: $-3+4=1$ ✓, $2+2=4$ ✓. <strong>S liegt auf $g$</strong> (bei $t=2$, also genau in der Mitte zwischen B (t=0) und G (t=4)). ·
+$A(1|2|6)$: $-4+3t=1\Rightarrow t=\tfrac53$. Probe: $-3+\tfrac{10}{3}=\tfrac{1}{3}\ne 2$ ✗ — nicht auf $g$. ·
+$W(3|0|2)$: $-4+3t=3\Rightarrow t=\tfrac73$. Probe: $-3+\tfrac{14}{3}=\tfrac{5}{3}\ne 0$ ✗. ·
+Nur S liegt auf dem Hauptseil — und zwar genau in der Mitte. Spechtnest = Mittelpunkt.</p>
+</details>
+</div>
+
+<!-- ===================== SZENARIO 3 ===================== -->
+<div class="karte">
+<h2>Szenario 3: Zwei Seile kreuzen sich <span class="schwerpunkt">Schnittpunkt</span></h2>
+<p class="kontext">Ein zweites Seil verbindet die Wurzelhütte W mit dem Adlerhorst A. Du hast das Gefühl, es kreuzt das Hauptseil — aber wo genau?</p>
+
+<ol class="aufgaben">
+  <li><span class="zwischen">Grundlagen</span> Berechne $\vec{WA}$ und $|\vec{WA}|$.</li>
+  <li>Stelle die Geradengleichung $g_{WA}$ in Parameterform auf (Parameter $s$).</li>
+  <li><strong>Untersuche, ob $g_{BG}$ und $g_{WA}$ sich schneiden.</strong> Setze die Gleichungen gleich und löse das LGS.</li>
+  <li>Bestimme den Schnittpunkt $S^*$ und vergleiche ihn mit dem Spechtnest. Was beobachtest du?</li>
+  <li><span class="zwischen">Grundlagen</span> Welcher Anteil des Seils $\overline{WA}$ liegt zwischen Wurzelhütte und Schnittpunkt? (Bestimme $s$ und interpretiere.)</li>
+</ol>
+
+<details class="loesung"><summary>Lösung 3</summary>
+<p>$\vec{WA}=\begin{pmatrix}-2\\2\\4\end{pmatrix}$, $|\vec{WA}|=\sqrt{24}=2\sqrt{6}\approx 4{,}90$ LE. ·
+$g_{WA}:\vec{x}=\begin{pmatrix}3\\0\\2\end{pmatrix}+s\begin{pmatrix}-2\\2\\4\end{pmatrix}$. ·
+Mit $g_{BG}$ (Richtung $(3,2,1)$, Parameter $t$):
+$-4+3t=3-2s$ → $3t+2s=7$ · $-3+2t=2s$ → $2t-2s=3$ · Addieren: $5t=10\Rightarrow t=2$, dann $s=\tfrac12$. ·
+Probe in $z$: $2+t=4$ ✓ und $2+4s=4$ ✓. Schnittpunkt $S^*=(2|1|4)$ — <strong>das ist genau das Spechtnest</strong>. ·
+$s=\tfrac12$: Der Schnittpunkt liegt in der Mitte zwischen W und A — das Spechtnest halbiert auch das Seil $\overline{WA}$.</p>
+</details>
+</div>
+
+<!-- ===================== SZENARIO 4 ===================== -->
+<div class="karte">
+<h2>Szenario 4: Parallele Seile <span class="schwerpunkt">Parallelität</span></h2>
+<p class="kontext">Vom Eichenturm E spannt ein weiteres Seil zum Fuchsbau F. Eine erste Sichtkontrolle: sieht es nicht parallel zum Hauptseil aus?</p>
+
+<ol class="aufgaben">
+  <li><span class="zwischen">Grundlagen</span> Berechne $\vec{EF}$.</li>
+  <li>Zeige, dass $\vec{EF}$ ein <strong>Vielfaches</strong> des Richtungsvektors von $g_{BG}$ ist. Welcher Faktor?</li>
+  <li>Folgere: Sind $g_{EF}$ und $g_{BG}$ parallel oder identisch? (Tipp: Mache eine Punktprobe für $E$ auf $g_{BG}$.)</li>
+  <li><span class="zwischen">Grundlagen</span> Vergleiche die Längen $|\vec{BG}|$ und $|\vec{EF}|$. Welches Seil ist länger und um wie viel cm?</li>
+  <li>Wenn $g_{BG}\parallel g_{EF}$ und die Punkte $B,E,F,G$ damit in einer Ebene liegen — bilden BEFG ein Parallelogramm? Begründe per Vektor.</li>
+</ol>
+
+<details class="loesung"><summary>Lösung 4</summary>
+<p>$\vec{EF}=\begin{pmatrix}6\\4\\2\end{pmatrix}=2\begin{pmatrix}3\\2\\1\end{pmatrix}$ → Vielfaches mit Faktor 2 der Richtung von $g_{BG}$. ·
+Punktprobe $E(-7|3|3)$ auf $g_{BG}$: $-4+3t=-7\Rightarrow t=-1$. Probe $-3+2(-1)=-5\ne 3$ ✗. E liegt NICHT auf $g_{BG}$ → die beiden Geraden sind <strong>echt parallel</strong> (nicht identisch). ·
+$|\vec{BG}|=\sqrt{224}\approx 14{,}97$ LE, $|\vec{EF}|=\sqrt{56}\approx 7{,}48$ LE. Differenz $\approx 7{,}48$ LE = $22{,}4$ cm. BG ist doppelt so lang wie EF. ·
+Parallelogramm BEFG erfordert $\vec{BE}=\vec{GF}$. $\vec{BE}=(-3,6,1)$, $\vec{GF}=(-9,2,-1)$ — nicht gleich. Also <strong>kein Parallelogramm</strong>; nur ein Trapez (zwei parallele, aber ungleich lange Seiten).</p>
+</details>
+</div>
+
+<!-- ===================== SZENARIO 5 ===================== -->
+<div class="karte">
+<h2>Szenario 5: Windschiefe Seile <span class="schwerpunkt">Lagebeziehung</span></h2>
+<p class="kontext">Manche Seile sehen so aus, als müssten sie sich kreuzen — tun sie aber nicht. Sie verlaufen <em>aneinander vorbei</em>.</p>
+
+<ol class="aufgaben">
+  <li>Untersuche die Lagebeziehung der Seile $\overline{AR}$ (Adlerhorst → Rabenfels) und $\overline{EW}$ (Eichenturm → Wurzelhütte):
+    <ul>
+      <li><span class="zwischen">Grundlagen</span> Berechne $\vec{AR}$ und $\vec{EW}$.</li>
+      <li><strong>Parallel?</strong> Sind die Richtungsvektoren Vielfache voneinander?</li>
+      <li>Stelle beide Geradengleichungen auf und prüfe per LGS, ob sie sich schneiden.</li>
+      <li>Folgere die Lagebeziehung.</li>
+    </ul>
+  </li>
+  <li>Wiederhole das Verfahren für die Seile $\overline{BR}$ und $\overline{EF}$.</li>
+</ol>
+
+<div class="merken">
+<strong>Entscheidungsbaum:</strong> Richtungsvektoren Vielfache? <em>Ja</em> → parallel oder identisch (Punktprobe!). <em>Nein</em> → LGS lösen: Lösung existiert → schneidend; keine Lösung → <strong>windschief</strong>.
+</div>
+
+<details class="loesung"><summary>Lösung 5</summary>
+<p><strong>(a) AR vs. EW:</strong> $\vec{AR}=(4,-6,-2)$, $\vec{EW}=(10,-3,-1)$. $(4,-6,-2)\ne k(10,-3,-1)$ (z.B. $4=10k\Rightarrow k=0{,}4$, aber $-6\ne -1{,}2$) → nicht parallel. ·
+LGS: $1+4t=-7+10s$, $2-6t=3-3s$, $6-2t=3-s$.
+Aus 3.: $s=2t-3$. In 2.: $2-6t=3-3(2t-3)=12-6t\Rightarrow 2=12$ ✗ keine Lösung → <strong>windschief</strong>. ·
+<strong>(b) BR vs. EF:</strong> $\vec{BR}=(9,-1,2)$, $\vec{EF}=(6,4,2)$. $(9,-1,2)$ kein Vielfaches von $(6,4,2)$ → nicht parallel.
+LGS: $-4+9t=-7+6s$ → $9t-6s=-3$ · $-3-t=3+4s$ → $-t-4s=6$ · $2+2t=3+2s$ → $2t-2s=1$.
+Aus 3.: $t=s+\tfrac12$. In 1.: $9s+\tfrac{9}{2}-6s=-3\Rightarrow 3s=-\tfrac{15}{2}\Rightarrow s=-\tfrac{5}{2}$, $t=-2$.
+Probe in 2.: $-(-2)-4\cdot(-\tfrac52)=2+10=12\ne 6$ ✗ → keine Lösung → <strong>windschief</strong>.</p>
+</details>
+</div>
+
+<!-- ===================== SZENARIO 6 ===================== -->
+<div class="karte">
+<h2>Szenario 6: Spurpunkte mit dem Boden <span class="schwerpunkt">Spurpunkt</span></h2>
+<p class="kontext">Du verlängerst gedanklich ein Seil, bis es den Boden ($z=0$) trifft. <em>Wo</em> würde es einschlagen?</p>
+
+<ol class="aufgaben">
+  <li><span class="zwischen">Grundlagen</span> Schreibe die Geradengleichung des Seils vom Adlerhorst A zur Wurzelhütte W auf.</li>
+  <li>Bestimme den <strong>Spurpunkt</strong> $S_{xy}$ von $g_{AW}$ mit der $xy$-Ebene ($z=0$).</li>
+  <li>Liegt $S_{xy}$ innerhalb der Anlage (Bereich $-13\le x\le 13$, $-8\le y\le 8$)?</li>
+  <li>Bestimme analog den Spurpunkt von $g_{EF}$ mit der Ebene $y=0$. Welche $z$-Höhe hat dieser Punkt?</li>
+  <li><span class="zwischen">Grundlagen</span> Was ist der geometrische Unterschied zwischen einem Spurpunkt und einem Schnittpunkt zweier Geraden?</li>
+</ol>
+
+<details class="loesung"><summary>Lösung 6</summary>
+<p>$g_{AW}:\vec{x}=\begin{pmatrix}1\\2\\6\end{pmatrix}+t\begin{pmatrix}2\\-2\\-4\end{pmatrix}$. ·
+$z=0$: $6-4t=0\Rightarrow t=\tfrac{3}{2}$. Punkt $S_{xy}=(1+3, 2-3, 0)=(4|-1|0)$. ✓ liegt innerhalb der Anlage. ·
+$g_{EF}:\vec{x}=\begin{pmatrix}-7\\3\\3\end{pmatrix}+t\begin{pmatrix}6\\4\\2\end{pmatrix}$. $y=0$: $3+4t=0\Rightarrow t=-\tfrac34$. Punkt: $(-7-\tfrac{18}{4}, 0, 3-\tfrac{6}{4})=(-\tfrac{23}{2}|0|\tfrac{3}{2})$. ·
+Spurpunkt: Schnitt einer Geraden mit einer <em>Ebene</em> (Boden oder Wand). Schnittpunkt: Schnitt <em>zweier Geraden</em>.</p>
+</details>
+</div>
+
+<!-- ===================== SZENARIO 7 ===================== -->
+<div class="karte">
+<h2>Szenario 7: Routenplanung zur Gipfelstation <span class="schwerpunkt">Geraden + Längen</span></h2>
+<p class="kontext">Vier Routen vom Basislager B zur Gipfelstation G stehen zur Wahl. Welche ist die kürzeste?</p>
+
+<ol class="aufgaben">
+  <li><strong>Route 1 (direkt):</strong> B → G. Länge?</li>
+  <li><strong>Route 2 (über Spechtnest):</strong> B → S → G.
+    <ul>
+      <li><span class="zwischen">Grundlagen</span> Berechne $|\vec{BS}|$ und $|\vec{SG}|$ einzeln.</li>
+      <li>Was fällt auf? Begründe ohne erneutes Rechnen, warum diese Route gleich lang sein muss wie Route 1.</li>
+    </ul>
+  </li>
+  <li><strong>Route 3 (über die Wurzelhütte):</strong> B → W → G. Berechne die Gesamtlänge.</li>
+  <li><strong>Route 4 (Umweg über das Rabenfels und den Adlerhorst):</strong> B → R → A → G. Gesamtlänge?</li>
+  <li>Sortiere alle vier Routen nach Länge. Was lehrt die Dreiecksungleichung?</li>
+</ol>
+
+<details class="loesung"><summary>Lösung 7</summary>
+<p><strong>R1:</strong> $|BG|=\sqrt{224}\approx 14{,}97$ LE. ·
+<strong>R2:</strong> $|BS|=\sqrt{36+16+4}=\sqrt{56}\approx 7{,}48$, $|SG|=\sqrt{36+16+4}=\sqrt{56}\approx 7{,}48$. Summe $\approx 14{,}97$ — <em>exakt gleich</em>, weil S auf der Geraden BG liegt (Mittelpunkt). Eine Strecke über einen Zwischenpunkt auf <em>derselben Geraden</em> ist genauso lang wie die direkte Strecke. ·
+<strong>R3:</strong> $|BW|=\sqrt{49+9+0}=\sqrt{58}\approx 7{,}62$, $|WG|=\sqrt{25+25+16}=\sqrt{66}\approx 8{,}12$. Summe $\approx 15{,}74$. ·
+<strong>R4:</strong> $|BR|=\sqrt{81+1+4}=\sqrt{86}\approx 9{,}27$, $|RA|=\sqrt{16+36+4}=\sqrt{56}\approx 7{,}48$, $|AG|=\sqrt{49+9+0}=\sqrt{58}\approx 7{,}62$. Summe $\approx 24{,}37$. ·
+Sortiert: R1 = R2 (≈14,97) < R3 (≈15,74) < R4 (≈24,37) LE. Dreiecksungleichung: Ein echter Umweg über einen Punkt <em>außerhalb</em> der Geraden ist immer länger als die direkte Strecke.</p>
+</details>
+</div>
+
+<hr>
+<p class="hinweis"><strong>Bauanleitung-Erinnerung:</strong> A1-Druck auf XPS-Hartschaum (80 × 60 cm × 3 cm) kleben. Holzspieße auf Länge $z\cdot 3$ cm schneiden ($z=2 → 6$ cm; $z=6 → 18$ cm; $z=8 → 24$ cm). Seile mit buntem Bastelgarn — verschiedene Farben für die Szenarien (Hauptseil rot, Speichen blau, Spezial gelb).</p>
+
+</body>
+</html>

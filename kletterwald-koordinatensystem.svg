@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Kletterwald A4 Querformat, 1 LE = 1 cm, x: -12..12, y: -8..8 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 297 210">
+  <defs>
+    <style>
+      .grid-minor { stroke:#d8e6d4; stroke-width:0.12; fill:none; }
+      .grid-major { stroke:#7aa874; stroke-width:0.3; fill:none; }
+      .axis      { stroke:#1a3a1a; stroke-width:0.8; fill:none; }
+      .tick      { font: 2.6px 'Helvetica', sans-serif; fill:#1a3a1a; }
+      .baum      { fill:#2e6b2e; stroke:#1a3a1a; stroke-width:0.35; }
+      .baum-z    { fill:#c44; stroke:#1a3a1a; stroke-width:0.3; }
+      .label     { font: 3.5px 'Helvetica', sans-serif; font-weight:bold; fill:#1a3a1a; }
+      .sublabel  { font: 2.5px 'Helvetica', sans-serif; fill:#444; }
+      .title     { font: 5px 'Helvetica', sans-serif; font-weight:bold; fill:#1a3a1a; }
+      .legend    { font: 3px 'Helvetica', sans-serif; fill:#1a3a1a; }
+    </style>
+    <pattern id="minorGrid" width="2.5" height="2.5" patternUnits="userSpaceOnUse">
+      <path d="M 2.5 0 L 0 0 0 2.5" class="grid-minor"/>
+    </pattern>
+    <pattern id="majorGrid" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path d="M 10 0 L 0 0 0 10" class="grid-major"/>
+    </pattern>
+  </defs>
+
+  <rect x="0" y="0" width="297" height="210" fill="white"/>
+
+  <text x="15" y="9" class="title">Kletterwald — Koordinatensystem mit allen 4 Quadranten (1 LE = 1 cm)</text>
+
+  <!-- Origin (0|0) at page coord (148.5, 105). Plot: x: -12..12 → ±120mm, y: -8..8 → ±80mm -->
+  <g transform="translate(148.5,105)">
+    <!-- Plot-Hintergrund mit Raster (Pattern alignt auf Origin) -->
+    <rect x="-120" y="-80" width="240" height="160" fill="url(#minorGrid)"/>
+    <rect x="-120" y="-80" width="240" height="160" fill="url(#majorGrid)"/>
+
+    <!-- Achsen durch Origin -->
+    <line x1="-125" y1="0" x2="125" y2="0" class="axis"/>
+    <line x1="0" y1="85" x2="0" y2="-85" class="axis"/>
+    <polygon points="125,0 121,-1.3 121,1.3" fill="#1a3a1a"/>
+    <polygon points="0,-85 -1.3,-81 1.3,-81" fill="#1a3a1a"/>
+    <text x="128" y="2" class="label">x</text>
+    <text x="-3" y="-87" class="label">y</text>
+
+    <!-- x-Ticks (y-Werte negativ = oben in SVG) -->
+    <g>
+      <text x="-120" y="4" class="tick" text-anchor="middle">-12</text>
+      <text x="-110" y="4" class="tick" text-anchor="middle">-11</text>
+      <text x="-100" y="4" class="tick" text-anchor="middle">-10</text>
+      <text x="-90"  y="4" class="tick" text-anchor="middle">-9</text>
+      <text x="-80"  y="4" class="tick" text-anchor="middle">-8</text>
+      <text x="-70"  y="4" class="tick" text-anchor="middle">-7</text>
+      <text x="-60"  y="4" class="tick" text-anchor="middle">-6</text>
+      <text x="-50"  y="4" class="tick" text-anchor="middle">-5</text>
+      <text x="-40"  y="4" class="tick" text-anchor="middle">-4</text>
+      <text x="-30"  y="4" class="tick" text-anchor="middle">-3</text>
+      <text x="-20"  y="4" class="tick" text-anchor="middle">-2</text>
+      <text x="-10"  y="4" class="tick" text-anchor="middle">-1</text>
+      <text x="10"   y="4" class="tick" text-anchor="middle">1</text>
+      <text x="20"   y="4" class="tick" text-anchor="middle">2</text>
+      <text x="30"   y="4" class="tick" text-anchor="middle">3</text>
+      <text x="40"   y="4" class="tick" text-anchor="middle">4</text>
+      <text x="50"   y="4" class="tick" text-anchor="middle">5</text>
+      <text x="60"   y="4" class="tick" text-anchor="middle">6</text>
+      <text x="70"   y="4" class="tick" text-anchor="middle">7</text>
+      <text x="80"   y="4" class="tick" text-anchor="middle">8</text>
+      <text x="90"   y="4" class="tick" text-anchor="middle">9</text>
+      <text x="100"  y="4" class="tick" text-anchor="middle">10</text>
+      <text x="110"  y="4" class="tick" text-anchor="middle">11</text>
+      <text x="120"  y="4" class="tick" text-anchor="middle">12</text>
+    </g>
+    <!-- y-Ticks -->
+    <g>
+      <text x="-2" y="-79" class="tick" text-anchor="end">8</text>
+      <text x="-2" y="-69" class="tick" text-anchor="end">7</text>
+      <text x="-2" y="-59" class="tick" text-anchor="end">6</text>
+      <text x="-2" y="-49" class="tick" text-anchor="end">5</text>
+      <text x="-2" y="-39" class="tick" text-anchor="end">4</text>
+      <text x="-2" y="-29" class="tick" text-anchor="end">3</text>
+      <text x="-2" y="-19" class="tick" text-anchor="end">2</text>
+      <text x="-2" y="-9"  class="tick" text-anchor="end">1</text>
+      <text x="-2" y="11"  class="tick" text-anchor="end">-1</text>
+      <text x="-2" y="21"  class="tick" text-anchor="end">-2</text>
+      <text x="-2" y="31"  class="tick" text-anchor="end">-3</text>
+      <text x="-2" y="41"  class="tick" text-anchor="end">-4</text>
+      <text x="-2" y="51"  class="tick" text-anchor="end">-5</text>
+      <text x="-2" y="61"  class="tick" text-anchor="end">-6</text>
+      <text x="-2" y="71"  class="tick" text-anchor="end">-7</text>
+      <text x="-2" y="81"  class="tick" text-anchor="end">-8</text>
+    </g>
+    <text x="-2" y="4" class="tick" text-anchor="end">0</text>
+
+    <!-- Bäume: SVG-Koord = (x*10, -y*10) mm -->
+    <!-- Quadrat ABCD in z=3 zentriert um Ursprung -->
+    <!-- A(-3|-3|3) -->
+    <g transform="translate(-30,30)"><circle r="1.6" class="baum"/><text x="2.5" y="-1.5" class="label">A</text><text x="2.5" y="2" class="sublabel">(-3|-3|3)</text></g>
+    <!-- B(3|-3|3) -->
+    <g transform="translate(30,30)"><circle r="1.6" class="baum"/><text x="2.5" y="-1.5" class="label">B</text><text x="2.5" y="2" class="sublabel">(3|-3|3)</text></g>
+    <!-- C(3|3|3) -->
+    <g transform="translate(30,-30)"><circle r="1.6" class="baum"/><text x="2.5" y="-1.5" class="label">C</text><text x="2.5" y="2" class="sublabel">(3|3|3)</text></g>
+    <!-- D(-3|3|3) -->
+    <g transform="translate(-30,-30)"><circle r="1.6" class="baum"/><text x="2.5" y="-1.5" class="label">D</text><text x="2.5" y="2" class="sublabel">(-3|3|3)</text></g>
+    <!-- E(0|0|7) Adlerhorst über Ursprung -->
+    <g transform="translate(0,0)"><circle r="2.2" class="baum-z"/><text x="3" y="-1.5" class="label">E</text><text x="3" y="2" class="sublabel">(0|0|7) Adlerhorst</text></g>
+    <!-- F(8|-4|5) -->
+    <g transform="translate(80,40)"><circle r="1.6" class="baum"/><text x="2.5" y="-1.5" class="label">F</text><text x="2.5" y="2" class="sublabel">(8|-4|5)</text></g>
+    <!-- G(-8|5|4) -->
+    <g transform="translate(-80,-50)"><circle r="1.6" class="baum"/><text x="2.5" y="-1.5" class="label">G</text><text x="2.5" y="2" class="sublabel">(-8|5|4)</text></g>
+    <!-- H(10|6|9) Gipfel -->
+    <g transform="translate(100,-60)"><circle r="2.2" class="baum-z"/><text x="3" y="-1.5" class="label">H</text><text x="3" y="2" class="sublabel">(10|6|9) Gipfel</text></g>
+  </g>
+
+  <!-- Legende -->
+  <g transform="translate(15,204)">
+    <circle cx="2" cy="-2" r="1.6" class="baum"/>
+    <text x="6" y="-1" class="legend">Plattform (Spießposition, z = Spießhöhe in cm)</text>
+    <circle cx="100" cy="-2" r="2.2" class="baum-z"/>
+    <text x="104" y="-1" class="legend">hohe Plattform</text>
+    <text x="200" y="-1" class="legend">Maßstab: 1 LE = 1 cm (100 % drucken!)</text>
+  </g>
+</svg>
